@@ -1,0 +1,141 @@
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+a{
+    color: black;
+}
+:root {
+    --left-sidebar-width: 8vmin;
+    --left-sidebar-icon-height: 10vmin;
+    --sidebar-icon-width-height: 4vmin;
+}
+
+.left-sidebar {
+    width: var(--left-sidebar-width);
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: black;
+}
+.sidebar-icon a {
+    width: calc(var(--left-sidebar-width) - 2vmin);
+    height: var(--left-sidebar-icon-height);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 10px;
+}
+.sidebar-icon:hover {
+    background-color: rgb(197, 197, 197);
+}
+.sidebar-icon p {
+    font-size: 0.6rem;
+}
+.sidebar-icon:not(:first-child) svg {
+    width: var(--sidebar-icon-width-height);
+    height: var(--sidebar-icon-width-height);
+}
+.sidebar-icon .sidebar-icon-menu {
+    height: 6vmin;
+    width: 6vmin;
+    border-radius: 50%;
+}
+
+.video-section {
+    margin-left: calc(var(--left-sidebar-width) + 10px);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    place-items: center center;
+}
+@media (min-width: 900px) {
+    .video-section {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+}
+
+.video-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+}
+
+.thumbnail {
+    width: 100%;
+    aspect-ratio: 16/9;
+    position: relative;
+}
+.thumbnail::before{
+    content: attr(data-duration);
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    padding: 3px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
+.thumbnail-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+.video-infos {
+    display: flex;
+    flex-basis: auto;
+    margin-top: 10px;
+}
+
+.video-title {
+    margin-bottom: 10px;
+    color: black;
+    font-size: 1rem;
+}
+
+.channel-name {
+    margin-bottom: 0.5vmin;
+    font-size: 0.9rem;
+    color: rgb(41, 41, 41);
+}
+.channel-name:hover {
+    color: rgb(124, 124, 124);
+}
+.video-metadata {
+    font-size: 0.9rem;
+    color: grey;
+}
+
+.user-icon {
+    align-self: flex-start;
+    border-radius: 50%;
+    margin-right: 2vmin;
+}
+
+.vertical-dots {
+    opacity: 0;
+    margin: -2vmin 0;
+    align-self: flex-start;
+}
+.video-infos:hover {
+    .vertical-dots{
+        opacity: 1;
+    }
+}
