@@ -11,14 +11,135 @@ a{
     color: black;
 }
 :root {
-    --left-sidebar-width: 8vmin;
-    --left-sidebar-icon-height: 10vmin;
+    --left-sidebar-width: 10vmin;
+    --left-sidebar-icon-height: 12vmin;
     --sidebar-icon-width-height: 4vmin;
+    --top-bar-height: 80px;
+    --btn-hover-bg-color: rgb(197, 197, 197);
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    padding-right: 30px;
+    display: grid;
+    grid-template-columns: var(--left-sidebar-width) 1fr;
+    grid-template-rows: minmax(min-content, max-content) 1fr;
+    grid-template-areas: "b b"
+    "a c";
+    gap: 2rem;
+}
+
+.top-bar {
+    grid-area: b;
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
+    grid-auto-flow: column;
+    align-items: center;
+    position: fixed;
+    width: calc(100vw - 17px);
+    height: var(--top-bar-height);
+    z-index: 2;
+    background-color: white;
+    padding-right: 30px;
+}
+.top-bar-left-side {
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    gap: 20px
+}
+.top-bar-icon-menu {
+    margin-left: 15px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+.sidebar-icon-menu:hover {
+    background-color: var(--btn-hover-bg-color);
+}
+.sidebar-icon-menu svg {
+    height: 30px;
+    width: 30px;
+}
+.youtube-logo {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.youtube-logo svg {
+    width: 30px;
+    height: 30px;
+}
+.search-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+}
+.search-input {
+    width: clamp(200px, 100%, 500px);
+    height: 40px;
+    border-radius: 100px 0 0 100px;
+    padding-left: 20px;
+    border: 0.5px solid var(--btn-hover-bg-color);
+    justify-self: flex-start;
+}
+.search-btn {
+    height: 40px;
+    width: 41px;
+    border-radius: 0 100px 100px 0;
+    cursor: pointer;
+    border: 0.5px solid var(--btn-hover-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 5px;
+}
+.voice-btn {
+    margin-left: 20px;
+    background-color: rgb(215, 215, 215);
+}
+.voice-btn:hover {
+    background-color: var(--btn-hover-bg-color);
+}
+.top-bar-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 0px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.current-user-related {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.current-user-related .top-bar-btn {
+    background-color: transparent;
+}
+.current-user-related .top-bar-btn:hover {
+    background-color: var(--btn-hover-bg-color);
+}
+
+.current-user-icon {
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 .left-sidebar {
+    grid-area: a;
+    margin-top: var(--top-bar-height);
     width: var(--left-sidebar-width);
-    height: 100vh;
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -26,35 +147,35 @@ a{
     gap: 3px;
     color: black;
 }
+.sidebar-icon {
+    border-radius: 10px;
+}
 .sidebar-icon a {
-    width: calc(var(--left-sidebar-width) - 2vmin);
+    width: var(--left-sidebar-width);
     height: var(--left-sidebar-icon-height);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    border-radius: 10px;
 }
 .sidebar-icon:hover {
-    background-color: rgb(197, 197, 197);
+    background-color: var(--btn-hover-bg-color);
 }
 .sidebar-icon p {
     font-size: 0.6rem;
 }
-.sidebar-icon:not(:first-child) svg {
+.sidebar-icon svg {
     width: var(--sidebar-icon-width-height);
     height: var(--sidebar-icon-width-height);
 }
-.sidebar-icon .sidebar-icon-menu {
-    height: 6vmin;
-    width: 6vmin;
-    border-radius: 50%;
-}
+
 
 .video-section {
     margin-left: calc(var(--left-sidebar-width) + 10px);
+    margin-top: calc(var(--top-bar-height));
     display: grid;
+    width: calc(100vw - var(--left-sidebar-width) - 40px);
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1rem;
     place-items: center center;
@@ -137,5 +258,17 @@ a{
 .video-infos:hover {
     .vertical-dots{
         opacity: 1;
+    }
+}
+
+
+
+@media(max-width: 760px) {
+    .left-sidebar {
+        display: none;
+    }
+    .video-section {
+        width: calc(100vw - 40px);
+        margin-left: 10px;
     }
 }
