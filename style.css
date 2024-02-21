@@ -102,8 +102,9 @@ body {
     padding-right: 5px;
 }
 .voice-btn {
-    margin-left: 20px;
-    background-color: rgb(215, 215, 215);
+    margin-left: 10px;
+    background-color: rgb(236, 236, 236);
+    justify-self: flex-end;
 }
 .voice-btn:hover {
     background-color: var(--btn-hover-bg-color);
@@ -270,5 +271,28 @@ body {
     .video-section {
         width: calc(100vw - 40px);
         margin-left: 10px;
+    }
+}
+@media(max-width: 760px) {
+    .search-bar {
+        justify-self: flex-end;
+    }
+    .search-input {
+        display: none;
+    }
+    .search-btn {
+        border-radius: 50%;
+        border: none;
+        background-color: transparent;
+    }
+    .search-btn:hover {
+        background-color: var(--btn-hover-bg-color);
+    }
+    .voice-btn {
+        margin-left: 0;
+        background-color: transparent;
+    }
+    .voice-btn:hover {
+        background-color: var(--btn-hover-bg-color);
     }
 }
