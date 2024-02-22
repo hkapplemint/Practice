@@ -2,26 +2,30 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    user-select: none;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
+body {
+    background-color: #242222;
+}
 
 
 #main-container {
     display: flex;
     flex-direction: column;
-    width: 90vw;
-    padding: 30px;
-    margin: 30px 0;
+    padding: 15px;
     gap: 10px;
-    background-color: grey;
 }
 
 .tier-bracket {
+    display: grid;
+    grid-template-columns: min-content 1fr min-content;
     align-items: center;
-    width: 90%;
+    width: 95%;
     min-height: 120px;
-    background-color: lightgrey;
-    border: 2px solid black;
+    background-color: #252d32;
+    border: 2px solid #000000;
 }
 
 .tier-name {
@@ -36,19 +40,39 @@
 
 .tier-container {
     display: flex;
-
     flex-wrap: wrap;
     
     min-height: 100px;
-    /* width: calc(100% - 100px); */
     margin: 0 10px;
-    border: 2px solid blue;
+}
+
+.action-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center center;
+    height: 100%;
+    gap: 5px;
+    padding-inline: 10px;
+    background-color: #000000;
+}
+
+.setting {
+    height: 40px;
+    width: 40px;
+    fill: white;
+    cursor: pointer;
+}
+.move-row {
+    width: 40px;
+    height: 100%;
+    cursor: move;
 }
 
 .participant {
     cursor: move;
     min-width: 0;
     max-width: 90px;
+    border-radius: 5px;
     align-self: center;
     object-fit: cover;
     object-position: center;
