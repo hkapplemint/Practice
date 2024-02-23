@@ -1,12 +1,28 @@
-const tierContainers = document.querySelectorAll(".tier-container");
 let tierBrackets = document.querySelectorAll(".tier-bracket");
+let tierNames = document.querySelectorAll(".tier-name");
+let tierContainers = document.querySelectorAll(".tier-container");
+let settings = document.querySelectorAll(".setting");
 const participants = document.querySelectorAll(".participant");
-const settings = document.querySelectorAll(".setting");
-const moveControls = document.querySelectorAll(".move-row");
 const brackets = document.querySelector(".brackets");
-const tierNames = document.querySelectorAll(".tier-name");
 const body = document.getElementById("body");
 const tierNotRanked = document.getElementById("tier-not-ranked");
+const editWrapper = document.getElementById("edit-wrapper");
+const editDiv = document.getElementById("edit-div");
+const editCloseBtn = document.getElementById("edit-close-btn");
+const nameTextArea = document.getElementById("name-textarea");
+const applyBtn = document.getElementById("option-apply");
+const clearBtn = document.getElementById("option-clear");
+const deleteBtn = document.getElementById("option-delete");
+const addRowAboveBtn = document.getElementById("option-add-row-above");
+const addRowBelowBtn = document.getElementById("option-add-row-below");
+
+let indexOfCurrentSetting = 999;
+
+
+function closeAll() {
+    editDiv.style.display = "none";
+    editWrapper.style.display = "none";
+}
 
 const defaultColorsForTier = [
     "#ff7f7f",
@@ -20,6 +36,12 @@ const defaultColorsForTier = [
     "#7f7fff",
     "#ff7fff"
 ]
+
+tierNames.forEach( (tierName, index) => {
+    if(defaultColorsForTier[index]) {
+        tierName.style.backgroundColor = defaultColorsForTier[index]
+    }
+})
 
 participants.forEach( participant => {
     participant.addEventListener("dragstart", () => {
@@ -63,44 +85,7 @@ function addDragOverForEachTierContainer(arr) {
 }
 addDragOverForEachTierContainer(tierContainers);
 
-// function createDiv() {
-//     const lmao = document.createElement("div");
-//     lmao.classList.add("tier-bracket");
 
-//     tierBrackets = document.querySelectorAll(".tier-bracket");
-//     addDragOverForEachTierContainer()
-// }
-
-
-
-// tierContainers.forEach( tierContainer => {
-
-//     tierContainer.addEventListener("dragover", event => {
-//         event.preventDefault();
-
-//         const imgElementBeingDragged = document.querySelector(".participant.dragging")
-//         const tierBracketElementBeingDragged = document.querySelector(".tier-bracket.dragging")
-//         if (imgElementBeingDragged){
-//             const indexOfTargetElement = getIndexToInsert(tierContainer, event.clientX, event.clientY);
-    
-//             if (tierContainer.children[indexOfTargetElement]) {
-//                 const afterElement = tierContainer.children[indexOfTargetElement];
-//                 tierContainer.insertBefore(imgElementBeingDragged, afterElement);
-//             } else {
-//                 tierContainer.append(imgElementBeingDragged);
-//             }
-//         } else if (tierBracketElementBeingDragged) {
-//             const indexOfTargetElement = getIndexToInsert(brackets, event.clientX, event.clientY);
-    
-//             if (brackets.children[indexOfTargetElement]) {
-//                 const afterElement = brackets.children[indexOfTargetElement];
-//                 brackets.insertBefore(tierBracketElementBeingDragged, afterElement);
-//             } else {
-//                 brackets.append(tierBracketElementBeingDragged);
-//             }
-//         }
-//     })
-// })
 
 function getIndexToInsert(container, clientX, clientY) {
     const elementsInThisContainer = [...container.children]
@@ -135,46 +120,15 @@ function getIndexToInsert(container, clientX, clientY) {
 }
 
 settings.forEach( setting => {
-    setting.addEventListener("click", () => {
-        const editWrapper = document.getElementById("edit-wrapper");
-        const editDiv = document.getElementById("edit-div");
-        const editCloseBtn = document.getElementById("edit-close-btn");
-        const nameTextArea = document.getElementById("name-textarea");
-        const applyBtn = document.getElementById("option-apply");
-        const clearBtn = document.getElementById("option-clear");
-        const deleteBtn = document.getElementById("option-delete");
-        const addRowAboveBtn = document.getElementById("option-add-row-above");
-        const addRowBelowBtn = document.getElementById("option-add-row-below");
-        const currentTierBracket = setting.parentNode;
-        const currentTierContainer = currentTierBracket.querySelector(".tier-container")
-        const currentTierName = currentTierBracket.querySelector(".tier-name");
+    setting.addEventListener("click", (event) => {
         
-        function closeAll() {
-            editDiv.style.display = "none";
-            editWrapper.style.display = "none";
-        }
-
-        editCloseBtn.addEventListener("click", () => {
-            closeAll();
-        })
-
-        editWrapper.style.display = "block";
         editDiv.style.display = "flex";
-        
-        nameTextArea.value = currentTierName.textContent;
+        editWrapper.style.display = "block";
 
-        applyBtn.addEventListener("click", () => {
-            currentTierName.textContent = nameTextArea.value;
-            closeAll();
-        })
-        clearBtn.addEventListener("click", () => {
-            const imgsInThisTier = [...currentTierContainer.children]
-            imgsInThisTier.forEach(img => {
-                tierNotRanked.append(img);
-                closeAll();
-            })
-        })
+        nameTextArea.value = event.currentTarget.parentNode.querySelector(".tier-name").textContent
 
+        const tierBrackets = event.currentTarget.parentNode.parentNode.children;
+        indexOfCurrentSetting = [...tierBrackets].indexOf(event.currentTarget.parentNode);
     })
 })
 
@@ -187,9 +141,83 @@ tierBrackets.forEach( tierBracket => {
     })
 })
 
-tierNames.forEach( (tierName, index) => {
-    if(defaultColorsForTier[index]) {
-        tierName.style.backgroundColor = defaultColorsForTier[index]
+
+
+editCloseBtn.addEventListener("click", () => {
+    closeAll();
+})
+
+applyBtn.addEventListener("click", () => {
+    const currentTierName = [...tierNames][indexOfCurrentSetting];
+    currentTierName.textContent = nameTextArea.value;
+    closeAll();
+})
+
+deleteBtn.addEventListener("click", () => {
+    const currentTierBracket = [...tierBrackets][indexOfCurrentSetting];
+    const currentTierContainer = [...tierContainers][indexOfCurrentSetting];
+    const currentTierName = [...tierNames][indexOfCurrentSetting];
+    const imgsInThisTier = [...currentTierContainer.children]
+
+    const userResponse = confirm(`This will delete Tier: ${currentTierName.textContent}. Confirm action?`)
+    if (userResponse) {
+        imgsInThisTier.forEach( img => {
+            tierNotRanked.append(img);
+        })
+        currentTierBracket.remove();
+        tierBrackets = document.querySelectorAll(".tier-bracket");
+        tierNames = document.querySelectorAll(".tier-name");
+        tierContainers = document.querySelectorAll(".tier-container");
+        closeAll();
     }
 })
 
+addRowAboveBtn.addEventListener("click", () => {
+    const currentTierBracket = [...tierBrackets][indexOfCurrentSetting];
+    const newTierBracket = document.createElement("div");
+    newTierBracket.classList.add("tier-bracket");
+    newTierBracket.draggable = true;
+    newTierBracket.innerHTML = `
+        <div class="tier-name"></div>
+        <div class="tier-container"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" class="setting"><path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"/></svg>
+    `
+    brackets.insertBefore(newTierBracket, currentTierBracket);
+    
+    tierBrackets = document.querySelectorAll(".tier-bracket");
+    tierNames = document.querySelectorAll(".tier-name");
+    tierContainers = document.querySelectorAll(".tier-container");
+    settings = document.querySelectorAll(".setting");
+    closeAll();
+})
+
+
+
+// tierContainers.forEach( tierContainer => {
+
+//     tierContainer.addEventListener("dragover", event => {
+//         event.preventDefault();
+
+//         const imgElementBeingDragged = document.querySelector(".participant.dragging")
+//         const tierBracketElementBeingDragged = document.querySelector(".tier-bracket.dragging")
+//         if (imgElementBeingDragged){
+//             const indexOfTargetElement = getIndexToInsert(tierContainer, event.clientX, event.clientY);
+    
+//             if (tierContainer.children[indexOfTargetElement]) {
+//                 const afterElement = tierContainer.children[indexOfTargetElement];
+//                 tierContainer.insertBefore(imgElementBeingDragged, afterElement);
+//             } else {
+//                 tierContainer.append(imgElementBeingDragged);
+//             }
+//         } else if (tierBracketElementBeingDragged) {
+//             const indexOfTargetElement = getIndexToInsert(brackets, event.clientX, event.clientY);
+    
+//             if (brackets.children[indexOfTargetElement]) {
+//                 const afterElement = brackets.children[indexOfTargetElement];
+//                 brackets.insertBefore(tierBracketElementBeingDragged, afterElement);
+//             } else {
+//                 brackets.append(tierBracketElementBeingDragged);
+//             }
+//         }
+//     })
+// })
