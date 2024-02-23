@@ -1,11 +1,12 @@
 const tierContainers = document.querySelectorAll(".tier-container");
-const tierBrackets = document.querySelectorAll(".tier-bracket")
+let tierBrackets = document.querySelectorAll(".tier-bracket");
 const participants = document.querySelectorAll(".participant");
 const settings = document.querySelectorAll(".setting");
 const moveControls = document.querySelectorAll(".move-row");
-const brackets = document.querySelector(".brackets")
-const tierNames = document.querySelectorAll(".tier-name")
-const body = document.getElementById("body")
+const brackets = document.querySelector(".brackets");
+const tierNames = document.querySelectorAll(".tier-name");
+const body = document.getElementById("body");
+const tierNotRanked = document.getElementById("tier-not-ranked");
 
 const defaultColorsForTier = [
     "#ff7f7f",
@@ -30,34 +31,76 @@ participants.forEach( participant => {
     })
 })
 
-tierContainers.forEach( tierContainer => {
+function addDragOverForEachTierContainer(arr) {
+    arr.forEach( tierContainer => {
 
-    tierContainer.addEventListener("dragover", event => {
-        event.preventDefault();
-
-        const imgElementBeingDragged = document.querySelector(".participant.dragging")
-        const tierBracketElementBeingDragged = document.querySelector(".tier-bracket.dragging")
-        if (imgElementBeingDragged){
-            const indexOfTargetElement = getIndexToInsert(tierContainer, event.clientX, event.clientY);
+        tierContainer.addEventListener("dragover", event => {
+            event.preventDefault();
     
-            if (tierContainer.children[indexOfTargetElement]) {
-                const afterElement = tierContainer.children[indexOfTargetElement];
-                tierContainer.insertBefore(imgElementBeingDragged, afterElement);
-            } else {
-                tierContainer.append(imgElementBeingDragged);
+            const imgElementBeingDragged = document.querySelector(".participant.dragging")
+            const tierBracketElementBeingDragged = document.querySelector(".tier-bracket.dragging")
+            if (imgElementBeingDragged){
+                const indexOfTargetElement = getIndexToInsert(tierContainer, event.clientX, event.clientY);
+        
+                if (tierContainer.children[indexOfTargetElement]) {
+                    const afterElement = tierContainer.children[indexOfTargetElement];
+                    tierContainer.insertBefore(imgElementBeingDragged, afterElement);
+                } else {
+                    tierContainer.append(imgElementBeingDragged);
+                }
+            } else if (tierBracketElementBeingDragged) {
+                const indexOfTargetElement = getIndexToInsert(brackets, event.clientX, event.clientY);
+        
+                if (brackets.children[indexOfTargetElement]) {
+                    const afterElement = brackets.children[indexOfTargetElement];
+                    brackets.insertBefore(tierBracketElementBeingDragged, afterElement);
+                } else {
+                    brackets.append(tierBracketElementBeingDragged);
+                }
             }
-        } else if (tierBracketElementBeingDragged) {
-            const indexOfTargetElement = getIndexToInsert(brackets, event.clientX, event.clientY);
-    
-            if (brackets.children[indexOfTargetElement]) {
-                const afterElement = brackets.children[indexOfTargetElement];
-                brackets.insertBefore(tierBracketElementBeingDragged, afterElement);
-            } else {
-                brackets.append(tierBracketElementBeingDragged);
-            }
-        }
+        })
     })
-})
+}
+addDragOverForEachTierContainer(tierContainers);
+
+// function createDiv() {
+//     const lmao = document.createElement("div");
+//     lmao.classList.add("tier-bracket");
+
+//     tierBrackets = document.querySelectorAll(".tier-bracket");
+//     addDragOverForEachTierContainer()
+// }
+
+
+
+// tierContainers.forEach( tierContainer => {
+
+//     tierContainer.addEventListener("dragover", event => {
+//         event.preventDefault();
+
+//         const imgElementBeingDragged = document.querySelector(".participant.dragging")
+//         const tierBracketElementBeingDragged = document.querySelector(".tier-bracket.dragging")
+//         if (imgElementBeingDragged){
+//             const indexOfTargetElement = getIndexToInsert(tierContainer, event.clientX, event.clientY);
+    
+//             if (tierContainer.children[indexOfTargetElement]) {
+//                 const afterElement = tierContainer.children[indexOfTargetElement];
+//                 tierContainer.insertBefore(imgElementBeingDragged, afterElement);
+//             } else {
+//                 tierContainer.append(imgElementBeingDragged);
+//             }
+//         } else if (tierBracketElementBeingDragged) {
+//             const indexOfTargetElement = getIndexToInsert(brackets, event.clientX, event.clientY);
+    
+//             if (brackets.children[indexOfTargetElement]) {
+//                 const afterElement = brackets.children[indexOfTargetElement];
+//                 brackets.insertBefore(tierBracketElementBeingDragged, afterElement);
+//             } else {
+//                 brackets.append(tierBracketElementBeingDragged);
+//             }
+//         }
+//     })
+// })
 
 function getIndexToInsert(container, clientX, clientY) {
     const elementsInThisContainer = [...container.children]
@@ -92,28 +135,46 @@ function getIndexToInsert(container, clientX, clientY) {
 }
 
 settings.forEach( setting => {
-    setting.addEventListener("click", event => {
+    setting.addEventListener("click", () => {
+        const editWrapper = document.getElementById("edit-wrapper");
+        const editDiv = document.getElementById("edit-div");
+        const editCloseBtn = document.getElementById("edit-close-btn");
+        const nameTextArea = document.getElementById("name-textarea");
+        const applyBtn = document.getElementById("option-apply");
+        const clearBtn = document.getElementById("option-clear");
+        const deleteBtn = document.getElementById("option-delete");
+        const addRowAboveBtn = document.getElementById("option-add-row-above");
+        const addRowBelowBtn = document.getElementById("option-add-row-below");
         const currentTierBracket = setting.parentNode;
+        const currentTierContainer = currentTierBracket.querySelector(".tier-container")
         const currentTierName = currentTierBracket.querySelector(".tier-name");
+        
+        function closeAll() {
+            editDiv.style.display = "none";
+            editWrapper.style.display = "none";
+        }
 
-        const boxOfSetting = setting.getBoundingClientRect();
-        const settingLeft = parseInt(boxOfSetting.left);
-        const settingTop = parseInt(boxOfSetting.top);
+        editCloseBtn.addEventListener("click", () => {
+            closeAll();
+        })
 
+        editWrapper.style.display = "block";
+        editDiv.style.display = "flex";
+        
+        nameTextArea.value = currentTierName.textContent;
 
-        const tempEditPopUp = document.createElement("div");
-        tempEditPopUp.style.position = "fixed";
-        tempEditPopUp.style.top = "50%"
-        tempEditPopUp.style.left = "50%"
-        tempEditPopUp.style.transform = "translate(-50%, -50%)"
-        // tempEditPopUp.style.left = `${settingLeft}px`;
-        // tempEditPopUp.style.top = `${settingTop}px`;
-        tempEditPopUp.style.width = "clamp(50vw, 60vw ,90vw)";
-        tempEditPopUp.style.minHeight = "50vh";
-        tempEditPopUp.style.backgroundColor = "white";
-        tempEditPopUp.style.zIndex = "5";
+        applyBtn.addEventListener("click", () => {
+            currentTierName.textContent = nameTextArea.value;
+            closeAll();
+        })
+        clearBtn.addEventListener("click", () => {
+            const imgsInThisTier = [...currentTierContainer.children]
+            imgsInThisTier.forEach(img => {
+                tierNotRanked.append(img);
+                closeAll();
+            })
+        })
 
-        setting.insertAdjacentElement("beforebegin", tempEditPopUp);
     })
 })
 
@@ -131,3 +192,4 @@ tierNames.forEach( (tierName, index) => {
         tierName.style.backgroundColor = defaultColorsForTier[index]
     }
 })
+
