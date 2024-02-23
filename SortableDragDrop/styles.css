@@ -7,6 +7,8 @@
 }
 
 body {
+    height: 100%;
+    width: 100%;
     background-color: #242222;
 }
 
@@ -32,7 +34,7 @@ body {
     margin: 10px;
     width: 100px;
     height: 100px;
-    background-color: red;
+    background-color: white;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -41,25 +43,15 @@ body {
 .tier-container {
     display: flex;
     flex-wrap: wrap;
-    
     min-height: 100px;
     margin: 0 10px;
-}
-
-.action-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    place-items: center center;
-    height: 100%;
-    gap: 5px;
-    padding-inline: 10px;
-    background-color: #000000;
 }
 
 .setting {
     height: 40px;
     width: 40px;
     fill: white;
+    margin-inline: 10px;
     cursor: pointer;
 }
 .move-row {

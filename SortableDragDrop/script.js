@@ -4,7 +4,21 @@ const participants = document.querySelectorAll(".participant");
 const settings = document.querySelectorAll(".setting");
 const moveControls = document.querySelectorAll(".move-row");
 const brackets = document.querySelector(".brackets")
+const tierNames = document.querySelectorAll(".tier-name")
+const body = document.getElementById("body")
 
+const defaultColorsForTier = [
+    "#ff7f7f",
+    "#ffbf7f",
+    "#ffdf7f",
+    "#ffff7f",
+    "#bfff7f",
+    "#7fff7f",
+    "#7fffff",
+    "#7fbfff",
+    "#7f7fff",
+    "#ff7fff"
+]
 
 participants.forEach( participant => {
     participant.addEventListener("dragstart", () => {
@@ -74,14 +88,32 @@ function getIndexToInsert(container, clientX, clientY) {
         }
     }
 
-    console.log(indexOfTargetElement);
-
     return indexOfTargetElement;
 }
 
 settings.forEach( setting => {
     setting.addEventListener("click", event => {
-        const currentTierBracket = event.target.parent.parent;
+        const currentTierBracket = setting.parentNode;
+        const currentTierName = currentTierBracket.querySelector(".tier-name");
+
+        const boxOfSetting = setting.getBoundingClientRect();
+        const settingLeft = parseInt(boxOfSetting.left);
+        const settingTop = parseInt(boxOfSetting.top);
+
+
+        const tempEditPopUp = document.createElement("div");
+        tempEditPopUp.style.position = "fixed";
+        tempEditPopUp.style.top = "50%"
+        tempEditPopUp.style.left = "50%"
+        tempEditPopUp.style.transform = "translate(-50%, -50%)"
+        // tempEditPopUp.style.left = `${settingLeft}px`;
+        // tempEditPopUp.style.top = `${settingTop}px`;
+        tempEditPopUp.style.width = "clamp(50vw, 60vw ,90vw)";
+        tempEditPopUp.style.minHeight = "50vh";
+        tempEditPopUp.style.backgroundColor = "white";
+        tempEditPopUp.style.zIndex = "5";
+
+        setting.insertAdjacentElement("beforebegin", tempEditPopUp);
     })
 })
 
@@ -92,4 +124,10 @@ tierBrackets.forEach( tierBracket => {
     tierBracket.addEventListener("dragend", () => {
         tierBracket.classList.remove("dragging");
     })
+})
+
+tierNames.forEach( (tierName, index) => {
+    if(defaultColorsForTier[index]) {
+        tierName.style.backgroundColor = defaultColorsForTier[index]
+    }
 })
