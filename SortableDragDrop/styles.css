@@ -142,11 +142,19 @@ body {
 
 .upload-container {
     background-color: #252d32;
+    color: white;
+    font-size: 3rem;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
+    min-height: 200px;
+    margin-top: 30px;
+    cursor: pointer;
 }
+.highlight {
+    background-color: #3f4c53;
+}
+
 #imageUpload{
     margin: 20px;
     color: #252d32;

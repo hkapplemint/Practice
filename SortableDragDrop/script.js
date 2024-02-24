@@ -18,6 +18,80 @@ const addRowAboveBtn = document.getElementById("option-add-row-above");
 const addRowBelowBtn = document.getElementById("option-add-row-below");
 const imageUploadInput = document.getElementById("imageUpload");
 const previewContainer = document.getElementById("previewContainer");
+const uploadContainer = document.getElementById("upload-container");
+
+["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+    uploadContainer.addEventListener(eventName, preventDefaults);
+    body.addEventListener(eventName, preventDefaults);
+})
+
+uploadContainer.addEventListener("dragenter", () => {
+    uploadContainer.classList.add("highlight");
+})
+uploadContainer.addEventListener("dragover", () => {
+    uploadContainer.classList.add("highlight");
+})
+uploadContainer.addEventListener("dragleave", () => {
+    uploadContainer.classList.remove("highlight")
+})
+uploadContainer.addEventListener("click", (e) => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.multiple = true;
+    fileInput.addEventListener("change", e => {
+        handleFiles(e, fileInput)
+    });
+    fileInput.click();
+})
+
+uploadContainer.addEventListener("drop", (e) => {
+    uploadContainer.classList.remove("highlight");
+    handleFiles(e);
+})
+
+function handleFiles(e, fileInput = "") {
+    let files;
+    if (fileInput.files) {
+        files = fileInput.files;
+    } else if (e.dataTransfer.files) {
+        files = e.dataTransfer.files;
+    } else {
+        return;
+    }
+
+    if(files.length > 0) {
+        uploadContainer.innerHTML = "";
+
+        for (let  i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            const reader = new FileReader();
+
+            reader.addEventListener("load", () => {
+                const image = new Image();
+
+                image.src = reader.result;
+                image.classList.add("participant");
+
+                
+                uploadContainer.append(image);
+
+                participants = document.querySelectorAll(".participant");
+                updateParticipants(participants);
+            });
+
+            reader.readAsDataURL(file);
+        }
+    }
+}
+
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
 
 let indexOfCurrentSetting = 999;
 
@@ -53,40 +127,6 @@ function updateParticipants(participantArr) {
     })
 }
 
-
-
-imageUploadInput.addEventListener("change", () => {
-    const files = imageUploadInput.files;
-
-    if(files.length > 0) {
-        previewContainer.innerHTML = "";
-        
-
-        for (let  i = 0; i < files.length; i++) {
-            const file = files[i];
-
-            const reader = new FileReader();
-    
-            reader.addEventListener("load", () => {
-                const image = new Image();
-
-                image.src = reader.result;
-                image.classList.add("participant");
-
-                
-                previewContainer.append(image);
-
-                participants = document.querySelectorAll(".participant");
-                updateParticipants(participants);
-            });
-    
-            reader.readAsDataURL(file);
-        }
-    }
-
-    imageUploadInput.value = "";
-
-});
 
 function updateTierContainers(tierContainersArr) {
     tierContainersArr.forEach( tierContainer => {
