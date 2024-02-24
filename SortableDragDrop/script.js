@@ -20,6 +20,7 @@ const imageUploadInput = document.getElementById("imageUpload");
 const previewContainer = document.getElementById("previewContainer");
 const uploadContainer = document.getElementById("upload-container");
 
+
 ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
     uploadContainer.addEventListener(eventName, preventDefaults);
     body.addEventListener(eventName, preventDefaults);
@@ -32,7 +33,7 @@ uploadContainer.addEventListener("dragover", () => {
     uploadContainer.classList.add("highlight");
 })
 uploadContainer.addEventListener("dragleave", () => {
-    uploadContainer.classList.remove("highlight")
+    uploadContainer.classList.remove("highlight");
 })
 uploadContainer.addEventListener("click", (e) => {
     const fileInput = document.createElement("input");
@@ -51,6 +52,7 @@ uploadContainer.addEventListener("drop", (e) => {
 })
 
 function handleFiles(e, fileInput = "") {
+
     let files;
     if (fileInput.files) {
         files = fileInput.files;
@@ -73,9 +75,10 @@ function handleFiles(e, fileInput = "") {
 
                 image.src = reader.result;
                 image.classList.add("participant");
-
+                image.draggable = true;
                 
-                uploadContainer.append(image);
+
+                tierNotRanked.append(image);
 
                 participants = document.querySelectorAll(".participant");
                 updateParticipants(participants);
@@ -83,6 +86,7 @@ function handleFiles(e, fileInput = "") {
 
             reader.readAsDataURL(file);
         }
+        
     }
 }
 
