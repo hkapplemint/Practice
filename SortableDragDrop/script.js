@@ -16,9 +16,10 @@ const clearBtn = document.getElementById("option-clear");
 const deleteBtn = document.getElementById("option-delete");
 const addRowAboveBtn = document.getElementById("option-add-row-above");
 const addRowBelowBtn = document.getElementById("option-add-row-below");
+const imageUploadInput = document.getElementById("imageUpload");
+const previewContainer = document.getElementById("previewContainer");
 
 let indexOfCurrentSetting = 999;
-
 
 function closeAll() {
     editDiv.style.display = "none";
@@ -38,6 +39,7 @@ const defaultColorsForTier = [
     "#ff7fff"
 ];
 
+
 function updateParticipants(participantArr) {
     participantArr.forEach( participant => {
         participant.addEventListener("dragstart", (event) => {
@@ -51,6 +53,40 @@ function updateParticipants(participantArr) {
     })
 }
 
+
+
+imageUploadInput.addEventListener("change", () => {
+    const files = imageUploadInput.files;
+
+    if(files.length > 0) {
+        previewContainer.innerHTML = "";
+        
+
+        for (let  i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            const reader = new FileReader();
+    
+            reader.addEventListener("load", () => {
+                const image = new Image();
+
+                image.src = reader.result;
+                image.classList.add("participant");
+
+                
+                previewContainer.append(image);
+
+                participants = document.querySelectorAll(".participant");
+                updateParticipants(participants);
+            });
+    
+            reader.readAsDataURL(file);
+        }
+    }
+
+    imageUploadInput.value = "";
+
+});
 
 function updateTierContainers(tierContainersArr) {
     tierContainersArr.forEach( tierContainer => {
@@ -125,6 +161,8 @@ function updateSettings(settingsArr) {
             nameTextArea.value = event.currentTarget.parentNode.querySelector(".tier-name").textContent
 
             function rbgToHex(rgbString) {
+                if (rgbString === "") return `#ffffff`
+
                 const rgbValues = rgbString.match(/\d+/g);
                 const r = parseInt(rgbValues[0]);
                 const g = parseInt(rgbValues[1]);
@@ -137,7 +175,8 @@ function updateSettings(settingsArr) {
                 return `#${red}${green}${blue}`
             }
 
-            colorPicker.value = rbgToHex(event.currentTarget.parentNode.querySelector(".tier-name").style.backgroundColor);
+            colorPicker.value = rbgToHex(
+                event.currentTarget.parentNode.querySelector(".tier-name").style.backgroundColor);
     
             const tierBrackets = event.currentTarget.parentNode.parentNode.children;
             indexOfCurrentSetting = [...tierBrackets].indexOf(event.currentTarget.parentNode);

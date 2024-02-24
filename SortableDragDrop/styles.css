@@ -24,10 +24,10 @@ body {
     display: grid;
     grid-template-columns: min-content 1fr min-content;
     align-items: center;
-    width: 95%;
+    width: 100%;
     min-height: 120px;
     background-color: #252d32;
-    border: 2px solid #000000;
+    border: 1px solid #000000;
 }
 
 .tier-name {
@@ -127,15 +127,35 @@ body {
 }
 
 
+
 .participant {
     cursor: move;
     min-width: 0;
-    max-width: 90px;
+    max-height: 90px;
+    aspect-ratio: 1/1;
     border-radius: 5px;
     align-self: center;
     object-fit: cover;
     object-position: center;
     margin: 2px;
+}
+
+.upload-container {
+    background-color: #252d32;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#imageUpload{
+    margin: 20px;
+    color: #252d32;
+    translate: 27%;
+}
+
+#previewContainer {
+    width: 90%;
+    min-height: 0;
 }
 
 .dragging {
