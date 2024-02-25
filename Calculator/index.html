@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="display" placeholder="0">
+        <button id="display-show-more" class="display-show-more">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
+        </button>
+        <div class="more-functions-container">
+            <div id="more-functions" class="more-functions">
+                <button id="sq-root-btn" class="more-fx-btn">√</button>
+                <button id="pi-btn" class="more-fx-btn">π</button>
+                <button id="power-btn" class="more-fx-btn">^</button>
+                <button id="factorial-btn" class="more-fx-btn">!</button>
+                <button id="show-more-btn" class="show-more">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
+                </button>
+                <button id="RAD-btn" class="more-fx-btn hidden">RAD</button>
+                <button id="sin-btn" class="more-fx-btn hidden">sin</button>
+                <button id="cos-btn" class="more-fx-btn hidden">cos</button>
+                <button id="tan-btn" class="more-fx-btn hidden">tan</button>
+                <div class="empty-div hidden"></div>
+                <button id="INV-btn" class="more-fx-btn hidden">INV</button>
+                <button id="e-btn" class="more-fx-btn hidden">e</button>
+                <button id="ln-btn" class="more-fx-btn hidden">ln</button>
+                <button id="log-btn" class="more-fx-btn hidden">log</button>
+                <div class="empty-div hidden"></div>
+            </div>
+        </div>
+        <div class="common-btns">
+            <button id="AC-btn" class="all-clear-btn btn">AC</button>
+            <button id="paren-btn" class="fx-btn btn">()</button>
+            <button id="percent-btn" class="fx-btn btn">%</button>
+            <button id="divide-btn" class="btn">÷</button>
+            <button id="num-7-btn" class="numpad-btn btn digit">7</button>
+            <button id="num-8-btn" class="numpad-btn btn digit">8</button>
+            <button id="num-9-btn" class="numpad-btn btn digit">9</button>
+            <button id="multiply-btn" class="btn">x</button>
+            <button id="num-4-btn" class="numpad-btn btn digit">4</button>
+            <button id="num-5-btn" class="numpad-btn btn digit">5</button>
+            <button id="num-6-btn" class="numpad-btn btn digit">6</button>
+            <button id="minus-btn" class="btn">-</button>
+            <button id="num-1-btn" class="numpad-btn btn digit">1</button>
+            <button id="num-2-btn" class="numpad-btn btn digit">2</button>
+            <button id="num-3-btn" class="numpad-btn btn digit">3</button>
+            <button id="plus-btn" class="btn">+</button>
+            <button id="num-0-btn" class="numpad-btn btn">0</button>
+            <button id="dot-btn" class="numpad-btn btn">•</button>
+            <button id="delete-btn" class="numpad-btn btn">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M360-200q-20 0-37.5-9T294-234L120-480l174-246q11-16 28.5-25t37.5-9h400q33 0 56.5 23.5T840-680v400q0 33-23.5 56.5T760-200H360Zm400-80v-400 400Zm-400 0h400v-400H360L218-480l142 200Zm96-40 104-104 104 104 56-56-104-104 104-104-56-56-104 104-104-104-56 56 104 104-104 104 56 56Z"/></svg>
+            </button>
+            <button id="equal-btn" class="equal-btn btn">=</button>
+        </div>
+    </div>
+</body>
+</html>
