@@ -10,15 +10,21 @@ const multiplyBtn = document.getElementById("multiply-btn");
 const divideBtn = document.getElementById("divide-btn");
 const plusBtn = document.getElementById("plus-btn");
 const minusBtn = document.getElementById("minus-btn");
+const displayResult = document.getElementById("display-result");
 
+const regexOperators = /[x÷\+\-]/;
+
+const previousCalculations = [];
 
 digitBtns.forEach(digitBtn => {
     digitBtn.addEventListener("click", (e) => {
         display.value += e.currentTarget.textContent;
+        if(display.value.match(regexOperators)){
+            calculate(display.value);
+        }
     })
 })
 
-const regexOperators = /[x÷\+\-]/
 
 plusBtn.addEventListener("click", replaceLastOperator);
 multiplyBtn.addEventListener("click", replaceLastOperator);
@@ -42,6 +48,7 @@ function replaceLastOperator(e) {
 
 allClearBtn.addEventListener("click", () => {
     display.value = "";
+    displayResult.textContent = "";
     display.disabled = false;
 })
 
@@ -50,8 +57,38 @@ deleteBtn.addEventListener("click", () => {
         display.value = display.value.slice(0, -1);
     }
 })
-
+let isShowingMore = false;
+let animationInProgress = false;
 showMoreBtn.addEventListener("click", () => {
+    const showMoreSvg = showMoreBtn.querySelector("svg");
+    if(!isShowingMore) {
+        const animation = showMoreSvg.animate(
+            { transform: "rotate(-180deg"},
+            { duration: 200, fill: "forwards" }
+        );
+
+        animationInProgress = true;
+
+        animation.finished.then(()=>{
+            animationInProgress = false;
+            isShowingMore = true;
+        });
+    } else {
+        const animation = showMoreSvg.animate(
+            { transform: "rotate(0deg"},
+            { duration: 200, fill: "forwards" }
+        );
+        
+        animationInProgress = true;
+
+        animation.finished.then(()=>{
+            animationInProgress = false;
+            isShowingMore = false;
+        })
+    }
+
+    isShowingMore = !isShowingMore;
+
     showMoreRelateds.forEach(element => {
         element.classList.toggle("hidden");
     })
@@ -95,8 +132,8 @@ function calculate(inputString) {
     //const inputString = display.value;
     //e.g. 230+(12.66*-23)-(32.1-34.1)
     //parenMatches = ["(12.66*-23)", "(32.1-34.1)"]
-    let leftMostParen = display.value.match(regexParen);
-    if(leftMostParen[0]) {
+    let leftMostParen = inputString.match(regexParen);
+    if(leftMostParen) {
         console.log("Left Most Paren Exist")
         let formula = regexExtractFormulaHighInfix.exec(leftMostParen[0]);
         if (formula !== null) {
@@ -115,7 +152,6 @@ function calculate(inputString) {
             secondNumber = toFixedAndParseFloat(formula[3]);
     
             result = switchFourOperators(firstNumber, infix, secondNumber)
-            console.log(leftMostParen[0])
             inputString = inputString.replace(leftMostParen[0], result);
             calculate(inputString);
         }
@@ -123,7 +159,7 @@ function calculate(inputString) {
     } else {
         console.log("Left most paren not exist")
         let leftMostFormula = inputString.match(regexExtractFormulaHighInfix);
-        if(leftMostFormula !== null){
+        if(leftMostFormula){
             formula = regexExtractFormulaHighInfix.exec(leftMostFormula);
             firstNumber = toFixedAndParseFloat(formula[1]);
             infix = formula[2];
@@ -131,16 +167,17 @@ function calculate(inputString) {
             
             result = switchFourOperators(firstNumber, infix, secondNumber);
             inputString = inputString.replace(leftMostFormula[0], result);
-            
+            calculate(inputString);
         } else {
             leftMostFormula = inputString.match(regexExtractFormulaLowInfix);
 
             if(!leftMostFormula) {
-                const isNumberCheck = inputString.match(/\d*\.?\d*/);
-                display.value = isNumberCheck[0] === inputString
+                console.log("Final answer: ", inputString)
+                const isNumberCheck = inputString.match(/-?\d*\.?\d*/);
+                displayResult.textContent = isNumberCheck[0] === inputString
                     ? inputString
                     : "Syntax Error";
-                if (display.value === "Syntax Error") {
+                if (displayResult.textContent === "Syntax Error") {
                     display.disabled = true;
                 }
                 return
@@ -161,10 +198,16 @@ function calculate(inputString) {
 
 equalBtn.addEventListener("click", () => {
     calculate(display.value);
+    previousCalculations.push([display.value, displayResult.textContent]);
+    display.value = displayResult.textContent;
+    displayResult.textContent = "";
 })
 
 display.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         calculate(display.value);
+        previousCalculations.push([display.value, displayResult.textContent]);
+        display.value = displayResult.textContent;
+        displayResult.textContent = "";
     }
 })
