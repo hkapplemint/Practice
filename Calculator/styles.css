@@ -7,16 +7,21 @@
 }
 
 body {
+    height: 100vh;
     background-color: aqua;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .calculator {
-    position: absolute;
+    /* position: absolute;
     top: 50%;
     left: 50%;
-    translate: -50% -50%;
-    min-width: 300px;
-    min-height: 500px;
+    translate: -50% -50%; */
+    max-width: 400px;
+    justify-self: center;
+    min-height: 50%;
     background-color: black;
     padding: 40px;
     border-radius: 5px;
@@ -120,7 +125,6 @@ body {
     justify-content: center;
     align-items: center;
 }
-
 .hidden {
     display: none;
 }
