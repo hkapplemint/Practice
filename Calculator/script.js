@@ -15,8 +15,10 @@ const displayResult = document.getElementById("display-result");
 const displayShowMoreBtn = document.getElementById("display-show-more");
 const history = document.getElementById("history");
 
-const regexOperators = /[x÷\+\-]/;
+const regexOperators = /[x÷\*\/\+\-]/;
 let calculated = false;
+
+const regexValidFormula = /(-?\d+\.?\d*)([\+\-x÷\/\*])(-?\d+\.?\d*)/;
 
 digitBtns.forEach(digitBtn => {
     digitBtn.addEventListener("click", (e) => {
@@ -26,10 +28,32 @@ digitBtns.forEach(digitBtn => {
         }
 
         display.value += e.currentTarget.textContent;
-        if(display.value.match(regexOperators)){
+        if(display.value.match(regexValidFormula)){
             calculate(display.value);
         }
     })
+})
+
+document.addEventListener("keydown", (e) => {
+    if (e.target.tagName !== "INPUT") {
+        if (e.key.match(/[0-9\.]/)) {
+            if(calculated) {
+                display.value = ""
+                calculated = false;
+            }
+    
+            display.value += e.key;
+            if(display.value.match(regexValidFormula)){
+                calculate(display.value);
+            }
+        }
+    }
+})
+
+display.addEventListener("input", (e) => {
+    if(display.value.match(regexValidFormula)){
+        calculate(display.value);
+    }
 })
 
 displayShowMoreBtn.addEventListener("click", () => {
@@ -49,6 +73,7 @@ minusBtn.addEventListener("click", (e) => {
         display.value += e.currentTarget.textContent;
     }
 })
+
 function replaceLastOperator(e) {
     if (display.value.at(-1).match(regexOperators)) {
         display.value = display.value.slice(0, -1);
@@ -57,6 +82,28 @@ function replaceLastOperator(e) {
         display.value += e.currentTarget.textContent;
     }
 }
+
+//    \-\+\*\/
+document.addEventListener("keydown", (e) => {
+    if (e.target.tagName !== "INPUT") {
+        if (e.key.match(/[\+\*\/]/)) { //for plus, multiply, divide;
+            if (display.value.at(-1).match(regexOperators)) {
+                display.value = display.value.slice(0, -1);
+                display.value += e.key;
+            } else {
+                display.value += e.key;
+            }
+        }
+        if (e.key.match(/[\-]/)) { //for minus
+            if (display.value.at(-1).match(/[\+\-]/)) {
+                display.value = display.value.slice(0, -1);
+                display.value += e.key;
+            } else {
+                display.value += e.key;
+            }
+        }
+    }
+})
 
 allClearBtn.addEventListener("click", () => {
     display.value = "";
@@ -68,8 +115,24 @@ allClearBtn.addEventListener("click", () => {
 deleteBtn.addEventListener("click", () => {
     if(display.value.length > 0) {
         display.value = display.value.slice(0, -1);
+        if(display.value.match(regexValidFormula)){
+            calculate(display.value);
+        }
     }
 })
+document.addEventListener("keydown", (e) => {
+    if (e.target.tagName !== "INPUT") {
+        if (e.key === "Backspace") {
+            if(display.value.length > 0) {
+                display.value = display.value.slice(0, -1);
+                if(display.value.match(regexValidFormula)){
+                    calculate(display.value);
+                }
+            }
+        }
+    }
+})
+
 let isShowingMore = false;
 let animationInProgress = false;
 showMoreBtn.addEventListener("click", () => {
@@ -143,6 +206,7 @@ const regexExtractFormulaHighInfix = /(-?\d+\.?\d*)([x÷\/\*])(-?\d+\.?\d*)/;
 const regexExtractFormulaLowInfix = /(-?\d+\.?\d*)([\+\-])(-?\d+\.?\d*)/;
 
 function calculate(inputString) {
+
     let leftMostParen = inputString.match(regexParen);
     if(leftMostParen) {
         console.log(`Left Most Paren Exist: ${leftMostParen}`)
@@ -218,7 +282,7 @@ function addToHistory() {
     objHTML.classList.add("previousCal");
     objHTML.innerHTML = `
     <p class="formula">${formula}</p>
-    <p class="answer">=${answer}</p>
+    <p class="answer">= <span>${answer}</span></p>
     `
 
     history.append(objHTML);
@@ -235,12 +299,11 @@ equalBtn.addEventListener("click", () => {
 
 })
 
-display.addEventListener("keydown", (e) => {
+document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         addToHistory();
 
         calculate(display.value);
-        previousCalculations.push([display.value, displayResult.textContent]);
         display.value = displayResult.textContent;
         displayResult.textContent = "";
 

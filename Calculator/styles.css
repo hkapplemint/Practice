@@ -28,6 +28,8 @@ body {
 .display-container {
     display: grid;
     grid-template-rows: 1fr 1fr;
+    border-radius: 15px 15px 10px 10px;
+    overflow: hidden;
 }
 .display {
     min-width: 90%;
@@ -69,7 +71,7 @@ body {
     transform: rotate(180deg);
 }
 .history {
-    min-width: 40px;
+    min-width: 35px;
     width: 0px;
     height: 590px;
     background-color: #707070;
@@ -88,7 +90,7 @@ body {
 .previousCal {
     width: 90%;
     height: 60px;
-    background-color: white;
+    background-color: rgb(201, 201, 201);
     margin: 10px;
     border-radius: 5px;
     transition: width 0.5s;
@@ -100,6 +102,13 @@ body {
 .previousCal p {
     font-size: 1rem;
     margin-right: 20px;
+    user-select:text;
+}
+.previousCal p::selection, .previousCal p span::selection {
+    background-color: #bb87ff;
+}
+.previousCal p span {
+    user-select: all;
 }
 .more-functions-container {
     display: flex;
