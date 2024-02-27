@@ -8,36 +8,32 @@
 
 body {
     height: 100vh;
-    background-color: aqua;
+    background-color: #e1caff;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.history {
-    width: 300px;
-    height: 590px;
-    background-color: red;
-}
+
 .calculator {
     max-width: 400px;
     justify-self: center;
     min-height: 50%;
     background-color: black;
     padding: 20px;
-    border-radius: 5px;
+    border-radius: 10px;
 
     display: grid;
     grid-template-rows: max-content min-content min-content 1fr;
 }  
-.divplay-container {
+.display-container {
     display: grid;
-    grid-template-columns: 1fr min-content;
     grid-template-rows: 1fr 1fr;
 }
 .display {
     min-width: 90%;
     min-height: 3rem;
     font-size: 3rem;
+    padding-right: 10px;
     background-color: #707070;
     color: rgb(218, 218, 218);
     border: 0 solid transparent;
@@ -50,22 +46,61 @@ body {
 .display-result {
     min-height: 4.5rem;
     font-size: 3.5rem;
+    padding-right: 10px;
     color: white;
     background-color: #707070;
     text-align: end;
 }
 .display-show-more {
-    grid-area: 1 / 2 / 3 / 3;
+    grid-area: 1 / 1 / 999 / 2;
     background-color: #707070;
     border: 0 solid transparent;
+    height: 100%;
 }
 .display-show-more:hover {
     filter: brightness(0.8);
 }
 .display-show-more svg {
+    transform: rotate(0deg);
+    transition: transform 0.3s;
     fill: white;
 }
+.display-show-more svg.display-show-more-expanded {
+    transform: rotate(180deg);
+}
+.history {
+    min-width: 40px;
+    width: 0px;
+    height: 590px;
+    background-color: #707070;
+    transition: width 0.5s;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: relative;
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    grid-template-rows: auto;
+}
 
+.history-expand {
+    width: 350px;
+}
+.previousCal {
+    width: 90%;
+    height: 60px;
+    background-color: white;
+    margin: 10px;
+    border-radius: 5px;
+    transition: width 0.5s;
+    text-align: end;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.previousCal p {
+    font-size: 1rem;
+    margin-right: 20px;
+}
 .more-functions-container {
     display: flex;
     flex-direction: column;
@@ -106,9 +141,11 @@ body {
 .show-more:hover {
     background-color: #424242;
 }
+
 .show-more svg {
     fill: white;
 }
+
 
 .common-btns {
     display: grid;

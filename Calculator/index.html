@@ -9,12 +9,9 @@
 </head>
 <body>
     <div class="calculator">
-        <div class="divplay-container">
+        <div class="display-container">
             <input type="text" class="display" placeholder="0">
             <div id="display-result" class="display-result"></div>
-            <button id="display-show-more" class="display-show-more">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
-            </button>
         </div>
         <div class="more-functions-container">
             <div id="more-functions" class="more-functions">
@@ -62,7 +59,10 @@
             <button id="equal-btn" class="equal-btn btn">=</button>
         </div>
     </div>
-    <div class="history">
+    <div id="history" class="history">
+        <button id="display-show-more" class="display-show-more">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+        </button>
     </div>
 </body>
 </html>

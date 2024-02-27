@@ -12,13 +12,19 @@ const divideBtn = document.getElementById("divide-btn");
 const plusBtn = document.getElementById("plus-btn");
 const minusBtn = document.getElementById("minus-btn");
 const displayResult = document.getElementById("display-result");
+const displayShowMoreBtn = document.getElementById("display-show-more");
+const history = document.getElementById("history");
 
 const regexOperators = /[x÷\+\-]/;
-
-const previousCalculations = [];
+let calculated = false;
 
 digitBtns.forEach(digitBtn => {
     digitBtn.addEventListener("click", (e) => {
+        if(calculated) {
+            display.value = ""
+            calculated = false;
+        }
+
         display.value += e.currentTarget.textContent;
         if(display.value.match(regexOperators)){
             calculate(display.value);
@@ -26,6 +32,11 @@ digitBtns.forEach(digitBtn => {
     })
 })
 
+displayShowMoreBtn.addEventListener("click", () => {
+    const svg = displayShowMoreBtn.querySelector("svg");
+    svg.classList.toggle("display-show-more-expanded");
+    history.classList.toggle("history-expand")
+})
 
 plusBtn.addEventListener("click", replaceLastOperator);
 multiplyBtn.addEventListener("click", replaceLastOperator);
@@ -51,6 +62,7 @@ allClearBtn.addEventListener("click", () => {
     display.value = "";
     displayResult.textContent = "";
     display.disabled = false;
+    calculated = false;
 })
 
 deleteBtn.addEventListener("click", () => {
@@ -93,14 +105,13 @@ showMoreBtn.addEventListener("click", () => {
     moreFunctions.classList.toggle("more-functions-expand");
     showMoreRelateds.forEach(element => {
         element.classList.toggle("hidden");
-        element.classList.toggle("")
     })
 })
 
 
 
 function toFixedAndParseFloat(string) {
-    return parseFloat(parseFloat(string).toFixed(10))
+    return parseFloat(parseFloat(string).toFixed(7))
 }
 
 function switchFourOperators(firstNumber, infix, secondNumber) {
@@ -127,19 +138,17 @@ function switchFourOperators(firstNumber, infix, secondNumber) {
     return result;
 }
 const regexNumbers = /[\d]+[.]?[\d]*/g;
-const regexParen = /\([^()]+\)/;
+const regexParen = /\(-?\d+.?\d?\)/;
 const regexExtractFormulaHighInfix = /(-?\d+\.?\d*)([x÷\/\*])(-?\d+\.?\d*)/;
 const regexExtractFormulaLowInfix = /(-?\d+\.?\d*)([\+\-])(-?\d+\.?\d*)/;
 
 function calculate(inputString) {
-    //const inputString = display.value;
-    //e.g. 230+(12.66*-23)-(32.1-34.1)
-    //parenMatches = ["(12.66*-23)", "(32.1-34.1)"]
     let leftMostParen = inputString.match(regexParen);
     if(leftMostParen) {
-        console.log("Left Most Paren Exist")
+        console.log(`Left Most Paren Exist: ${leftMostParen}`)
         let formula = regexExtractFormulaHighInfix.exec(leftMostParen[0]);
         if (formula !== null) {
+            console.log(`Paren formula: ${formula}`)
             let firstNumber = toFixedAndParseFloat(formula[1]);
             let infix = formula[2];
             let secondNumber = toFixedAndParseFloat(formula[3]);
@@ -150,6 +159,7 @@ function calculate(inputString) {
             calculate(inputString);
         } else {
             formula = regexExtractFormulaLowInfix.exec(leftMostParen[0]);
+            console.log(`Paren formula: ${formula}`)
             firstNumber = toFixedAndParseFloat(formula[1]);
             infix = formula[2];
             secondNumber = toFixedAndParseFloat(formula[3]);
@@ -164,6 +174,7 @@ function calculate(inputString) {
         let leftMostFormula = inputString.match(regexExtractFormulaHighInfix);
         if(leftMostFormula){
             formula = regexExtractFormulaHighInfix.exec(leftMostFormula);
+            console.log(`Not paren formula: ${formula}`);
             firstNumber = toFixedAndParseFloat(formula[1]);
             infix = formula[2];
             secondNumber = toFixedAndParseFloat(formula[3]);
@@ -187,6 +198,7 @@ function calculate(inputString) {
             }
 
             formula = regexExtractFormulaLowInfix.exec(leftMostFormula);
+            console.log(`Not paren formula: ${formula}`);
             firstNumber = toFixedAndParseFloat(formula[1]);
             infix = formula[2];
             secondNumber = toFixedAndParseFloat(formula[3]);
@@ -199,18 +211,39 @@ function calculate(inputString) {
     }
 }
 
+function addToHistory() {
+    const formula = display.value;
+    const answer = displayResult.textContent;
+    const objHTML = document.createElement("div");
+    objHTML.classList.add("previousCal");
+    objHTML.innerHTML = `
+    <p class="formula">${formula}</p>
+    <p class="answer">=${answer}</p>
+    `
+
+    history.append(objHTML);
+}
+
 equalBtn.addEventListener("click", () => {
+    addToHistory();
+
     calculate(display.value);
-    previousCalculations.push([display.value, displayResult.textContent]);
     display.value = displayResult.textContent;
     displayResult.textContent = "";
+
+    calculated = true;
+
 })
 
 display.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
+        addToHistory();
+
         calculate(display.value);
         previousCalculations.push([display.value, displayResult.textContent]);
         display.value = displayResult.textContent;
         displayResult.textContent = "";
+
+        calculated = true;
     }
 })
