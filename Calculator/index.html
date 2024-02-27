@@ -9,11 +9,13 @@
 </head>
 <body>
     <div class="calculator">
-        <input type="text" class="display" placeholder="0">
-        <div id="display-result" class="display-result"></div>
-        <button id="display-show-more" class="display-show-more">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
-        </button>
+        <div class="divplay-container">
+            <input type="text" class="display" placeholder="0">
+            <div id="display-result" class="display-result"></div>
+            <button id="display-show-more" class="display-show-more">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
+            </button>
+        </div>
         <div class="more-functions-container">
             <div id="more-functions" class="more-functions">
                 <button id="sq-root-btn" class="more-fx-btn">√</button>
@@ -22,7 +24,6 @@
                 <button id="factorial-btn" class="more-fx-btn">!</button>
                 <button id="show-more-btn" class="show-more">
                     <svg id="show-more-svg" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
-                    <!-- <svg class="show-more-related hidden" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m296-345-56-56 240-240 240 240-56 56-184-184-184 184Z"/></svg> -->
                 </button>
                 <button id="RAD-btn" class="more-fx-btn show-more-related hidden">RAD</button>
                 <button id="sin-btn" class="more-fx-btn show-more-related hidden">sin</button>
@@ -60,6 +61,8 @@
             </button>
             <button id="equal-btn" class="equal-btn btn">=</button>
         </div>
+    </div>
+    <div class="history">
     </div>
 </body>
 </html>

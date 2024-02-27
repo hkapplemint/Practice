@@ -1,5 +1,6 @@
 const digitBtns = document.querySelectorAll(".digit");
 const display = document.querySelector(".display");
+const moreFunctions = document.getElementById("more-functions");
 const allClearBtn = document.getElementById("AC-btn");
 const deleteBtn = document.getElementById("delete-btn");
 const showMoreBtn = document.getElementById("show-more-btn");
@@ -89,8 +90,10 @@ showMoreBtn.addEventListener("click", () => {
 
     isShowingMore = !isShowingMore;
 
+    moreFunctions.classList.toggle("more-functions-expand");
     showMoreRelateds.forEach(element => {
         element.classList.toggle("hidden");
+        element.classList.toggle("")
     })
 })
 

@@ -13,23 +13,27 @@ body {
     justify-content: center;
     align-items: center;
 }
-
+.history {
+    width: 300px;
+    height: 590px;
+    background-color: red;
+}
 .calculator {
-    /* position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%; */
     max-width: 400px;
     justify-self: center;
     min-height: 50%;
     background-color: black;
-    padding: 40px;
+    padding: 20px;
     border-radius: 5px;
 
     display: grid;
     grid-template-rows: max-content min-content min-content 1fr;
 }  
-
+.divplay-container {
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-template-rows: 1fr 1fr;
+}
 .display {
     min-width: 90%;
     min-height: 3rem;
@@ -51,6 +55,7 @@ body {
     text-align: end;
 }
 .display-show-more {
+    grid-area: 1 / 2 / 3 / 3;
     background-color: #707070;
     border: 0 solid transparent;
 }
@@ -69,8 +74,12 @@ body {
 .more-functions {
     display: grid;
     grid-template-columns: repeat(4, 1fr) 40px;
-    place-items: center center;
     gap: 10px;
+    height: 30px;
+    transition: height 0.2s;
+}
+.more-functions.more-functions-expand {
+    height: 110px;
 }
 .more-fx-btn {
     --fx-btn-height: 2rem;
@@ -79,7 +88,6 @@ body {
     width: var(--fx-btn-width);
     border-radius: 999px;
     background-color: #333;
-
     font-size: 1rem;
     color: white;
 }
