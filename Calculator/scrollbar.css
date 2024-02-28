@@ -2,6 +2,7 @@
 *::-webkit-scrollbar {
     background-color: grey;
     width: 10px;
+    border-radius: 10px;
 }
   
 
