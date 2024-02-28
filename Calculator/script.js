@@ -48,6 +48,29 @@ document.addEventListener("keydown", (e) => {
                 calculate(display.value);
             }
         }
+        if (e.key.match(/[\+\*\/]/)) { //for plus, multiply, divide;
+            if (display.value.at(-1).match(regexOperators)) {
+                display.value = display.value.slice(0, -1);
+                display.value += e.key;
+            } else {
+                display.value += e.key;
+            }
+        }
+        if (e.key.match(/[\-]/)) { //for minus
+            if (display.value.at(-1).match(/[\+\-]/)) {
+                display.value = display.value.slice(0, -1);
+                display.value += e.key;
+            } else {
+                display.value += e.key;
+            }
+        }
+        if (e.key === ".") { //for dot
+            handleDotBtn();
+        }
+        calculated = false;
+    }   
+    if (e.key === "Tab" || e.key === " " || e.key === "Enter") {
+        e.preventDefault();
     }
 })
 
@@ -86,33 +109,33 @@ function replaceLastOperator(e) {
     }
 }
 
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Tab" || e.key === " " || e.key === "Enter") {
-        e.preventDefault();
-    }
-    if (e.target.tagName !== "INPUT") {
-        if (e.key.match(/[\+\*\/]/)) { //for plus, multiply, divide;
-            if (display.value.at(-1).match(regexOperators)) {
-                display.value = display.value.slice(0, -1);
-                display.value += e.key;
-            } else {
-                display.value += e.key;
-            }
-        }
-        if (e.key.match(/[\-]/)) { //for minus
-            if (display.value.at(-1).match(/[\+\-]/)) {
-                display.value = display.value.slice(0, -1);
-                display.value += e.key;
-            } else {
-                display.value += e.key;
-            }
-        }
-        if (e.key === ".") { //for dot
-            handleDotBtn();
-        }
-        calculated = false;
-    }
-})
+// document.addEventListener("keydown", (e) => {
+//     if (e.key === "Tab" || e.key === " " || e.key === "Enter") {
+//         e.preventDefault();
+//     }
+//     if (e.target.tagName !== "INPUT") {
+//         if (e.key.match(/[\+\*\/]/)) { //for plus, multiply, divide;
+//             if (display.value.at(-1).match(regexOperators)) {
+//                 display.value = display.value.slice(0, -1);
+//                 display.value += e.key;
+//             } else {
+//                 display.value += e.key;
+//             }
+//         }
+//         if (e.key.match(/[\-]/)) { //for minus
+//             if (display.value.at(-1).match(/[\+\-]/)) {
+//                 display.value = display.value.slice(0, -1);
+//                 display.value += e.key;
+//             } else {
+//                 display.value += e.key;
+//             }
+//         }
+//         if (e.key === ".") { //for dot
+//             handleDotBtn();
+//         }
+//         calculated = false;
+//     }
+// })
 
 allClearBtn.addEventListener("click", () => {
     display.value = "";
