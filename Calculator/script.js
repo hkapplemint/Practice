@@ -37,7 +37,7 @@ digitBtns.forEach(digitBtn => {
 
 document.addEventListener("keydown", (e) => {
     if (e.target.tagName !== "INPUT") {
-        if (e.key.match(/[0-9\.]/) && e.key.length === 1) {
+        if (e.key.match(/[0-9]/) && e.key.length === 1) {
             if(calculated) {
                 display.value = ""
                 calculated = false;
@@ -87,7 +87,9 @@ function replaceLastOperator(e) {
 }
 
 document.addEventListener("keydown", (e) => {
-    e.preventDefault();
+    if (e.key === "Tab" || e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+    }
     if (e.target.tagName !== "INPUT") {
         if (e.key.match(/[\+\*\/]/)) { //for plus, multiply, divide;
             if (display.value.at(-1).match(regexOperators)) {
@@ -104,6 +106,9 @@ document.addEventListener("keydown", (e) => {
             } else {
                 display.value += e.key;
             }
+        }
+        if (e.key === ".") { //for dot
+            handleDotBtn();
         }
         calculated = false;
     }
@@ -278,10 +283,12 @@ function calculate(inputString) {
 }
 
 function addToHistory() {
-    const formula = display.value;
+    let formula = display.value;
     const answer = displayResult.textContent;
 
     if(!answer.match(/-?\d+\.?\d*/)) return
+
+    formula = cleanZeros(formula);
 
     const objHTML = document.createElement("div");
     objHTML.classList.add("previousCal");
@@ -298,9 +305,8 @@ equalBtn.addEventListener("click", () => {
 
 function handleEqualBtn() {
     addToHistory();
-    display.value = calculate(display.value);
+    calculate(display.value);
     if(displayResult.textContent !== "") {
-        cleanZeros(display.value);
         display.value = displayResult.textContent;
         displayResult.textContent = "";
     }
@@ -311,7 +317,6 @@ function cleanZeros(string) {
     const match = regexCleaningZero.exec(string);
     if (match) {
         string = string.replace(match[1], "");
-        console.log("cleaned: ",string);
     }
     return string
 }
@@ -320,4 +325,19 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         handleEqualBtn();
     }
+})
+
+function handleDotBtn() {
+    const regexDot = /-?\d+\.?\d*[x÷\*\/\+\-]?/g;
+    const matchesArr = display.value.match(regexDot);
+    const lastValue = matchesArr[matchesArr.length-1];
+    console.log("matchesArr: ", matchesArr, "lastValue: ", lastValue);
+    if(!lastValue.includes(".") && matchesArr){
+        console.log("lastValue does not have a dot")
+        display.value += ".";
+    }
+}
+
+dotBtn.addEventListener("click", () => {
+    handleDotBtn();
 })
