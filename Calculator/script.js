@@ -22,6 +22,7 @@ const regexValidFormula = /(-?\d+\.?\d*)([\+\-x÷\/\*])(-?\d+\.?\d*)/;
 
 digitBtns.forEach(digitBtn => {
     digitBtn.addEventListener("click", (e) => {
+
         if(calculated) {
             display.value = ""
             calculated = false;
@@ -36,7 +37,7 @@ digitBtns.forEach(digitBtn => {
 
 document.addEventListener("keydown", (e) => {
     if (e.target.tagName !== "INPUT") {
-        if (e.key.match(/[0-9\.]/)) {
+        if (e.key.match(/[0-9\.]/) && e.key.length === 1) {
             if(calculated) {
                 display.value = ""
                 calculated = false;
@@ -66,6 +67,7 @@ plusBtn.addEventListener("click", replaceLastOperator);
 multiplyBtn.addEventListener("click", replaceLastOperator);
 divideBtn.addEventListener("click", replaceLastOperator);
 minusBtn.addEventListener("click", (e) => {
+    calculated = false;
     if (display.value.at(-1).match(/[\+\-]/)) {
         display.value = display.value.slice(0, -1);
         display.value += e.currentTarget.textContent;
@@ -75,6 +77,7 @@ minusBtn.addEventListener("click", (e) => {
 })
 
 function replaceLastOperator(e) {
+    calculated = false;
     if (display.value.at(-1).match(regexOperators)) {
         display.value = display.value.slice(0, -1);
         display.value += e.currentTarget.textContent;
@@ -83,8 +86,8 @@ function replaceLastOperator(e) {
     }
 }
 
-//    \-\+\*\/
 document.addEventListener("keydown", (e) => {
+    e.preventDefault();
     if (e.target.tagName !== "INPUT") {
         if (e.key.match(/[\+\*\/]/)) { //for plus, multiply, divide;
             if (display.value.at(-1).match(regexOperators)) {
@@ -102,6 +105,7 @@ document.addEventListener("keydown", (e) => {
                 display.value += e.key;
             }
         }
+        calculated = false;
     }
 })
 
@@ -251,13 +255,11 @@ function calculate(inputString) {
 
             if(!leftMostFormula) {
                 console.log("Final answer: ", inputString)
-                const isNumberCheck = inputString.match(/-?\d*\.?\d*/);
+                const isNumberCheck = inputString.match(/-?\d+\.?\d*/);
                 displayResult.textContent = isNumberCheck[0] === inputString
                     ? inputString
-                    : "Syntax Error";
-                if (displayResult.textContent === "Syntax Error") {
-                    display.disabled = true;
-                }
+                    : "";
+                    // : "Syntax Error";
                 return
             }
 
@@ -278,35 +280,44 @@ function calculate(inputString) {
 function addToHistory() {
     const formula = display.value;
     const answer = displayResult.textContent;
+
+    if(!answer.match(/-?\d+\.?\d*/)) return
+
     const objHTML = document.createElement("div");
     objHTML.classList.add("previousCal");
     objHTML.innerHTML = `
     <p class="formula">${formula}</p>
     <p class="answer">= <span>${answer}</span></p>
     `
-
     history.append(objHTML);
 }
 
 equalBtn.addEventListener("click", () => {
-    addToHistory();
-
-    calculate(display.value);
-    display.value = displayResult.textContent;
-    displayResult.textContent = "";
-
-    calculated = true;
-
+    handleEqualBtn()
 })
+
+function handleEqualBtn() {
+    addToHistory();
+    display.value = calculate(display.value);
+    if(displayResult.textContent !== "") {
+        cleanZeros(display.value);
+        display.value = displayResult.textContent;
+        displayResult.textContent = "";
+    }
+    calculated = true;
+};
+function cleanZeros(string) {
+    const regexCleaningZero = /-?(0+)[1-9]+\.?\d*/;
+    const match = regexCleaningZero.exec(string);
+    if (match) {
+        string = string.replace(match[1], "");
+        console.log("cleaned: ",string);
+    }
+    return string
+}
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
-        addToHistory();
-
-        calculate(display.value);
-        display.value = displayResult.textContent;
-        displayResult.textContent = "";
-
-        calculated = true;
+        handleEqualBtn();
     }
 })
