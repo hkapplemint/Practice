@@ -14,9 +14,14 @@ const minusBtn = document.getElementById("minus-btn");
 const displayResult = document.getElementById("display-result");
 const displayShowMoreBtn = document.getElementById("display-show-more");
 const history = document.getElementById("history");
+const percentBtn = document.getElementById("percent-btn");
+const parenBtn = document.getElementById("paren-btn");
 
 const regexOperators = /[x÷\*\/\+\-]/;
 let calculated = false;
+
+let numberOfOpenParen = 0;
+let numberOfCloseParen = 0;
 
 const regexValidFormula = /(-?\d+\.?\d*)([\+\-x÷\/\*])(-?\d+\.?\d*)/;
 
@@ -29,8 +34,10 @@ digitBtns.forEach(digitBtn => {
         }
 
         display.value += e.currentTarget.textContent;
-        if(display.value.match(regexValidFormula)){
-            calculate(display.value);
+        
+        calculate(display.value)
+        if(display.value === displayResult.textContent) {
+            displayResult.textContent = "";
         }
     })
 })
@@ -44,8 +51,9 @@ document.addEventListener("keydown", (e) => {
             }
     
             display.value += e.key;
-            if(display.value.match(regexValidFormula)){
-                calculate(display.value);
+            calculate(display.value)
+            if(display.value === displayResult.textContent) {
+                displayResult.textContent = "";
             }
         }
         if (e.key.match(/[\+\*\/]/)) { //for plus, multiply, divide;
@@ -109,34 +117,6 @@ function replaceLastOperator(e) {
     }
 }
 
-// document.addEventListener("keydown", (e) => {
-//     if (e.key === "Tab" || e.key === " " || e.key === "Enter") {
-//         e.preventDefault();
-//     }
-//     if (e.target.tagName !== "INPUT") {
-//         if (e.key.match(/[\+\*\/]/)) { //for plus, multiply, divide;
-//             if (display.value.at(-1).match(regexOperators)) {
-//                 display.value = display.value.slice(0, -1);
-//                 display.value += e.key;
-//             } else {
-//                 display.value += e.key;
-//             }
-//         }
-//         if (e.key.match(/[\-]/)) { //for minus
-//             if (display.value.at(-1).match(/[\+\-]/)) {
-//                 display.value = display.value.slice(0, -1);
-//                 display.value += e.key;
-//             } else {
-//                 display.value += e.key;
-//             }
-//         }
-//         if (e.key === ".") { //for dot
-//             handleDotBtn();
-//         }
-//         calculated = false;
-//     }
-// })
-
 allClearBtn.addEventListener("click", () => {
     display.value = "";
     displayResult.textContent = "";
@@ -198,9 +178,9 @@ showMoreBtn.addEventListener("click", () => {
     isShowingMore = !isShowingMore;
 
     moreFunctions.classList.toggle("more-functions-expand");
-    showMoreRelateds.forEach(element => {
-        element.classList.toggle("hidden");
-    })
+    // showMoreRelateds.forEach(element => {
+    //     element.classList.toggle("hidden");
+    // })
 })
 
 
@@ -237,10 +217,20 @@ const regexParen = /\(-?\d+.?\d?\)/;
 const regexExtractFormulaHighInfix = /(-?\d+\.?\d*)([x÷\/\*])(-?\d+\.?\d*)/;
 const regexExtractFormulaLowInfix = /(-?\d+\.?\d*)([\+\-])(-?\d+\.?\d*)/;
 const regexFxBefore = /([√])(-?\d+\.?\d*)/;
-const regexFxAfter = /(-?\d+\.?\d*)([π!])/;
+const regexFxAfter = /(-?\d+\.?\d*)([π!%])/;
 const regexFxBetween = /(-?\d+\.?\d*)([\^])(-?\d+\.?\d*)/;
+const regexSingleNumberInParen = /\((-?\d+\.?\d*)\)/;
 
 function calculate(inputString) {
+
+    numberOfOpenParen = 0;
+    numberOfCloseParen = 0;
+
+    inputString = removeParenOfSingleNumber(inputString);
+
+    if (inputString === "π") {
+        handleMoreFxAfter("1π");
+    }
 
     let leftMostParen = inputString.match(regexParen);
     if(leftMostParen) {
@@ -289,23 +279,26 @@ function calculate(inputString) {
             inputString = inputString.replace(leftMostFormula[0], result);
             calculate(inputString);
         } else if (regexFxAfter.exec(inputString) || regexFxBefore.exec(inputString) || regexFxBetween.exec(inputString)) {
-            console.log("LMAO2");
             if (regexFxBetween.exec(inputString)) {
                 handleMoreFxBetween(inputString);
             } else if (regexFxAfter.exec(inputString)) {
                 handleMoreFxAfter(inputString);
+            } else if (regexFxBefore.exec(inputString)) {
+                handleMoreFxBefore(inputString);
             }
         } else {
             leftMostFormula = inputString.match(regexExtractFormulaLowInfix);
 
             if(!leftMostFormula) {
                 console.log("Final answer: ", inputString)
-                const isNumberCheck = inputString.match(/-?\d+\.?\d*/);
-                displayResult.textContent = isNumberCheck[0] === inputString
-                    ? inputString
-                    : "";
-                    // : "Syntax Error";
-                return
+                const isNumberCheck = inputString.match(/-?\d+\.?\d*(?:e\+)?\d*/);
+                if (isNumberCheck) {
+                    console.log("Number made into displaying section")
+                    displayResult.textContent = isNumberCheck[0] === inputString
+                        ? inputString
+                        : "";
+                    return
+                }
             }
 
             formula = regexExtractFormulaLowInfix.exec(leftMostFormula);
@@ -341,6 +334,15 @@ function handleMoreFxAfter(inputString) {
     inputString = inputString.replace(formula[0], result);
     calculate(inputString);
 }
+function handleMoreFxBefore(inputString) {
+    formula = regexFxBefore.exec(inputString);
+    prefix = formula[1];
+    firstNumber = toFixedAndParseFloat(formula[2]);
+
+    result = moreFunctionsBefore(prefix, firstNumber);
+    inputString = inputString.replace(formula[0], result);
+    calculate(inputString);
+}
 
 function moreFunctionsAfter(firstNumber, suffix) {
     switch (suffix) {
@@ -348,6 +350,14 @@ function moreFunctionsAfter(firstNumber, suffix) {
             return toFixedAndParseFloat(factorialOf(firstNumber));
         case "π":
             return toFixedAndParseFloat(firstNumber * Math.PI);
+        case "%":
+            return toFixedAndParseFloat(firstNumber / 100);
+    }
+}
+function moreFunctionsBefore(prefix, firstNumber) {
+    switch (prefix) {
+        case "√":
+            return toFixedAndParseFloat(Math.sqrt(firstNumber));
     }
 }
 
@@ -362,6 +372,15 @@ function moreFunctionsBetween(firstNumber, infix, secondNumber) {
     switch (infix) {
         case "^":
             return toFixedAndParseFloat(Math.pow(firstNumber, secondNumber));
+    }
+}
+
+function removeParenOfSingleNumber(inputString) {
+    const match = regexSingleNumberInParen.exec(inputString);
+    if (match) {
+        return inputString.replace(match[0], match[1]);
+    } else {
+        return inputString;
     }
 }
 
@@ -423,4 +442,83 @@ function handleDotBtn() {
 
 dotBtn.addEventListener("click", () => {
     handleDotBtn();
+})
+
+
+
+const sqRootBtn = document.getElementById("sq-root-btn");
+const piBtn = document.getElementById("pi-btn");
+const powerBtn = document.getElementById("power-btn");
+const factorialBtn = document.getElementById("factorial-btn");
+
+
+sqRootBtn.addEventListener("click", e => {
+    display.value += sqRootBtn.textContent;
+    display.value += "("
+})
+
+piBtn.addEventListener("click", e => {
+    display.value += piBtn.textContent;
+    calculate(display.value)
+    if(display.value === displayResult.textContent) {
+        displayResult.textContent = "";
+    }
+})
+
+powerBtn.addEventListener("click", e => {
+    display.value += powerBtn.textContent;
+    calculate(display.value)
+    if(display.value === displayResult.textContent) {
+        displayResult.textContent = "";
+    }
+})
+
+factorialBtn.addEventListener("click", e => {
+    display.value += factorialBtn.textContent;
+    calculate(display.value)
+    if(display.value === displayResult.textContent) {
+        displayResult.textContent = "";
+    }
+})
+
+
+
+parenBtn.addEventListener("click", e => {
+    const openParenMatches = display.value.match(/\(/g);
+    if(openParenMatches) {
+        numberOfOpenParen = openParenMatches.length;
+        console.log(numberOfOpenParen);
+    }
+    
+    if (display.value) {
+        if (display.value.at(-1).match(/\(/) || display.value.at(-1).match(regexOperators)) {
+            display.value += "(";
+        } else if (numberOfOpenParen > 0) {
+            const closeParenMatches = display.value.match(/\)/g)
+            if(closeParenMatches) {
+                numberOfCloseParen = closeParenMatches.length;
+            }
+            if(numberOfOpenParen > numberOfCloseParen){
+                display.value += ")";
+            }
+        }
+    } else {
+        display.value += "("
+    }
+
+    calculate(display.value);
+    if(display.value === displayResult.textContent) {
+        displayResult.textContent = "";
+    }
+})
+
+percentBtn.addEventListener("click", e => {
+    if (display.value) {
+        const match = display.value.at(-1).match(/\d/)
+        if (match) {
+            display.value += "%";
+        }
+    }
+
+    calculate(display.value);
 })

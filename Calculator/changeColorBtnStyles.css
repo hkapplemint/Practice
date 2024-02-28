@@ -6,11 +6,25 @@
     gap: 10px
 }
 .change-color-btn {
+    position: relative;
     width: 30px;
     height: 30px;
     border-radius: 50% ;
     transition: transform 1s;
     border: none;
+}
+
+.change-color-btn-expand {
+    transform: scale(100);
+    transition-duration: 1s;
     z-index: -1;
-    cursor: pointer;
+}
+
+.change-color-btn-shrink {
+    transform: scale(1);
+    transition-duration: 0s;
+}
+
+.top {
+    z-index: 0;
 }
