@@ -236,6 +236,9 @@ const regexNumbers = /[\d]+[.]?[\d]*/g;
 const regexParen = /\(-?\d+.?\d?\)/;
 const regexExtractFormulaHighInfix = /(-?\d+\.?\d*)([x÷\/\*])(-?\d+\.?\d*)/;
 const regexExtractFormulaLowInfix = /(-?\d+\.?\d*)([\+\-])(-?\d+\.?\d*)/;
+const regexFxBefore = /([√])(-?\d+\.?\d*)/;
+const regexFxAfter = /(-?\d+\.?\d*)([π!])/;
+const regexFxBetween = /(-?\d+\.?\d*)([\^])(-?\d+\.?\d*)/;
 
 function calculate(inputString) {
 
@@ -253,6 +256,13 @@ function calculate(inputString) {
     
             inputString = inputString.replace(leftMostParen[0], result);
             calculate(inputString);
+        } else if (regexFxAfter.exec(inputString) || regexFxBefore.exec(inputString) || regexFxBetween.exec(inputString)) {
+            console.log("LMAO1");
+            if (regexFxBetween.exec(inputString)) {
+                handleMoreFxBetween(inputString);
+            } else if (regexFxAfter.exec(inputString)) {
+                handleMoreFxAfter(inputString);
+            }
         } else {
             formula = regexExtractFormulaLowInfix.exec(leftMostParen[0]);
             console.log(`Paren formula: ${formula}`)
@@ -278,6 +288,13 @@ function calculate(inputString) {
             result = switchFourOperators(firstNumber, infix, secondNumber);
             inputString = inputString.replace(leftMostFormula[0], result);
             calculate(inputString);
+        } else if (regexFxAfter.exec(inputString) || regexFxBefore.exec(inputString) || regexFxBetween.exec(inputString)) {
+            console.log("LMAO2");
+            if (regexFxBetween.exec(inputString)) {
+                handleMoreFxBetween(inputString);
+            } else if (regexFxAfter.exec(inputString)) {
+                handleMoreFxAfter(inputString);
+            }
         } else {
             leftMostFormula = inputString.match(regexExtractFormulaLowInfix);
 
@@ -302,6 +319,49 @@ function calculate(inputString) {
     
             calculate(inputString);
         }
+    }
+}
+
+function handleMoreFxBetween(inputString) {
+    formula = regexFxBetween.exec(inputString);
+    firstNumber = toFixedAndParseFloat(formula[1]);
+    infix = formula[2];
+    secondNumber= toFixedAndParseFloat(formula[3]);
+
+    result = moreFunctionsBetween(firstNumber, infix, secondNumber);
+    inputString = inputString.replace(formula[0], result);
+    calculate(inputString);
+}
+function handleMoreFxAfter(inputString) {
+    formula = regexFxAfter.exec(inputString);
+    firstNumber = toFixedAndParseFloat(formula[1]);
+    suffix = formula[2];
+
+    result = moreFunctionsAfter(firstNumber, suffix);
+    inputString = inputString.replace(formula[0], result);
+    calculate(inputString);
+}
+
+function moreFunctionsAfter(firstNumber, suffix) {
+    switch (suffix) {
+        case "!":
+            return toFixedAndParseFloat(factorialOf(firstNumber));
+        case "π":
+            return toFixedAndParseFloat(firstNumber * Math.PI);
+    }
+}
+
+function factorialOf(number) {
+    if (number === 0 || number === 1){
+        return 1;
+    }
+    return number * factorialOf(number - 1);
+}
+
+function moreFunctionsBetween(firstNumber, infix, secondNumber) {
+    switch (infix) {
+        case "^":
+            return toFixedAndParseFloat(Math.pow(firstNumber, secondNumber));
     }
 }
 

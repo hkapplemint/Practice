@@ -4,20 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
-    <link rel="stylesheet" href="styles2.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="changeColorBtnStyles.css">
     <link rel="stylesheet" href="scrollbar.css">
     <script src="script.js" defer></script>
     <script src="colorBtns.js" defer></script>
+    <script src="moreFunctions.js" defer></script>
 </head>
 <body>
     <div class="change-color-container">
-        <button id="change-color-btn-1" class="change-color-btn change-color-btn-expand"></button>
-        <button id="change-color-btn-2" class="change-color-btn"></button>
-        <button id="change-color-btn-3" class="change-color-btn"></button>
+        <button id="change-color-btn-1" class="change-color-btn change-color-btn-expand"  style="background: linear-gradient(135deg, #f2e8ff, #d5b4fe);"></button>
+        <button id="change-color-btn-2" class="change-color-btn" style="background: linear-gradient(135deg, #32c2fe, #0089cd);"></button>
+        <button id="change-color-btn-3" class="change-color-btn" style="background: linear-gradient(135deg, #d39c64, #9c5732);"></button>
     </div>
     <div class="calculator">
         <div class="display-container">
-            <input type="text" class="display" placeholder="0">
+            <input id="display" type="text" class="display" placeholder="0">
             <div id="display-result" class="display-result"></div>
         </div>
         <div class="more-functions-container">
@@ -29,13 +31,11 @@
                 <button id="show-more-btn" class="show-more">
                     <svg id="show-more-svg" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
                 </button>
-                <button id="RAD-btn" class="more-fx-btn show-more-related hidden">RAD</button>
                 <button id="sin-btn" class="more-fx-btn show-more-related hidden">sin</button>
                 <button id="cos-btn" class="more-fx-btn show-more-related hidden">cos</button>
                 <button id="tan-btn" class="more-fx-btn show-more-related hidden">tan</button>
-                <div class="empty-div show-more-related hidden"></div>
-                <button id="INV-btn" class="more-fx-btn show-more-related hidden">INV</button>
                 <button id="e-btn" class="more-fx-btn show-more-related hidden">e</button>
+                <div class="empty-div show-more-related hidden"></div>
                 <button id="ln-btn" class="more-fx-btn show-more-related hidden">ln</button>
                 <button id="log-btn" class="more-fx-btn show-more-related hidden">log</button>
                 <div class="empty-div show-more-related hidden"></div>
