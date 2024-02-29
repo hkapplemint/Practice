@@ -197,7 +197,7 @@ showMoreBtn.addEventListener("click", () => {
 
 
 function toFixedAndParseFloat(string) {
-    return parseFloat(parseFloat(string).toFixed(7))
+    return parseFloat(parseFloat(string).toFixed(20))
 }
 
 function switchFourOperators(firstNumber, infix, secondNumber) {
@@ -227,27 +227,36 @@ const regexNumbers = /[\d]+[.]?[\d]*/g;
 const regexParen = /\(-?\d+.?\d?\)/;
 const regexExtractFormulaHighInfix = /(-?\d+\.?\d*)([x÷\/\*])(-?\d+\.?\d*)/;
 const regexExtractFormulaLowInfix = /(-?\d+\.?\d*)([\+\-])(-?\d+\.?\d*)/;
-const regexFxBefore = /([√]|[a-zA-Z]+)(-?\d+\.?\d*)/;
-const regexFxAfter = /(-?\d+\.?\d*)([π!%])/;
+const regexFxBefore = /([√]|(?![x])[a-zA-Z]+)(-?\d+\.?\d*)/;
+const regexFxAfter = /(-?\d+\.?\d*)([π!%e])/;
 const regexFxBetween = /(-?\d+\.?\d*)([\^])(-?\d+\.?\d*)/;
 const regexSingleNumberInParen = /\((-?\d+\.?\d*)\)/;
 
 function calculate(inputString) {
+    console.log("Starting a new round of calculation:", inputString)
 
     numberOfOpenParen = 0;
     numberOfCloseParen = 0;
 
     inputString = removeParenOfSingleNumber(inputString);
 
-    if (inputString === "π") {
-        handleMoreFxAfter("1π");
-    }
 
     let leftMostParen = inputString.match(regexParen);
     if(leftMostParen) {
         console.log(`Left Most Paren Exist: ${leftMostParen}`)
         let formula = regexExtractFormulaHighInfix.exec(leftMostParen[0]);
-        if (formula !== null) {
+        if (regexFxAfter.exec(inputString) || regexFxBefore.exec(inputString) || regexFxBetween.exec(inputString)) {
+            if (regexFxBetween.exec(inputString)) {
+                handleMoreFxBetween(inputString);
+                return
+            } else if (regexFxAfter.exec(inputString)) {
+                handleMoreFxAfter(inputString);
+                return
+            } else if (regexFxBefore.exec(inputString)) {
+                handleMoreFxBefore(inputString);
+                return
+            }
+        } else if (formula !== null) {
             console.log(`Paren formula: ${formula}`)
             let firstNumber = toFixedAndParseFloat(formula[1]);
             let infix = formula[2];
@@ -257,13 +266,6 @@ function calculate(inputString) {
     
             inputString = inputString.replace(leftMostParen[0], result);
             calculate(inputString);
-        } else if (regexFxAfter.exec(inputString) || regexFxBefore.exec(inputString) || regexFxBetween.exec(inputString)) {
-            console.log("LMAO1");
-            if (regexFxBetween.exec(inputString)) {
-                handleMoreFxBetween(inputString);
-            } else if (regexFxAfter.exec(inputString)) {
-                handleMoreFxAfter(inputString);
-            }
         } else {
             formula = regexExtractFormulaLowInfix.exec(leftMostParen[0]);
             console.log(`Paren formula: ${formula}`)
@@ -279,7 +281,18 @@ function calculate(inputString) {
     } else {
         console.log("Left most paren not exist")
         let leftMostFormula = inputString.match(regexExtractFormulaHighInfix);
-        if(leftMostFormula){
+        if (regexFxAfter.exec(inputString) || regexFxBefore.exec(inputString) || regexFxBetween.exec(inputString)) {
+            if (regexFxBetween.exec(inputString)) {
+                handleMoreFxBetween(inputString);
+                return
+            } else if (regexFxAfter.exec(inputString)) {
+                handleMoreFxAfter(inputString);
+                return
+            } else if (regexFxBefore.exec(inputString)) {
+                handleMoreFxBefore(inputString);
+                return
+            }
+        } else if(leftMostFormula){
             formula = regexExtractFormulaHighInfix.exec(leftMostFormula);
             console.log(`Not paren formula: ${formula}`);
             firstNumber = toFixedAndParseFloat(formula[1]);
@@ -289,15 +302,6 @@ function calculate(inputString) {
             result = switchFourOperators(firstNumber, infix, secondNumber);
             inputString = inputString.replace(leftMostFormula[0], result);
             calculate(inputString);
-        } else if (regexFxAfter.exec(inputString) || regexFxBefore.exec(inputString) || regexFxBetween.exec(inputString)) {
-            if (regexFxBetween.exec(inputString)) {
-                handleMoreFxBetween(inputString);
-            } else if (regexFxAfter.exec(inputString)) {
-                handleMoreFxAfter(inputString);
-            } else if (regexFxBefore.exec(inputString)) {
-                console.log(regexFxBefore.exec(inputString)[0])
-                handleMoreFxBefore(inputString);
-            }
         } else {
             leftMostFormula = inputString.match(regexExtractFormulaLowInfix);
 
@@ -309,6 +313,12 @@ function calculate(inputString) {
                     displayResult.textContent = isNumberCheck[0] === inputString
                         ? inputString
                         : "";
+                    return
+                } else if (inputString === "Infinity") {
+                    displayResult.textContent = "Infinity";
+                    return
+                } else if (inputString === "-Infinity") {
+                    displayResult.textContent = "-Infinity";
                     return
                 }
             }
@@ -348,11 +358,17 @@ function handleMoreFxAfter(inputString) {
 }
 function handleMoreFxBefore(inputString) {
     formula = regexFxBefore.exec(inputString);
-    prefix = formula[1];
+    prefix = formula[1].startsWith("x")
+        ? formula[1].slice(1)
+        : formula[1];
     firstNumber = toFixedAndParseFloat(formula[2]);
 
     result = moreFunctionsBefore(prefix, firstNumber);
     inputString = inputString.replace(formula[0], result);
+    console.log(
+        "formula[0]:", formula[0],
+        "handleMoreFxBefore Output:", inputString
+        )
     calculate(inputString);
 }
 
@@ -364,6 +380,8 @@ function moreFunctionsAfter(firstNumber, suffix) {
             return toFixedAndParseFloat(firstNumber * Math.PI);
         case "%":
             return toFixedAndParseFloat(firstNumber / 100);
+        case "e":
+            return toFixedAndParseFloat(firstNumber * Math.E)
     }
 }
 function moreFunctionsBefore(prefix, firstNumber) {
@@ -477,6 +495,7 @@ fxBeforeBtns.forEach(btn => {
 })
 eBtn.addEventListener("click", () => {
     display.value += eBtn.textContent;
+    calculate(display.value);
 })
 
 piBtn.addEventListener("click", e => {
