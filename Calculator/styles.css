@@ -77,7 +77,8 @@ body {
     transition: transform 0.3s;
     fill: white;
 }
-.display-show-more svg.display-show-more-expanded {
+.display-show-more svg.display-show-more-expanded,
+.display-show-more-horizontal svg.display-show-more-expanded {
     transform: rotate(180deg);
 }
 .history {
@@ -96,6 +97,9 @@ body {
     grid-auto-rows: 60px;
     opacity: 90%;
     border-radius: 0 10px 10px 0;
+}
+.display-show-more-horizontal {
+    display: none;
 }
 
 .history-expand {

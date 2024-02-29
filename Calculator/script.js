@@ -13,6 +13,7 @@ const plusBtn = document.getElementById("plus-btn");
 const minusBtn = document.getElementById("minus-btn");
 const displayResult = document.getElementById("display-result");
 const displayShowMoreBtn = document.getElementById("display-show-more");
+const displayShowMoreHorizontalBtn = document.getElementById("display-show-more-horizontal")
 const history = document.getElementById("history");
 const percentBtn = document.getElementById("percent-btn");
 const parenBtn = document.getElementById("paren-btn");
@@ -102,7 +103,12 @@ display.addEventListener("input", (e) => {
 displayShowMoreBtn.addEventListener("click", () => {
     const svg = displayShowMoreBtn.querySelector("svg");
     svg.classList.toggle("display-show-more-expanded");
-    history.classList.toggle("history-expand")
+    history.classList.toggle("history-expand");
+})
+displayShowMoreHorizontalBtn.addEventListener("click", () => {
+    const svg = displayShowMoreHorizontalBtn.querySelector("svg");
+    svg.classList.toggle("display-show-more-expanded");
+    history.classList.toggle("history-expand");
 })
 
 plusBtn.addEventListener("click", replaceLastOperator);
