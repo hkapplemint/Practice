@@ -16,6 +16,17 @@ const displayShowMoreBtn = document.getElementById("display-show-more");
 const history = document.getElementById("history");
 const percentBtn = document.getElementById("percent-btn");
 const parenBtn = document.getElementById("paren-btn");
+const sinBtn = document.getElementById("sin-btn");
+const cosBtn = document.getElementById("cos-btn");
+const tanBtn = document.getElementById("tan-btn");
+const eBtn = document.getElementById("e-btn");
+const lnBtn = document.getElementById("ln-btn");
+const logBtn = document.getElementById("log-btn");
+const sqRootBtn = document.getElementById("sq-root-btn");
+const piBtn = document.getElementById("pi-btn");
+const powerBtn = document.getElementById("power-btn");
+const factorialBtn = document.getElementById("factorial-btn");
+const fxBeforeBtns = document.querySelectorAll(".fx-before");
 
 const regexOperators = /[x÷\*\/\+\-]/;
 let calculated = false;
@@ -216,7 +227,7 @@ const regexNumbers = /[\d]+[.]?[\d]*/g;
 const regexParen = /\(-?\d+.?\d?\)/;
 const regexExtractFormulaHighInfix = /(-?\d+\.?\d*)([x÷\/\*])(-?\d+\.?\d*)/;
 const regexExtractFormulaLowInfix = /(-?\d+\.?\d*)([\+\-])(-?\d+\.?\d*)/;
-const regexFxBefore = /([√])(-?\d+\.?\d*)/;
+const regexFxBefore = /([√]|[a-zA-Z]+)(-?\d+\.?\d*)/;
 const regexFxAfter = /(-?\d+\.?\d*)([π!%])/;
 const regexFxBetween = /(-?\d+\.?\d*)([\^])(-?\d+\.?\d*)/;
 const regexSingleNumberInParen = /\((-?\d+\.?\d*)\)/;
@@ -284,6 +295,7 @@ function calculate(inputString) {
             } else if (regexFxAfter.exec(inputString)) {
                 handleMoreFxAfter(inputString);
             } else if (regexFxBefore.exec(inputString)) {
+                console.log(regexFxBefore.exec(inputString)[0])
                 handleMoreFxBefore(inputString);
             }
         } else {
@@ -358,6 +370,17 @@ function moreFunctionsBefore(prefix, firstNumber) {
     switch (prefix) {
         case "√":
             return toFixedAndParseFloat(Math.sqrt(firstNumber));
+        case "sin":
+            return toFixedAndParseFloat(Math.sin(firstNumber));
+        case "cos":
+            return toFixedAndParseFloat(Math.cos(firstNumber));
+        case "tan":
+            return toFixedAndParseFloat(Math.tan(firstNumber));
+        case "log":
+            return toFixedAndParseFloat(Math.log10(firstNumber));
+        case "ln":
+            return toFixedAndParseFloat(Math.log(firstNumber));
+
     }
 }
 
@@ -446,39 +469,28 @@ dotBtn.addEventListener("click", () => {
 
 
 
-const sqRootBtn = document.getElementById("sq-root-btn");
-const piBtn = document.getElementById("pi-btn");
-const powerBtn = document.getElementById("power-btn");
-const factorialBtn = document.getElementById("factorial-btn");
 
-
-sqRootBtn.addEventListener("click", e => {
-    display.value += sqRootBtn.textContent;
-    display.value += "("
+fxBeforeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        display.value += `${btn.textContent}(`
+    })
+})
+eBtn.addEventListener("click", () => {
+    display.value += eBtn.textContent;
 })
 
 piBtn.addEventListener("click", e => {
     display.value += piBtn.textContent;
     calculate(display.value)
-    if(display.value === displayResult.textContent) {
-        displayResult.textContent = "";
-    }
 })
 
 powerBtn.addEventListener("click", e => {
     display.value += powerBtn.textContent;
-    calculate(display.value)
-    if(display.value === displayResult.textContent) {
-        displayResult.textContent = "";
-    }
 })
 
 factorialBtn.addEventListener("click", e => {
     display.value += factorialBtn.textContent;
     calculate(display.value)
-    if(display.value === displayResult.textContent) {
-        displayResult.textContent = "";
-    }
 })
 
 
