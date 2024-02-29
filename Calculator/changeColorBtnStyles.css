@@ -10,9 +10,5 @@
     width: 30px;
     height: 30px;
     border-radius: 50% ;
-    border: none;
-}
-
-.top {
-    z-index: 0;
+    border: 1px solid gray;
 }
