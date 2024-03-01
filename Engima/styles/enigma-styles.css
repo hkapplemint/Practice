@@ -1,0 +1,92 @@
+
+.enigma {
+    --primary-color: black;
+    --key-and-light-size: 3rem;
+    --row-offset: -1.6rem;
+
+    height: 100%;
+    font-family: Courier, sans-serif;
+    user-select: none;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--primary-color);
+}
+
+.lightbulb-container, .keyboard-container, .plugboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 30px;
+}
+
+.key, .light, .plug, .rotor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.rotor-display-container {
+    display: flex;
+    gap: 20px;
+    background-color: aliceblue;
+}
+.rotor {
+    height: 2rem;
+    width: var(--key-and-light-size);
+}
+
+.lightbulb-container {
+    background-color: yellow;
+}
+.light-row-1, .light-row-2, .light-row-3 {
+    display: flex;
+    gap: 20px;
+}
+.light-row-2, .light-row-3 {
+    transform: translateX(var(--row-offset));
+}
+.light {
+    height: var(--key-and-light-size);
+    width: var(--key-and-light-size);
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+}
+
+.keyboard-container {
+    background-color: gray;
+}
+.key-row-1, .key-row-2, .key-row-3 {
+    display: flex;
+    gap: 20px;
+}
+.key-row-2, .key-row-3 {
+    transform: translateX(var(--row-offset));
+}
+.key {
+    height: var(--key-and-light-size);
+    width: var(--key-and-light-size);
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+}
+
+.plugboard-container {
+    background-color: burlywood;
+}
+.plug-row-1, .plug-row-2, .plug-row-3 {
+    display: flex;
+    gap: 20px;
+}
+.plug {
+    height: 5rem;
+    width: 3rem;
+    border-radius: 999px;
+    color: var(--primary-color);
+    background-color: white;
+    border: 2px solid var(--primary-color);
+}
