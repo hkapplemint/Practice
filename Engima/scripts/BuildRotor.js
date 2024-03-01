@@ -1,45 +1,46 @@
-export default class BuildRotor {
+export default class RotorBuilder {
     constructor() {
         this.rotor = {}
         this.rotor.currentNumber = 0;
+    }
 
-        this.rotor.rotate = () => {
-            this.rotor.currentNumber++;
+    rotate() {
+        this.rotor.currentNumber++;
 
-            if(this.rotor.currentNumber === this.rotor.scrambleArr.letter - 1) {
-                //rotor rotated a whole round, hence need to loop from the beginning
-                this.rotor.currentNumber = 0;
-            }
-        };
+        if(this.rotor.currentNumber === this.rotor.scrambleArr.length) {
+            //rotor rotated a whole round, hence need to loop from the beginning
+            this.rotor.currentNumber = 0;
+        }
+    };
 
-        this.rotor.inToOut = (letter) => {
-            //char code "a" is 65, "z" is 90
-            let newLetterCharCode = letter.charCodeAt(0) + this.rotor.scrambleArr[currentNumber] //result a number
+    inToOut(letter) {
+        //char code "a" is 65, "z" is 90
+        let newLetterCharCode = letter.charCodeAt(0) + this.rotor.scrambleArr[this.rotor.currentNumber] //result a number
+        console.log("InToOut offset:", this.rotor.scrambleArr[this.rotor.currentNumber])
 
-            if (newLetterCharCode > 90) {
-                newLetterCharCode = newLetterCharCode - 26;
-                return letter = String.fromCharCode(newLetterCharCode);
-            } else if (newLetterCharCode < 65) {
-                newLetterCharCode = newLetterCharCode + 26;
-                return letter = String.fromCharCode(newLetterCharCode)
-            } else {
-                return letter;
-            }
+        if (newLetterCharCode > 90) {
+            newLetterCharCode = newLetterCharCode - 26;
+        } else if (newLetterCharCode < 65) {
+            newLetterCharCode = newLetterCharCode + 26;
         }
 
-        this.rotor.outToIn = (letter) => {
-            let newLetterCharCode = letter.charCodeAt(0) - this.rotor.scrambleArr[currentNumber] //changes from + to -
+        console.log(`Rotor In to Out, ${letter} changed to ${String.fromCharCode(newLetterCharCode)}`)
+        return letter = String.fromCharCode(newLetterCharCode)
+    }
 
-            if (newLetterCharCode > 90) {
-                newLetterCharCode = newLetterCharCode - 26;
-                return letter = String.fromCharCode(newLetterCharCode);
-            } else if (newLetterCharCode < 65) {
-                newLetterCharCode = newLetterCharCode + 26;
-                return letter = String.fromCharCode(newLetterCharCode)
-            } else {
-                return letter;
-            }
+    outToIn(letter) {
+        let newLetterCharCode = letter.charCodeAt(0) - this.rotor.scrambleArr[this.rotor.currentNumber] //changes from + to -
+
+        console.log("InToOut offset:", -this.rotor.scrambleArr[this.rotor.currentNumber])
+
+        if (newLetterCharCode > 90) {
+            newLetterCharCode = newLetterCharCode - 26;
+        } else if (newLetterCharCode < 65) {
+            newLetterCharCode = newLetterCharCode + 26;
         }
+
+        console.log(`Rotor Out to In, ${letter} changed to ${String.fromCharCode(newLetterCharCode)}`)
+        return letter = String.fromCharCode(newLetterCharCode)
     }
 
     setScrambleArr(arr) {
@@ -54,6 +55,16 @@ export default class BuildRotor {
         }
 
         this.rotor.ringNotch = num;
+        return this;
+    }
+
+    setStartingNumber(num) {
+        if (num < 0 || num > 25) {
+            console.error("Ring notch must be between 0 and 25")
+            return
+        }
+
+        this.rotor.currentNumber = num;
         return this;
     }
 

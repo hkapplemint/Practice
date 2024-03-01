@@ -1,6 +1,6 @@
 
 .enigma {
-    --primary-color: black;
+    --primary-color: rgb(32, 32, 32);
     --key-and-light-size: 3rem;
     --row-offset: -1.6rem;
 
@@ -42,7 +42,7 @@
 }
 
 .lightbulb-container {
-    background-color: yellow;
+    background-color: rgb(61, 61, 2);
 }
 .light-row-1, .light-row-2, .light-row-3 {
     display: flex;
@@ -56,7 +56,12 @@
     width: var(--key-and-light-size);
     background-color: var(--primary-color);
     color: white;
+    font-weight: bold;
     border-radius: 50%;
+}
+.highlight {
+    background-color: yellow;
+    color: var(--primary-color)
 }
 
 .keyboard-container {
@@ -75,6 +80,13 @@
     background-color: var(--primary-color);
     color: white;
     border-radius: 50%;
+    transition: filter 0.05s linear;
+    filter: drop-shadow(5px 5px 3px rgb(51, 51, 51));
+}
+.key-pressed {
+    border: 1px inset black;
+    background-color: black;
+    filter: drop-shadow(0px 0px 1px black);
 }
 
 .plugboard-container {
