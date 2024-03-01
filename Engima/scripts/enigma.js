@@ -1,12 +1,51 @@
+import BuildRotor from "./BuildRotor.js";
 
 class EnigmaBuilder {
     constructor() {
         this.enigma = {};
 
+        this.enigma.reflects = (letter) => {
+            const reflectorArr = [
+                {"A": "E"},
+                {"B": "O"},
+                {"C": "A"},
+                {"D": "J"},
+                {"E": "D"},
+                {"F": "Y"},
+                {"G": "B"},
+                {"H": "W"},
+                {"I": "S"},
+                {"J": "Z"},
+                {"K": "F"},
+                {"L": "K"},
+                {"M": "G"},
+                {"N": "I"},
+                {"O": "U"},
+                {"P": "Q"},
+                {"Q": "V"},
+                {"R": "P"},
+                {"S": "L"},
+                {"T": "C"},
+                {"U": "T"},
+                {"V": "X"},
+                {"W": "M"},
+                {"X": "H"},
+                {"Y": "R"},
+                {"Z": "N"}
+            ]
+            reflectorArr.find((obj) => {
+                //an obj looks like {"B": "R"}
+                //by passing letter directly as a key, it will return the corresponding value
+                if (obj[letter]) {
+                    return obj[letter]
+                }
+            })
+        }
+
         this.enigma.encrypt = (letter) => {
             let currentLetter = letter;
     
-            //the character first go through a plug board
+            //the letter first go through a plug board
             currentLetter = this.enigma.plugArr.find((plugObj) => {
                 if (plugObj[1] === currentLetter) {
                     //if there is a plugObj with its "1" value equal to 
@@ -20,13 +59,40 @@ class EnigmaBuilder {
                 }
             })
 
+            //the letter go through right rotor
+            currentLetter = this.enigma.rotor1.inToOut(currentLetter);
+            this.enigma.rotor1.rotate();
+            if(this.enigma.rotor1.currentNumber === this.enigma.rotor2.ringNotch) {
+                this.enigma.rotor2.rotate();
+            }
+            
+            currentLetter = this.enigma.rotor2.inToOut(currentLetter);
+            this.enigma.rotor2.rotate()
+            if(this.enigma.rotor2.currentNumber === this.enigma.rotor3.ringNotch) {
+                this.enigma.rotor3.rotate();
+            }
+
+            currentLetter = this.enigma.rotor3.inToOut(currentLetter);
+
+            currentLetter = this.enigma.reflects(currentLetter);
+
+            currentLetter = this.enigma.rotor3.outToIn(currentLetter);
+
+            currentLetter = this.enigma.rotor2.outToIn(currentLetter);
+
+            currentLetter = this.enigma.rotor1.outToIn(currentLetter);
+
+            currentLetter = this.enigma.plugArr.find((plugObj) => {
+                if (plugObj[2] === currentLetter) {
+                    return plugObj[1];
+                } else {
+                    return currentLetter;
+                }
+            })
         };
     }
 
     setRotor1(rotorObj) {
-        //rotorObj has an array, containing a pre-defined internal randomization for 13 pairs of numbers
-        //  example [{in: 10, out: 21}, {in: 11, out: 4}, {in: 12, out: 3}]
-        //rotorObj has 3 functions
         //  transform an incoming character to a different character
         //  transform an outgoing character to a different character
         // rotate, uses the next item in the rotorObj array
