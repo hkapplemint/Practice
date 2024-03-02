@@ -30,5 +30,8 @@
     background-color: rgb(41, 41, 41);
     color: white;
     border: 0;
-    box-shadow: 5px 5px 2px black;
+    box-shadow: 2px 2px 2px black;
+}
+.line:nth-child(2n) {
+    stroke: gray;
 }

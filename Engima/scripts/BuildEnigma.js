@@ -163,6 +163,13 @@ export default class EnigmaBuilder {
         this.enigma.plugArr.push(plugObj);
         return this;
     }
+    removePlug(plugObj) {
+        const targetPlugIndex = this.enigma.plugArr.indexOf(plugObj);
+        if (targetPlugIndex >= 0) {
+            this.enigma.plugArr.splice(targetPlugIndex, 1);
+        }
+        return this;
+    }
 
     build() {
         if (this.enigma.rotor1 && this.enigma.rotor2 && this.enigma.rotor3) {

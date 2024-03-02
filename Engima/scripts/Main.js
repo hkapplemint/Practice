@@ -38,8 +38,8 @@ const enigma = new EnigmaBuilder()
     .setRotor1(rotor1)
     .setRotor2(rotor2)
     .setRotor3(rotor3)
-    .setPlug(plug1)
-    .setPlug(plug2)
+    // .setPlug(plug1)
+    // .setPlug(plug2)
 
 
 
@@ -131,6 +131,29 @@ document.addEventListener("keyup", () => {
     }
 })
 
-document.addEventListener("mousedown", () => {
-    console.log(globalPlugArr);
+//listening for dropping a plug
+document.addEventListener("drop", (e) => {
+    if (typeof e.target.className !== "string") return
+
+    if (e.target.className.includes("plugged")) {
+    //if the target being dropped on, has a class call "plugged"
+    //as globalPugArr is updated by MainPlugLogic
+    //clear all previous plugs, and set all new plugs to enigma
+        enigma.enigma.plugArr = [];
+        globalPlugArr.forEach((plugObj) => {
+            enigma.setPlug(plugObj);
+        })
+    };
+})
+
+document.addEventListener("mousedown", (e) => {
+    if (typeof e.target.className !== "string") return
+
+    if (e.target.className.includes("plugged")) {
+        const letter = e.target.textContent;
+        const targetPlugObj = globalPlugArr.find((plugObj) => plugObj["firstLetter"] === letter || plugObj["secondLetter"] === letter);
+        if (targetPlugObj) {
+            enigma.removePlug(targetPlugObj);
+        }
+    }
 })
