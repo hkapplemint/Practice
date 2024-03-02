@@ -1,7 +1,7 @@
 import RotorBuilder from "./BuildRotor.js";
 import EnigmaBuilder from "./BuildEnigma.js";
 import PlugBuilder from "./BuildPlug.js";
-import {globalLetterUsed} from "./MainPlugLogic.js"
+import {globalPlugArr} from "./MainPlugLogic.js"
 
 const scrambleArr1 = [11, 24, 16, -2, 15, 16, 2, -5, 6, 4, -6, 11, 12, 10, -7, -15, 1, -12, -9, -9, -5, -5, -16, -11, -21, -5];
 const scrambleArr2 = [16, 8, 7, 10, 11, 6, 2, 4, 22, 0, 19, 21, 1, 24, 18, 14, 17, 9, 3, 25, 23, 15, 13, 20, 12, 5];
@@ -131,3 +131,6 @@ document.addEventListener("keyup", () => {
     }
 })
 
+document.addEventListener("mousedown", () => {
+    console.log(globalPlugArr);
+})

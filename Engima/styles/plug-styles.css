@@ -1,7 +1,12 @@
 .plugboard-container {
     background-color: burlywood;
     transition: height 0.5s;
-
+    position: relative;
+}
+.plugboard-svg {
+    position: absolute;
+    width: 100%;
+    height: 90%;
 }
 .plug-row-1, .plug-row-2, .plug-row-3 {
     display: flex;
@@ -17,4 +22,13 @@
     background-color: white;
     border: 2px solid var(--primary-color);
     transform: translate(0, 0);
+}
+.dragging {
+    opacity: 0.5;
+}
+.plugged {
+    background-color: rgb(41, 41, 41);
+    color: white;
+    border: 0;
+    box-shadow: 5px 5px 2px black;
 }
