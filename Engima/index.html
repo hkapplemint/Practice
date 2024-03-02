@@ -7,14 +7,16 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/setting-styles.css">
     <link rel="stylesheet" href="styles/enigma-styles.css">
+    <link rel="stylesheet" href="styles/plug-styles.css">
     <script type="module" src="scripts/Main.js" defer></script>
+    <script type="module" src="scripts/MainPlugLogic.js" defer></script>
 </head>
 <body>
     <div class="enigma">
         <div class="rotor-display-container">
-            <div id="rotor3" class="rotor">02</div>
-            <div id="rotor2" class="rotor">23</div>
-            <div id="rotor1" class="rotor">15</div>
+            <div id="rotor3" class="rotor"> - </div>
+            <div id="rotor2" class="rotor"> - </div>
+            <div id="rotor1" class="rotor"> - </div>
         </div>
         <div class="lightbulb-container">
             <div class="light-row-1">
@@ -86,36 +88,36 @@
         </div>
         <div class="plugboard-container">
             <div class="plug-row-1">
-                <div class="plug">Q</div>
-                <div class="plug">W</div>
-                <div class="plug">E</div>
-                <div class="plug">R</div>
-                <div class="plug">T</div>
-                <div class="plug">Z</div>
-                <div class="plug">U</div>
-                <div class="plug">I</div>
-                <div class="plug">O</div>
+                <div class="plug" draggable="true">Q</div>
+                <div class="plug" draggable="true">W</div>
+                <div class="plug" draggable="true">E</div>
+                <div class="plug" draggable="true">R</div>
+                <div class="plug" draggable="true">T</div>
+                <div class="plug" draggable="true">Z</div>
+                <div class="plug" draggable="true">U</div>
+                <div class="plug" draggable="true">I</div>
+                <div class="plug" draggable="true">O</div>
             </div>
             <div class="plug-row-2">
-                <div class="plug">A</div>
-                <div class="plug">S</div>
-                <div class="plug">D</div>
-                <div class="plug">F</div>
-                <div class="plug">G</div>
-                <div class="plug">H</div>
-                <div class="plug">J</div>
-                <div class="plug">K</div>
+                <div class="plug" draggable="true">A</div>
+                <div class="plug" draggable="true">S</div>
+                <div class="plug" draggable="true">D</div>
+                <div class="plug" draggable="true">F</div>
+                <div class="plug" draggable="true">G</div>
+                <div class="plug" draggable="true">H</div>
+                <div class="plug" draggable="true">J</div>
+                <div class="plug" draggable="true">K</div>
             </div>
             <div class="plug-row-3">
-                <div class="plug">P</div>
-                <div class="plug">Y</div>
-                <div class="plug">X</div>
-                <div class="plug">C</div>
-                <div class="plug">V</div>
-                <div class="plug">B</div>
-                <div class="plug">N</div>
-                <div class="plug">M</div>
-                <div class="plug">L</div>
+                <div class="plug" draggable="true">P</div>
+                <div class="plug" draggable="true">Y</div>
+                <div class="plug" draggable="true">X</div>
+                <div class="plug" draggable="true">C</div>
+                <div class="plug" draggable="true">V</div>
+                <div class="plug" draggable="true">B</div>
+                <div class="plug" draggable="true">N</div>
+                <div class="plug" draggable="true">M</div>
+                <div class="plug" draggable="true">L</div>
             </div>
         </div>
     </div>

@@ -1,0 +1,20 @@
+.plugboard-container {
+    background-color: burlywood;
+    transition: height 0.5s;
+
+}
+.plug-row-1, .plug-row-2, .plug-row-3 {
+    display: flex;
+    gap: 20px;
+}
+.plug {
+    cursor: move;
+    height: 3.5rem;
+    width: 2.5rem;
+    font-size: 2rem;
+    border-radius: 999px;
+    color: var(--primary-color);
+    background-color: white;
+    border: 2px solid var(--primary-color);
+    transform: translate(0, 0);
+}

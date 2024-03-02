@@ -16,7 +16,7 @@ export default class RotorBuilder {
     inToOut(letter) {
         //char code "a" is 65, "z" is 90
         let newLetterCharCode = letter.charCodeAt(0) + this.rotor.scrambleArr[this.rotor.currentNumber] //result a number
-        console.log("InToOut offset:", this.rotor.scrambleArr[this.rotor.currentNumber])
+        // console.log("InToOut offset:", this.rotor.scrambleArr[this.rotor.currentNumber])
 
         if (newLetterCharCode > 90) {
             newLetterCharCode = newLetterCharCode - 26;
@@ -31,7 +31,7 @@ export default class RotorBuilder {
     outToIn(letter) {
         let newLetterCharCode = letter.charCodeAt(0) - this.rotor.scrambleArr[this.rotor.currentNumber] //changes from + to -
 
-        console.log("InToOut offset:", -this.rotor.scrambleArr[this.rotor.currentNumber])
+        // console.log("InToOut offset:", -this.rotor.scrambleArr[this.rotor.currentNumber])
 
         if (newLetterCharCode > 90) {
             newLetterCharCode = newLetterCharCode - 26;

@@ -1,6 +1,7 @@
 import RotorBuilder from "./BuildRotor.js";
 import EnigmaBuilder from "./BuildEnigma.js";
 import PlugBuilder from "./BuildPlug.js";
+import {globalLetterUsed} from "./MainPlugLogic.js"
 
 const scrambleArr1 = [11, 24, 16, -2, 15, 16, 2, -5, 6, 4, -6, 11, 12, 10, -7, -15, 1, -12, -9, -9, -5, -5, -16, -11, -21, -5];
 const scrambleArr2 = [16, 8, 7, 10, 11, 6, 2, 4, 22, 0, 19, 21, 1, 24, 18, 14, 17, 9, 3, 25, 23, 15, 13, 20, 12, 5];
@@ -20,7 +21,6 @@ const plug2 = new PlugBuilder()
     .setSecondLetter("K")
     .build();
 
-
 const rotor1 = new RotorBuilder()
     .setScrambleArr(scrambleArr1)
     .setRingNotch(ringNotch1)
@@ -38,8 +38,14 @@ const enigma = new EnigmaBuilder()
     .setRotor1(rotor1)
     .setRotor2(rotor2)
     .setRotor3(rotor3)
-    // .setPlug(plug1)
-    // .setPlug(plug2)
+    .setPlug(plug1)
+    .setPlug(plug2)
+
+
+
+
+
+
 
 
 
@@ -50,64 +56,78 @@ const rotorOne = document.getElementById("rotor1");
 const rotorTwo = document.getElementById("rotor2");
 const rotorThree = document.getElementById("rotor3");
 
-
+let isKeyDown = false;
 const handleKeyDown = (e) => {
-    let result;
-    if (e.target.tagName === "BODY") {
-        result = enigma.encrypt(e.key.toUpperCase());
-    } else {
-        result = enigma.encrypt(e.target.textContent);
-        e.target.classList.add("key-pressed")
-    }
-
-    //add result to display
-    decryptionContainer.textContent += result;
-
-    //update rotor display
-    console.log(rotorOne);
-    rotorOne.textContent = enigma.enigma.rotor1.rotor.currentNumber;
-    rotorTwo.textContent = enigma.enigma.rotor2.rotor.currentNumber;
-    rotorThree.textContent = enigma.enigma.rotor3.rotor.currentNumber;
-
-    const foundLightElement = [...lights].find((light) => light.textContent === result)
-    if (foundLightElement) {
-        foundLightElement.classList.add("highlight")
-        const keyDownAudio = new Audio("audio/key-down.mp3")
-        keyDownAudio.play();
-    }
+    if(!isKeyDown) {
+        let result;
+        if (e.target.tagName === "BODY") {
+            result = enigma.encrypt(e.key.toUpperCase());
+        } else {
+            result = enigma.encrypt(e.target.textContent);
+            e.target.classList.add("key-pressed")
+        }
     
+        //add result to display
+        decryptionContainer.textContent += result;
+    
+        //update rotor display
+        rotorOne.textContent = enigma.enigma.rotor1.rotor.currentNumber;
+        rotorTwo.textContent = enigma.enigma.rotor2.rotor.currentNumber;
+        rotorThree.textContent = enigma.enigma.rotor3.rotor.currentNumber;
+    
+        const foundLightElement = [...lights].find((light) => light.textContent === result)
+        if (foundLightElement) {
+            foundLightElement.classList.add("highlight")
+            const keyDownAudio = new Audio("audio/key-down.mp3")
+            keyDownAudio.play();
+        }
+
+        isKeyDown = true;
+    }
 }
+
 const handleKeyUp = () => {
-    lights.forEach((light) => {
-        light.classList.remove("highlight");
-    })
-    keys.forEach((key) => {
-        key.classList.remove("key-pressed");
-    })
-    const keyUpAudio = new Audio("audio/key-up.mp3")
+    if(isKeyDown) {
+        lights.forEach((light) => {
+            light.classList.remove("highlight");
+        })
+        keys.forEach((key) => {
+            key.classList.remove("key-pressed");
+        })
+
+        const keyUpAudio = new Audio("audio/key-up.mp3")
         keyUpAudio.play();
+        
+        isKeyDown = false;
+    }
 }
 
 keys.forEach((key) => {
-    key.addEventListener("mousedown", handleKeyDown)
-    key.addEventListener("mouseup", handleKeyUp)
+    key.addEventListener("mousedown", handleKeyDown);
+    key.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        handleKeyDown(e);
+    });
+    key.addEventListener("mouseup", handleKeyUp);
+    key.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        handleKeyUp(e);
+    });
 })
 
-let isKeyDown = false;
 document.addEventListener("keydown", (e) => {
     if (!isKeyDown) {
         keys.forEach((key) => {
-            if (e.key === key.textContent.toLowerCase()) {
+            if (e.key === key.textContent.toLowerCase() && !e.ctrlKey && !e.altKey && !e.shiftKey) {
                 handleKeyDown(e);
                 key.classList.add("key-pressed");
             }
         })
-
-        isKeyDown = true;
     }
 })
 document.addEventListener("keyup", () => {
-    handleKeyUp();
-    isKeyDown = false;
+    if(isKeyDown) {
+        handleKeyUp();
+    }
 })
 
