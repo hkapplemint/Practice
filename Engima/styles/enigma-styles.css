@@ -31,20 +31,8 @@
     font-size: 2rem;
 }
 
-.rotor-display-container {
-    display: flex;
-    justify-content: center;
-    align-self: center;
-    gap: 20px;
-    background-color: aliceblue;
-}
-.rotor {
-    height: 2rem;
-    width: var(--key-and-light-size);
-}
-
 .lightbulb-container {
-    background-color: rgb(61, 61, 2);
+    background-color: #242424;
 }
 .light-row-1, .light-row-2, .light-row-3 {
     display: flex;

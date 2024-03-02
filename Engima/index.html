@@ -8,15 +8,41 @@
     <link rel="stylesheet" href="styles/setting-styles.css">
     <link rel="stylesheet" href="styles/enigma-styles.css">
     <link rel="stylesheet" href="styles/plug-styles.css">
+    <link rel="stylesheet" href="styles/rotor-styles.css">
+    <link rel="stylesheet" href="styles/medias.css">
     <script type="module" src="scripts/Main.js" defer></script>
     <script type="module" src="scripts/MainPlugLogic.js" defer></script>
 </head>
 <body>
     <div class="enigma">
         <div class="rotor-display-container">
-            <div id="rotor3" class="rotor"> - </div>
-            <div id="rotor2" class="rotor"> - </div>
-            <div id="rotor1" class="rotor"> - </div>
+            <div class="rotor">
+                <div id="rotor3" class="current-number">5</div>
+                <div class="next-number">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m296-345-56-56 240-240 240 240-56 56-184-184-184 184Z"/></svg>
+                </div>
+                <div class="previous-number">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
+                </div>
+            </div>
+            <div class="rotor">
+                <div id="rotor2" class="current-number">7</div>
+                <div class="next-number">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m296-345-56-56 240-240 240 240-56 56-184-184-184 184Z"/></svg>
+                </div>
+                <div class="previous-number">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
+                </div>
+            </div>
+            <div class="rotor">
+                <div id="rotor1" class="current-number">25</div>
+                <div class="next-number">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m296-345-56-56 240-240 240 240-56 56-184-184-184 184Z"/></svg>
+                </div>
+                <div class="previous-number">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
+                </div>
+            </div>
         </div>
         <div class="lightbulb-container">
             <div class="light-row-1">

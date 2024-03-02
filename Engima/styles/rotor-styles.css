@@ -1,0 +1,39 @@
+.rotor-display-container {
+    width: 50%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    gap: 20px;
+    background-color: aliceblue;
+}
+.rotor {
+    width: var(--key-and-light-size);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s ease;
+    margin: auto auto;
+}
+
+.current-number {
+    grid-area: 1 / 1 / 3 / 2;
+    width: 2rem;
+    text-align: end;
+}
+.next-number, .previous-number {
+    max-height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.next-number {
+    background-color: red;
+}
+.previous-number {
+    background-color: yellow;
+}

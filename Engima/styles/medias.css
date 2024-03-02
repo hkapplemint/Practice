@@ -1,0 +1,11 @@
+@media screen and (max-width: 768px) {
+    body {
+        overflow: scroll;
+        grid-template-columns: 1fr;
+        gap: 30px
+    }
+
+    .interactive-container {
+        grid-area: 1 / 1 / 2 / 2;
+    }
+}

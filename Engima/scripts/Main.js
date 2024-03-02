@@ -55,6 +55,8 @@ const decryptionContainer = document.querySelector(".decryption-container");
 const rotorOne = document.getElementById("rotor1");
 const rotorTwo = document.getElementById("rotor2");
 const rotorThree = document.getElementById("rotor3");
+const nextNumberDivs = document.querySelectorAll(".next-number");
+const previousNumberDivs = document.querySelectorAll(".previous-number");
 
 let isKeyDown = false;
 const handleKeyDown = (e) => {
@@ -70,10 +72,10 @@ const handleKeyDown = (e) => {
         //add result to display
         decryptionContainer.textContent += result;
     
-        //update rotor display
-        rotorOne.textContent = enigma.enigma.rotor1.rotor.currentNumber;
-        rotorTwo.textContent = enigma.enigma.rotor2.rotor.currentNumber;
-        rotorThree.textContent = enigma.enigma.rotor3.rotor.currentNumber;
+        //update rotor display, parseInt then plus one is because .currentNumber is 0 indexed
+        rotorOne.textContent = parseInt(enigma.enigma.rotor1.rotor.currentNumber) + 1;
+        rotorTwo.textContent = parseInt(enigma.enigma.rotor2.rotor.currentNumber) + 1;
+        rotorThree.textContent = parseInt(enigma.enigma.rotor3.rotor.currentNumber) + 1;
     
         const foundLightElement = [...lights].find((light) => light.textContent === result)
         if (foundLightElement) {
@@ -113,6 +115,50 @@ keys.forEach((key) => {
         e.preventDefault();
         handleKeyUp(e);
     });
+})
+
+const setRotorCurrentNumber = (rotorId, num) => {
+    switch (rotorId) {
+        case "rotor1":
+            enigma.enigma.rotor1.rotor.currentNumber = num;
+            console.log("rotor1 currentNumber is now:", enigma.enigma.rotor1.rotor.currentNumber)
+            break
+        case "rotor2":
+            enigma.enigma.rotor2.rotor.currentNumber = num;
+            console.log("rotor2 currentNumber is now:", enigma.enigma.rotor2.rotor.currentNumber)
+            break
+        case "rotor3":
+            enigma.enigma.rotor3.rotor.currentNumber = num;
+            console.log("rotor3 currentNumber is now:", enigma.enigma.rotor3.rotor.currentNumber)
+            break
+    }
+}
+
+nextNumberDivs.forEach((nextNumberDiv) => {
+    nextNumberDiv.addEventListener("click", (e) => {
+        const currentRotor = nextNumberDiv.previousElementSibling;
+
+        if (currentRotor.textContent === "26") {
+            currentRotor.textContent = "1";
+        } else {
+            currentRotor.textContent = parseInt(currentRotor.textContent) + 1;
+        }
+
+        setRotorCurrentNumber(currentRotor.id, parseInt(currentRotor.textContent) - 1)
+    })
+})
+previousNumberDivs.forEach((previousNumberDiv) => {
+    previousNumberDiv.addEventListener("click", (e) => {
+        const currentRotor = previousNumberDiv.previousElementSibling.previousElementSibling;
+
+        if (currentRotor.textContent === "0") {
+            currentRotor.textContent = "26";
+        } else {
+            currentRotor.textContent = parseInt(currentRotor.textContent) - 1;
+        }
+
+        setRotorCurrentNumber(currentRotor.id, parseInt(currentRotor.textContent) - 1)
+    })
 })
 
 document.addEventListener("keydown", (e) => {
