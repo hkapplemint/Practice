@@ -68,6 +68,11 @@ export default class RotorBuilder {
         return this;
     }
 
+    setName(string) {
+        this.rotor.name = string;
+        return this;
+    }
+
     build() {
         if(this.rotor.scrambleArr) {
             return this.rotor;
