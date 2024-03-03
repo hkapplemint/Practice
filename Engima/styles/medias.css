@@ -1,4 +1,4 @@
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 768px) and (min-width: 426px) {
     body {
         overflow: scroll;
         grid-template-columns: 1fr;
@@ -7,5 +7,43 @@
 
     .interactive-container {
         grid-area: 1 / 1 / 2 / 2;
+    }
+}
+
+@media screen and (max-width: 425px) {
+    * {
+        font-size: 0.8rem;
+    }
+    th, td {
+        font-size: 1.2rem;
+    }
+    body {
+        overflow: scroll;
+        grid-template-columns: 1fr;
+        gap: 30px
+    }
+    .current-number {
+        font-size: 2.5rem;
+        margin-right: 10px;
+    }
+    .interactive-container {
+        grid-area: 1 / 1 / 2 / 2;
+    }
+    .lightbulb-container, .keyboard-container, .plugboard-container {
+        padding: 10px 5px;
+    }
+    .decryption-container {
+        font-size: 2rem;
+    }
+    .keyboard-container {
+        min-height: 33vh;
+        justify-content: space-evenly;
+    }
+    .plugboard-container {
+        padding-top: 50px;
+    }
+    .key-row-1, .key-row-2, .key-row-3, .light-row-1, .light-row-2, .light-row-3, .plug-row-1, .plug-row-2, .plug-row-3 {
+        display: flex;
+        gap: 4px;
     }
 }
