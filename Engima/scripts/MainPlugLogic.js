@@ -6,7 +6,6 @@ const plugboardContainer = document.querySelector(".plugboard-container");
 
 export const globalPlugArr = [];
 const globalLetterUsedArr = [];
-const colorPairs = [];
 
 const handlePlugDragStart = (e) => {
     //clear all first plugs with firstLetter dataset
@@ -22,10 +21,19 @@ const handlePlugDragStart = (e) => {
 }
 const handlePlugDragEnd = (e) => {
     e.target.classList.remove("dragging");
+    e.target.style.zIndex = "0";
 }
 
-const handlePlugDragDrop = (e) => {
-    const secondLetter = e.target.textContent;
+const handlePlugDragDrop = (e, targetElement = undefined) => {
+    let secondLetter;
+    let touchMode = false; 
+    if (targetElement) {
+        secondLetter = targetElement.textContent
+        touchMode = true;
+    } else {
+        secondLetter = e.target.textContent
+    }
+    console.log(secondLetter);
     
     //to get the firstLetter by finding through all the plugs.
     //if the plug element's data-first-letter value is equal to its textContent, return that element
@@ -39,20 +47,27 @@ const handlePlugDragDrop = (e) => {
     if (globalLetterUsedArr.includes(firstLetter) || globalLetterUsedArr.includes(secondLetter)) return
 
     firstLetterPlug.classList.add("plugged");
-    e.target.classList.add("plugged");
+
+    if (touchMode) {
+        targetElement.classList.add("plugged")
+        drawLineBetweenTwoPlugs(firstLetterPlug, targetElement);
+    } else {
+        e.target.classList.add("plugged");
+        drawLineBetweenTwoPlugs(firstLetterPlug, e.target);
+    }
 
     //draw a line to connect the centers of the two plugs
-    drawLineBetweenTwoPlugs(firstLetterPlug, e.target);
 
     const newPlug = new PlugBuilder()
         .setFirstLetter(firstLetter)
         .setSecondLetter(secondLetter)
         .build();
 
-    //add the letters to the "used" array
-    globalLetterUsedArr.push(firstLetter);
-    globalLetterUsedArr.push(secondLetter);
-
+        
+        //add the letters to the "used" array
+        globalLetterUsedArr.push(firstLetter);
+        globalLetterUsedArr.push(secondLetter);
+        
     return newPlug;
 }
 
@@ -76,6 +91,7 @@ const drawLineBetweenTwoPlugs = (element1, element2) => {
 
 const handlePlugClick = (e) => {
     e.stopPropagation();
+    console.log("plugclick")
     e.target.classList.remove("plugged");
 
     const letter = e.target.textContent;
@@ -113,15 +129,54 @@ const handlePlugClick = (e) => {
     }
 }
 
+let initialX, initialY, endX, endY;
+const handlePlugTouchStart = (e) => {
+    const touch = e.touches[0]
+    initialX = touch.clientX;
+    initialY = touch.clientY;
+    handlePlugDragStart(e);
+}
+const handlePlugTouchMove = (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const offsetX = touch.clientX - initialX;
+    const offsetY = touch.clientY - initialY;
+    e.target.style.transform = `translate(${offsetX}px, ${offsetY}px)`
+    e.target.style.zIndex = "2";
+}
+const handlePlugTouchEnd = (e) => {
+    // e.preventDefault();
+    e.target.style.transform = `translate(0, 0)`;
+    const touch = e.changedTouches[0];
+    endX = touch.clientX;
+    endY = touch.clientY;
+    const targetElement = document.elementFromPoint(endX, endY);
+    handlePlugDragEnd(e);
+    if (targetElement.tagName !== "SVG" && targetElement.className === "plug") {
+        return handlePlugDragDrop(e, targetElement);
+    }
+
+    return
+}
+
 plugs.forEach((plug) => {
     plug.addEventListener("dragstart", handlePlugDragStart);
     plug.addEventListener("dragend", handlePlugDragEnd);
+
+    plug.addEventListener("touchstart", handlePlugTouchStart);
+    plug.addEventListener("touchmove", handlePlugTouchMove);
+    plug.addEventListener("touchend", (e) => {
+        console.log("mainplug touchend")
+        const newPlug = handlePlugTouchEnd(e);
+        if (newPlug) {
+            globalPlugArr.push(newPlug);
+        }
+    });
 
     plug.addEventListener("drop", (e) => {
         const newPlug = handlePlugDragDrop(e);
         if (newPlug) {
             globalPlugArr.push(newPlug);
-            // colorAllPlugs(globalPlugArr);
         }
     })
     

@@ -94,6 +94,17 @@ const createRotorDropDownMenu = (parentElement) => {
     currentRotor.textContent = currentRotorName;
     parentElement.append(currentRotor);
 
+    //add the other rotors that are already in use
+    const otherInUseRotors = globalRotorArr.filter((rotor) => {
+        return rotor.rotorName !== currentRotorName && rotor.rotorInUse === true
+    })
+    otherInUseRotors.forEach((rotor) => {
+        const rotorInUseEle = document.createElement("p");
+        rotorInUseEle.classList.add("other-in-use-rotor");
+        rotorInUseEle.textContent = rotor.rotorName;
+        parentElement.append(rotorInUseEle)
+    })
+
     //add the available rotors' name as the subsequent p elements to the dropdown
     const availableRotorArr = globalRotorArr.filter((obj) => obj.rotorInUse === false)
 
@@ -136,27 +147,91 @@ const handleRotorClick = (e) => {
     //create the dropdown menu containing unused rotor
     createRotorDropDownMenu(availableRotorsEle);
     
-    const switchRotor = (currentRotorEle, newRotorObj) => {
+    const switchToAvailableRotor = (currentRotorEle, availableRotorObj) => {
         console.log(currentRotorEle.id);
         switch (currentRotorEle.id) {
             case "rotor1":
                 globalRotorArr.find((obj) => obj.rotorName === enigma.enigma.rotor1.rotor.name).rotorInUse = false;
-                enigma.setRotor1(newRotorObj);
-                globalRotorArr.find((obj) => obj.rotorObj === newRotorObj).rotorInUse = true;
+                enigma.setRotor1(availableRotorObj);
+                globalRotorArr.find((obj) => obj.rotorObj === availableRotorObj).rotorInUse = true;
                 break
             case "rotor2":
                 globalRotorArr.find((obj) => obj.rotorName === enigma.enigma.rotor2.rotor.name).rotorInUse = false;
-                enigma.setRotor2(newRotorObj);
-                globalRotorArr.find((obj) => obj.rotorObj === newRotorObj).rotorInUse = true;
+                enigma.setRotor2(availableRotorObj);
+                globalRotorArr.find((obj) => obj.rotorObj === availableRotorObj).rotorInUse = true;
                 break
             case "rotor3":
                 globalRotorArr.find((obj) => obj.rotorName === enigma.enigma.rotor3.rotor.name).rotorInUse = false;
-                enigma.setRotor3(newRotorObj);
-                globalRotorArr.find((obj) => obj.rotorObj === newRotorObj).rotorInUse = true;
+                enigma.setRotor3(availableRotorObj);
+                globalRotorArr.find((obj) => obj.rotorObj === availableRotorObj).rotorInUse = true;
                 break
         }
     }
+    const switchTwoInUseRotors = (currentRotorEle, otherInUseRotorObj) => {
+        let locationOfOtherInUseRotor;
+        switch (currentRotorEle.id) {
+            case "rotor1":
+                locationOfOtherInUseRotor = enigma.enigma.rotor2.rotor.name === otherInUseRotorObj.rotor.name
+                    ? "rotor2"
+                    : "rotor3"
+                switch (locationOfOtherInUseRotor) {
+                    case "rotor2":
+                        enigma.setRotor2(enigma.enigma.rotor1)
+                        break
+                    case "rotor3":
+                        enigma.setRotor3(enigma.enigma.rotor1)
+                        break
+                }
+                enigma.setRotor1(otherInUseRotorObj);
+                break
+            case "rotor2":
+                locationOfOtherInUseRotor = enigma.enigma.rotor1.rotor.name === otherInUseRotorObj.rotor.name
+                    ? "rotor1"
+                    : "rotor3"
+                switch (locationOfOtherInUseRotor) {
+                    case "rotor1":
+                        enigma.setRotor1(enigma.enigma.rotor2)
+                        break
+                    case "rotor3":
+                        enigma.setRotor3(enigma.enigma.rotor2)
+                        break
+                }
+                enigma.setRotor2(otherInUseRotorObj);
+                break
+            case "rotor3":
+                locationOfOtherInUseRotor = enigma.enigma.rotor1.rotor.name === otherInUseRotorObj.rotor.name
+                    ? "rotor1"
+                    : "rotor2"
+                switch (locationOfOtherInUseRotor) {
+                    case "rotor1":
+                        enigma.setRotor1(enigma.enigma.rotor3)
+                        break
+                    case "rotor2":
+                        enigma.setRotor2(enigma.enigma.rotor3)
+                        break
+                }
+                enigma.setRotor3(otherInUseRotorObj);
+        }
+    }
 
+    //for logic of when the use clicking on an already in-use rotor
+    const inUseRotors = document.querySelectorAll(".other-in-use-rotor");
+    [...inUseRotors].forEach((pEle) => {
+        pEle.addEventListener("click", (e) => {
+            const currentRotorEle = pEle.parentElement.parentElement
+            const selectedRotorObj = globalRotorArr.find((obj) => obj.rotorName === pEle.textContent).rotorObj
+
+            switchTwoInUseRotors(currentRotorEle, selectedRotorObj);
+
+            //update the current number display to the starting number of the new rotor 
+            updateCurrentNumberDisplay();
+            //closes the drop down menu
+            availableRotorsEle.style.display = "none"
+            isDropDownShowing = false;
+        })
+    })
+
+    //for logic of when the use clicking on a available rotor
     const availableRotors = document.querySelectorAll(".available-rotor");
     [...availableRotors].forEach((pEle) => {
         //add event listener for each p elements that was created by createRotorDropDownMenu() function
@@ -164,11 +239,8 @@ const handleRotorClick = (e) => {
             const currentRotorEle = pEle.parentElement.parentElement;
             const selectedRotorObj = globalRotorArr.find((obj) => obj.rotorName === pEle.textContent).rotorObj
             
-            switchRotor(currentRotorEle, selectedRotorObj);
+            switchToAvailableRotor(currentRotorEle, selectedRotorObj);
             updateCurrentNumberDisplay();
-            //update the current number display to the starting number of the new rotor 
-            
-            //closes the drop down menu
             availableRotorsEle.style.display = "none"
             isDropDownShowing = false;
         })
@@ -258,28 +330,30 @@ const setRotorCurrentNumber = (rotorId, num) => {
 
 nextNumberDivs.forEach((nextNumberDiv) => {
     nextNumberDiv.addEventListener("click", (e) => {
-        const currentRotor = nextNumberDiv.previousElementSibling;
+        const currentRotor = nextNumberDiv.parentElement;
+        const currentNumberDiv = currentRotor.querySelector(".current-number");
 
-        if (currentRotor.textContent === "26") {
-            currentRotor.textContent = "1";
+        if (currentNumberDiv.textContent === "26") {
+            currentNumberDiv.textContent = "1";
         } else {
-            currentRotor.textContent = parseInt(currentRotor.textContent) + 1;
+            currentNumberDiv.textContent = parseInt(currentNumberDiv.textContent) + 1;
         }
 
-        setRotorCurrentNumber(currentRotor.id, parseInt(currentRotor.textContent) - 1)
+        setRotorCurrentNumber(currentRotor.id, parseInt(currentNumberDiv.textContent) - 1)
     })
 })
 previousNumberDivs.forEach((previousNumberDiv) => {
     previousNumberDiv.addEventListener("click", (e) => {
-        const currentRotor = previousNumberDiv.previousElementSibling.previousElementSibling;
+        const currentRotor = previousNumberDiv.parentElement;
+        const currentNumberDiv = currentRotor.querySelector(".current-number");
 
-        if (currentRotor.textContent === "0") {
-            currentRotor.textContent = "26";
+        if (currentNumberDiv.textContent === "0") {
+            currentNumberDiv.textContent = "26";
         } else {
-            currentRotor.textContent = parseInt(currentRotor.textContent) - 1;
+            currentNumberDiv.textContent = parseInt(currentNumberDiv.textContent) - 1;
         }
 
-        setRotorCurrentNumber(currentRotor.id, parseInt(currentRotor.textContent) - 1)
+        setRotorCurrentNumber(currentRotor.id, parseInt(currentNumberDiv.textContent) - 1)
     })
 })
 
@@ -299,20 +373,36 @@ document.addEventListener("keyup", () => {
     }
 })
 
-//listening for dropping a plug
-document.addEventListener("drop", (e) => {
-    if (typeof e.target.className !== "string") return
 
+let initialX, initialY, endX, endY;
+const handleTouchStart = (e) => {
+    const touch = e.touches[0]
+    initialX = touch.clientX;
+    initialY = touch.clientY;
+}
+
+//listening for dropping a plug
+const handleDrop = (e) => {
+    console.log(e.changedTouches);
+    if (typeof e.target.className !== "string") return    
+    
     if (e.target.className.includes("plugged")) {
-    //if the target being dropped on, has a class call "plugged"
-    //as globalPugArr is updated by MainPlugLogic
-    //clear all previous plugs, and set all new plugs to enigma
+        //if the target being dropped on, has a class call "plugged"
+        //as globalPugArr is updated by MainPlugLogic
+        //clear all previous plugs, and set all new plugs to enigma
+        
         enigma.enigma.plugArr = [];
         globalPlugArr.forEach((plugObj) => {
             enigma.setPlug(plugObj);
         })
     };
-})
+}
+
+document.addEventListener("touchstart", handleTouchStart)
+
+//both for listening for user dropping a plug
+document.addEventListener("drop", handleDrop)
+document.addEventListener("touchend", handleDrop)
 
 document.addEventListener("mousedown", (e) => {
     //for removing plugs

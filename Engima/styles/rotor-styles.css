@@ -6,6 +6,7 @@
     align-self: center;
     gap: 20px;
     background-color: aliceblue;
+    border-radius: 15px;
 }
 .rotor {
     width: var(--key-and-light-size);
@@ -24,6 +25,7 @@
     grid-area: 1 / 1 / 3 / 2;
     width: 2rem;
     text-align: end;
+    font-weight: bold;
     cursor: pointer;
 }
 .next-number, .previous-number {
@@ -35,10 +37,13 @@
 }
 
 .next-number {
-    background-color: red;
+    background-color: rgb(95, 95, 95);
+    fill: white;
 }
+
 .previous-number {
-    background-color: yellow;
+    background-color: rgb(95, 95, 95);
+    fill: white;
 }
 
 .available-rotors {
@@ -49,11 +54,23 @@
     color: green;
     z-index: 2;
 }
+.current-rotor, .other-in-use-rotor, .available-rotor {
+    padding: 10px;
+}
 .current-rotor {
-    background-color: beige;
+    background-color: var(--primary-color);
+    color: gray;
     cursor: auto;
 }
+.other-in-use-rotor {
+    background-color: rgb(65, 65, 65);
+    color: white;
+    border: 1px solid white;
+    cursor: pointer;
+}
 .available-rotor {
-    background-color: aqua;
+    background-color: rgb(92, 92, 92);
+    color: white;
+    border: 1px solid white;
     cursor: pointer;
 }
