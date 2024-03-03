@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="styles/medias.css">
     <script type="module" src="scripts/Main.js" defer></script>
     <script type="module" src="scripts/MainPlugLogic.js" defer></script>
+    <script type="module" src="scripts/MainRotorLogic.js" defer></script>
 </head>
 <body>
     <div class="enigma">
@@ -24,6 +25,10 @@
                 <div class="previous-number">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
                 </div>
+                <div class="available-rotors" style="display: none;">
+                    <p id="available-rotor-1" class="available-rotor" data-set-rotor-d>rotor D</p>
+                    <p id="available-rotor-2" class="available-rotor" data-set-rotor-e>rotor E</p>
+                </div>
             </div>
             <div class="rotor">
                 <div id="rotor2" class="current-number">7</div>
@@ -33,6 +38,10 @@
                 <div class="previous-number">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
                 </div>
+                <div class="available-rotors" style="display: none;">
+                    <p id="available-rotor-1" class="available-rotor" data-set-rotor-d>rotor D</p>
+                    <p id="available-rotor-2" class="available-rotor" data-set-rotor-e>rotor E</p>
+                </div>
             </div>
             <div class="rotor">
                 <div id="rotor1" class="current-number">25</div>
@@ -41,6 +50,10 @@
                 </div>
                 <div class="previous-number">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>
+                </div>
+                <div class="available-rotors" style="display: none;">
+                    <p id="available-rotor-1" class="available-rotor" data-set-rotor-d>rotor D</p>
+                    <p id="available-rotor-2" class="available-rotor" data-set-rotor-e>rotor E</p>
                 </div>
             </div>
         </div>
@@ -158,13 +171,13 @@
                     <th>Right rotor</th>
                 </tr>
                 <tr>
-                    <th>Rotor number</th>
+                    <th class="rotor-spec">Rotor number</th>
                     <td></td>
                     <td></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <th>Starting number</th>
+                    <th class="rotor-spec">Starting number</th>
                     <td></td>
                     <td></td>
                     <td></td>

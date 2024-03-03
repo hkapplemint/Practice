@@ -57,6 +57,21 @@ const rotorThree = document.getElementById("rotor3");
 const nextNumberDivs = document.querySelectorAll(".next-number");
 const previousNumberDivs = document.querySelectorAll(".previous-number");
 
+const handleRotorClick = (e) => {
+    console.log(e.currentTarget)
+    const availableRotorsEle = e.currentTarget.parentElement.querySelector(".available-rotors");
+    if (availableRotorsEle.style.display === "none") {
+        availableRotorsEle.style.display = "block";
+    } else {
+        availableRotorsEle.style.display = "none"
+    }
+}
+
+rotorThree.addEventListener("click", handleRotorClick)
+rotorTwo.addEventListener("click", handleRotorClick)
+rotorOne.addEventListener("click", handleRotorClick)
+
+
 let isKeyDown = false;
 const handleKeyDown = (e) => {
     if(!isKeyDown) {

@@ -9,6 +9,10 @@ th, td {
     padding: 3px;
 }
 
+th.rotor-spec {
+    width: fit-content;
+}
+
 td {
     height: 24px;
 }
