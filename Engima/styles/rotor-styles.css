@@ -49,6 +49,10 @@
     color: green;
     z-index: 2;
 }
+.current-rotor {
+    background-color: beige;
+    cursor: auto;
+}
 .available-rotor {
     background-color: aqua;
     cursor: pointer;

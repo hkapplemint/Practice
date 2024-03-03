@@ -67,14 +67,35 @@ const keys = document.querySelectorAll(".key");
 const lights = document.querySelectorAll(".light");
 const decryptionContainer = document.querySelector(".decryption-container");
 const rotorOne = document.getElementById("rotor1");
+const rotorOneCurrentNumber = document.getElementById("rotor1-current-number");
 const rotorTwo = document.getElementById("rotor2");
+const rotorTwoCurrentNumber = document.getElementById("rotor2-current-number");
 const rotorThree = document.getElementById("rotor3");
+const rotorThreeCurrentNumber = document.getElementById("rotor3-current-number");
 const nextNumberDivs = document.querySelectorAll(".next-number");
 const previousNumberDivs = document.querySelectorAll(".previous-number");
 
-const createAvailableRotorDropDown = (parentElement) => {
+const createRotorDropDownMenu = (parentElement) => {
+    //add current rotor's name as the first p element of the dropdown
+    let currentRotorName;
+    switch (parentElement.parentElement.id) {
+        case "rotor1":
+            currentRotorName = enigma.enigma.rotor1.rotor.name;
+            break
+        case "rotor2":
+            currentRotorName = enigma.enigma.rotor2.rotor.name;
+            break
+        case "rotor3":
+            currentRotorName = enigma.enigma.rotor3.rotor.name;
+            break
+    }
+    const currentRotor = document.createElement("p");
+    currentRotor.classList.add("current-rotor");
+    currentRotor.textContent = currentRotorName;
+    parentElement.append(currentRotor);
+
+    //add the available rotors' name as the subsequent p elements to the dropdown
     const availableRotorArr = globalRotorArr.filter((obj) => obj.rotorInUse === false)
-    console.log(availableRotorArr);
 
     availableRotorArr.forEach((obj) => {
         const pEle = document.createElement("p");
@@ -85,30 +106,36 @@ const createAvailableRotorDropDown = (parentElement) => {
     })
 }
 
+const updateCurrentNumberDisplay = () => {
+    rotorOneCurrentNumber.textContent = enigma.enigma.rotor1.rotor.currentNumber + 1
+    rotorTwoCurrentNumber.textContent = enigma.enigma.rotor2.rotor.currentNumber + 1
+    rotorThreeCurrentNumber.textContent = enigma.enigma.rotor3.rotor.currentNumber + 1
+}
+
 let isDropDownShowing = false;
 
 const handleRotorClick = (e) => {
+    //availableRotorsEle is the div element that act as a drop down menu
     const availableRotorsEle = e.currentTarget.parentElement.querySelector(".available-rotors");
 
     if (availableRotorsEle.style.display === "block") {
         //user clicked on a rotor that is currently showing the dropdown menu
-        //this action show close the dropdown menu
-        //setting isDropDownShowing = false   allow user to click on other rotor
+        //this action closes the dropdown menu
+        //setting isDropDownShowing = false to allow user to click on other rotors
         availableRotorsEle.style.display = "none"
         isDropDownShowing = false;
         return
     } else if (availableRotorsEle.style.display = "none" && !isDropDownShowing) {
         //user clicked on a rotor this is not showing a dropdown menu
-        //the "!isDropDownShowing" check whether there is no other dropdown menu present
-        //proceed only if there is no other dropdown menu presents
+        //the "!isDropDownShowing" check make sure there is no other active drop down menu
         availableRotorsEle.style.display = "block"
         isDropDownShowing = true;
     }
 
     availableRotorsEle.innerHTML = "";
-    createAvailableRotorDropDown(availableRotorsEle);
     //create the dropdown menu containing unused rotor
-
+    createRotorDropDownMenu(availableRotorsEle);
+    
     const switchRotor = (currentRotorEle, newRotorObj) => {
         console.log(currentRotorEle.id);
         switch (currentRotorEle.id) {
@@ -132,12 +159,14 @@ const handleRotorClick = (e) => {
 
     const availableRotors = document.querySelectorAll(".available-rotor");
     [...availableRotors].forEach((pEle) => {
+        //add event listener for each p elements that was created by createRotorDropDownMenu() function
         pEle.addEventListener("click", (e) => {
             const currentRotorEle = pEle.parentElement.parentElement;
             const selectedRotorObj = globalRotorArr.find((obj) => obj.rotorName === pEle.textContent).rotorObj
             
             switchRotor(currentRotorEle, selectedRotorObj);
-            //update the current number display to the starting number of the new rotor
+            updateCurrentNumberDisplay();
+            //update the current number display to the starting number of the new rotor 
             
             //closes the drop down menu
             availableRotorsEle.style.display = "none"
@@ -146,9 +175,9 @@ const handleRotorClick = (e) => {
     })
 }
 
-rotorThree.querySelector(".current-number").addEventListener("click", handleRotorClick)
-rotorTwo.querySelector(".current-number").addEventListener("click", handleRotorClick)
-rotorOne.querySelector(".current-number").addEventListener("click", handleRotorClick)
+rotorThreeCurrentNumber.addEventListener("click", handleRotorClick)
+rotorTwoCurrentNumber.addEventListener("click", handleRotorClick)
+rotorOneCurrentNumber.addEventListener("click", handleRotorClick)
 
 
 let isKeyDown = false;
@@ -166,9 +195,9 @@ const handleKeyDown = (e) => {
         decryptionContainer.textContent += result;
     
         //update rotor display, parseInt then plus one is because .currentNumber is 0 indexed
-        rotorOne.querySelector(".current-number").textContent = parseInt(enigma.enigma.rotor1.rotor.currentNumber) + 1;
-        rotorTwo.querySelector(".current-number").textContent = parseInt(enigma.enigma.rotor2.rotor.currentNumber) + 1;
-        rotorThree.querySelector(".current-number").textContent = parseInt(enigma.enigma.rotor3.rotor.currentNumber) + 1;
+        rotorOneCurrentNumber.textContent = parseInt(enigma.enigma.rotor1.rotor.currentNumber) + 1;
+        rotorTwoCurrentNumber.textContent = parseInt(enigma.enigma.rotor2.rotor.currentNumber) + 1;
+        rotorThreeCurrentNumber.textContent = parseInt(enigma.enigma.rotor3.rotor.currentNumber) + 1;
     
         const foundLightElement = [...lights].find((light) => light.textContent === result)
         if (foundLightElement) {
@@ -297,3 +326,5 @@ document.addEventListener("mousedown", (e) => {
         }
     }
 })
+
+updateCurrentNumberDisplay();
