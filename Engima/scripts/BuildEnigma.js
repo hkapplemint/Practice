@@ -9,34 +9,6 @@ export default class EnigmaBuilder {
     }
 
     reflects(letter) {
-        // const reflectorArr = [
-        //     {"A": "E"},
-        //     {"B": "O"},
-        //     {"C": "A"},
-        //     {"D": "J"},
-        //     {"E": "D"},
-        //     {"F": "Y"},
-        //     {"G": "B"},
-        //     {"H": "W"},
-        //     {"I": "S"},
-        //     {"J": "Z"},
-        //     {"K": "F"},
-        //     {"L": "K"},
-        //     {"M": "G"},
-        //     {"N": "I"},
-        //     {"O": "U"},
-        //     {"P": "Q"},
-        //     {"Q": "V"},
-        //     {"R": "P"},
-        //     {"S": "L"},
-        //     {"T": "C"},
-        //     {"U": "T"},
-        //     {"V": "X"},
-        //     {"W": "M"},
-        //     {"X": "H"},
-        //     {"Y": "R"},
-        //     {"Z": "N"}
-        // ]
         const reflectorArr = [
             {"A": "E"},
             {"B": "O"},
@@ -100,8 +72,6 @@ export default class EnigmaBuilder {
         //the letter go through right rotor
         this.enigma.rotor1.rotate();
 
-        currentLetter = this.enigma.rotor1.inToOut(currentLetter);
-
         console.log(`Rotor 1 current number ${this.enigma.rotor1.rotor.currentNumber}, Rotor 2 ring notch ${this.enigma.rotor2.rotor.ringNotch}`)
         
         if(this.enigma.rotor1.rotor.currentNumber === this.enigma.rotor2.rotor.ringNotch) {
@@ -115,6 +85,8 @@ export default class EnigmaBuilder {
                 this.enigma.rotor3.rotate();
             }
         }
+
+        currentLetter = this.enigma.rotor1.inToOut(currentLetter);
         
         currentLetter = this.enigma.rotor2.inToOut(currentLetter);
 
@@ -142,9 +114,6 @@ export default class EnigmaBuilder {
     };
 
     setRotor1(rotorObj) {
-        //  transform an incoming character to a different character
-        //  transform an outgoing character to a different character
-        // rotate, uses the next item in the rotorObj array
         this.enigma.rotor1 = rotorObj;
         return this;
     }
@@ -163,7 +132,9 @@ export default class EnigmaBuilder {
         this.enigma.plugArr.push(plugObj);
         return this;
     }
+
     removePlug(plugObj) {
+        //look for the plugObj's index in the enigma.plugArr
         const targetPlugIndex = this.enigma.plugArr.indexOf(plugObj);
         if (targetPlugIndex >= 0) {
             this.enigma.plugArr.splice(targetPlugIndex, 1);
