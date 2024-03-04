@@ -11,6 +11,9 @@
     .lightbulb-container, .keyboard-container, .plugboard-container {
         padding: 10px 5px;
     }
+    .incoming-code-container, .decryption-container {
+        min-height: 5rem;
+    }
     .enigma {
         padding-top: 30px;
     }

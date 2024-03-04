@@ -74,6 +74,8 @@ const rotorThree = document.getElementById("rotor3");
 const rotorThreeCurrentNumber = document.getElementById("rotor3-current-number");
 const nextNumberDivs = document.querySelectorAll(".next-number");
 const previousNumberDivs = document.querySelectorAll(".previous-number");
+const autoEncryptTextArea = document.querySelector(".auto-encrypt-textarea");
+const autoEncryptBtn = document.querySelector(".auto-encrypt-btn");
 
 const createRotorDropDownMenu = (parentElement) => {
     //add current rotor's name as the first p element of the dropdown
@@ -232,65 +234,61 @@ rotorThreeCurrentNumber.addEventListener("click", handleRotorClick)
 rotorTwoCurrentNumber.addEventListener("click", handleRotorClick)
 rotorOneCurrentNumber.addEventListener("click", handleRotorClick)
 
-
-let isKeyDown = false;
 const handleKeyDown = (e) => {
-    if(!isKeyDown) {
-        let result;
-        if (e.target.tagName === "BODY") {
-            result = enigma.encrypt(e.key.toUpperCase());
-        } else {
-            result = enigma.encrypt(e.target.textContent);
-            e.target.classList.add("key-pressed")
-        }
-    
-        //add result to display
-        decryptionContainer.textContent += result;
-    
-        //update rotor display, parseInt then plus one is because .currentNumber is 0 indexed
-        rotorOneCurrentNumber.textContent = parseInt(enigma.enigma.rotor1.rotor.currentNumber) + 1;
-        rotorTwoCurrentNumber.textContent = parseInt(enigma.enigma.rotor2.rotor.currentNumber) + 1;
-        rotorThreeCurrentNumber.textContent = parseInt(enigma.enigma.rotor3.rotor.currentNumber) + 1;
-    
-        const foundLightElement = [...lights].find((light) => light.textContent === result)
-        if (foundLightElement) {
-            foundLightElement.classList.add("highlight")
-            const keyDownAudio = new Audio("audio/key-down.mp3")
-            keyDownAudio.play();
-        }
+    let result;
+    if (e.target.tagName === "BODY") {
+        result = enigma.encrypt(e.key.toUpperCase());
+    } else {
+        result = enigma.encrypt(e.target.textContent);
+        e.target.classList.add("key-pressed")
+    }
 
-        isKeyDown = true;
+    //add result to display
+    decryptionContainer.textContent += result;
+
+    //update rotor display, parseInt then plus one is because .currentNumber is 0 indexed
+    rotorOneCurrentNumber.textContent = parseInt(enigma.enigma.rotor1.rotor.currentNumber) + 1;
+    rotorTwoCurrentNumber.textContent = parseInt(enigma.enigma.rotor2.rotor.currentNumber) + 1;
+    rotorThreeCurrentNumber.textContent = parseInt(enigma.enigma.rotor3.rotor.currentNumber) + 1;
+
+    const foundLightElement = [...lights].find((light) => light.textContent === result)
+    if (foundLightElement) {
+        foundLightElement.classList.add("highlight")
+        const keyDownAudio = new Audio("audio/key-down.mp3")
+        keyDownAudio.play();
     }
 }
 
-const handleKeyUp = () => {
-    if(isKeyDown) {
-        lights.forEach((light) => {
-            light.classList.remove("highlight");
-        })
-        keys.forEach((key) => {
-            key.classList.remove("key-pressed");
-        })
-
-        const keyUpAudio = new Audio("audio/key-up.mp3")
-        keyUpAudio.play();
-        
-        isKeyDown = false;
-    }
+const handleKeyUp = (e) => {
+    lights.forEach((light) => {
+        light.classList.remove("highlight");
+    })
+    keys.forEach((key) => {
+        key.classList.remove("key-pressed");
+    })
+    const keyUpAudio = new Audio("audio/key-up.mp3")
+    keyUpAudio.play();
 }
 
+//for mouseup, mousedown, touchstart, touchend
 keys.forEach((key) => {
     key.addEventListener("mousedown", handleKeyDown);
     key.addEventListener("touchstart", (e) => {
         // e.preventDefault();
         handleKeyDown(e);
     });
-    key.addEventListener("mouseup", handleKeyUp);
     key.addEventListener("touchend", (e) => {
         e.preventDefault();
         handleKeyUp(e);
     });
 })
+document.addEventListener("mouseup", (e) => {
+    [...keys].forEach((key) => {
+        if (key.className.includes("pressed")) {
+            handleKeyUp(e)
+        }
+    })
+});
 
 const setRotorCurrentNumber = (rotorId, num) => {
     switch (rotorId) {
@@ -338,16 +336,20 @@ previousNumberDivs.forEach((previousNumberDiv) => {
     })
 })
 
+
+
 document.addEventListener("keydown", (e) => {
-    if (!isKeyDown) {
-        //to execute function for when the 26 characters is pressed
-        keys.forEach((key) => {
-            if ((e.key === key.textContent.toLowerCase() || e.key.toUpperCase() === key.textContent) && !e.ctrlKey && !e.altKey && !e.shiftKey) {
-                handleKeyDown(e);
-                key.classList.add("key-pressed");
-            }
-        })
-    }
+    keys.forEach((key) => {
+        if ((e.key === key.textContent.toLowerCase() || e.key.toUpperCase() === key.textContent) && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+            
+            const focusedElement = document.activeElement;
+            const isInputElement = focusedElement.tagName === "TEXTAREA";
+            if (isInputElement) return;
+
+            handleKeyDown(e);
+            key.classList.add("key-pressed");
+        }
+    })
     
     if (e.key === "Backspace") {
         if (decryptionContainer.textContent === "") return
@@ -378,9 +380,14 @@ document.addEventListener("keydown", (e) => {
         updateCurrentNumberDisplay();
     }
 })
-document.addEventListener("keyup", () => {
-    if(isKeyDown) {
-        handleKeyUp();
+
+document.addEventListener("keyup", (e) => {
+    if (e.key.match(/[A-Za-z]/) && e.key.length === 1) {
+        const focusedElement = document.activeElement;
+        const isInputElement = focusedElement.tagName === "TEXTAREA";
+        if (isInputElement) return;
+
+        handleKeyUp(e)
     }
 })
 
@@ -431,3 +438,49 @@ document.addEventListener("touchend", handleDrop)
 document.addEventListener("mousedown", handleMouseDown)
 
 updateCurrentNumberDisplay();
+
+const autoEncrypt = (string) => {
+    for (let i = 0; i < string.length; i++) {
+        const char = string[i];
+        const mouseDownEvent = new MouseEvent("mousedown", {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        });
+        const mouseUpEvent = new MouseEvent("mouseup", {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        })
+        const delay = 200;
+    
+        setTimeout(() => {
+            [...keys].forEach((key) => {
+                if (key.textContent === char) {
+                    key.dispatchEvent(mouseDownEvent);
+                }
+            })
+        }, i * delay)
+        setTimeout(() => {
+            [...keys].forEach((key) => {
+                if (key.textContent === char) {
+                    key.dispatchEvent(mouseUpEvent);
+                }
+            })
+        }, i * delay + 50)
+    }
+}
+let filteredInput;
+autoEncryptTextArea.addEventListener("input", (e) => {
+    autoEncryptTextArea.value = autoEncryptTextArea.value.toUpperCase();
+    const matches = autoEncryptTextArea.value.match(/[A-Z]/g);
+    if (matches) {
+        filteredInput = matches.join("")
+    }
+})
+autoEncryptBtn.addEventListener("click", (e) => {
+    console.log(filteredInput);
+    if (filteredInput) {
+        autoEncrypt(filteredInput);
+    }
+})

@@ -1,12 +1,10 @@
 .setting-container {
-    display: flex;
-    flex-direction: column;
     background-color: black;
     color: white;
 }
 
 table {
-    width: 100vw;
+    width: 100%;
 }
 
 th, td {
@@ -14,9 +12,7 @@ th, td {
     text-align: center;
     padding: 3px;
     overflow: hidden;
-}
-
-th.rotor-spec {
+    width: min-content;
 }
 
 th.plugs {

@@ -11,7 +11,6 @@ html, body {
 
 body {
     display: grid;
-    overflow: scroll;
-    overflow-y: hidden;
-    grid-template-columns: 1fr max-content;
+    grid-template-columns: min-content 1fr;
+    gap: 0;
 }

@@ -1,42 +1,59 @@
 .interactive-container {
     align-self: flex-start;
+    display: grid;
+    height: 100%;
+    grid-template-rows: min-content 1fr 1fr;
 }
 
 .incoming-code-container, .decryption-container, .setting-container {
     padding: 20px;
     width: 100%;
-    white-space: normal;
+    word-break: break-all;
+}
+.setting-container {
+    padding: 0;
+}
+
+.incoming-code-container, .decryption-container {
+    min-height: 4rem;
+    font-family: 'Courier New', Courier, monospace;
+    color: white;
+    font-size: 2rem;
+    letter-spacing: 2px;
 }
 
 .incoming-code-container {
-    display: block;
-    background-color: rgb(112, 108, 128);
-    font-size: 1rem;
-    color: black;
-    white-space: normal;
+    background-color: rgb(8, 0, 35);
 }
 
 .decryption-container {
+    background-color: rgb(112, 108, 128);
+}
+
+.incoming-code-container {
     display: flex;
-    flex-wrap: wrap;
-    background-color: rgb(8, 0, 35);
-    font-size: 1rem;
-    color: white;
+    flex-direction: column;
+}
+.auto-encrypt-textarea {
+    font-size: 2rem;
+}
+.auto-encrypt-btn {
+    font-size: 1.5rem;
+    padding: 4px;
 }
 
 @media screen and (max-width: 768px) {
     .incoming-code-container {
-        font-size: 1rem;
         background-color: rgb(8, 0, 35);
         color: white;
-        white-space: normal;
     }
     
     .decryption-container {
         background-color: rgb(112, 108, 128);
-        font-size: 1rem;
         color: white;
-        white-space: normal;
     }
     
+    .auto-encrypt-textarea, .auto-encrypt-btn {
+        font-size: 1rem;
+    }
 }
