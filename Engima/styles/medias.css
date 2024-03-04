@@ -1,8 +1,21 @@
 @media screen and (max-width: 768px) and (min-width: 426px) {
     body {
-        overflow: scroll;
         grid-template-columns: 1fr;
+        overflow-y: auto;
         gap: 30px
+    }
+    
+    .lightbulb-container, .keyboard-container, .plugboard-container {
+        padding: 10px 5px;
+    }
+    .enigma {
+        padding-top: 30px;
+    }
+    .key-row-2, .light-row-2 {
+        transform: translateX(calc(var(--row-offset) / 2));
+    }
+    .key-row-3, .light-row-3 {
+        transform: translateX(0);
     }
 
     .interactive-container {
@@ -10,21 +23,20 @@
     }
 }
 
-@media screen and (max-width: 425px) {
+@media screen and (max-width: 426px) {
     * {
         font-size: 0.8rem;
-    }
-    th, td {
-        font-size: 1.2rem;
     }
     body {
         overflow: scroll;
         grid-template-columns: 1fr;
         gap: 30px
     }
-    .current-number {
-        font-size: 2.5rem;
-        margin-right: 10px;
+    th, td {
+        font-size: 1.2rem;
+    }
+    .decryption-container {
+        font-size: 2rem;
     }
     .interactive-container {
         grid-area: 1 / 1 / 2 / 2;
@@ -32,7 +44,14 @@
     .lightbulb-container, .keyboard-container, .plugboard-container {
         padding: 10px 5px;
     }
-    .decryption-container {
+    .enigma {
+        padding-top: 30px;
+    }
+    .current-number {
+        font-size: 2.5rem;
+        margin-right: 10px;
+    }
+    .available-rotors p {
         font-size: 2rem;
     }
     .keyboard-container {
@@ -42,8 +61,17 @@
     .plugboard-container {
         padding-top: 50px;
     }
+    .key-row-2, .light-row-2 {
+        transform: translateX(calc(var(--row-offset) / 2));
+    }
+    .key-row-3, .light-row-3 {
+        transform: translateX(0);
+    }
     .key-row-1, .key-row-2, .key-row-3, .light-row-1, .light-row-2, .light-row-3, .plug-row-1, .plug-row-2, .plug-row-3 {
         display: flex;
         gap: 4px;
+    }
+    .key, .light {
+        transition: all 0s;
     }
 }

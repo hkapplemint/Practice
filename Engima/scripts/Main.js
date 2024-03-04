@@ -167,83 +167,64 @@ const handleRotorClick = (e) => {
                 break
         }
     }
+
     const switchTwoInUseRotors = (currentRotorEle, otherInUseRotorObj) => {
-        let locationOfOtherInUseRotor;
         switch (currentRotorEle.id) {
             case "rotor1":
-                locationOfOtherInUseRotor = enigma.enigma.rotor2.rotor.name === otherInUseRotorObj.rotor.name
-                    ? "rotor2"
-                    : "rotor3"
-                switch (locationOfOtherInUseRotor) {
-                    case "rotor2":
-                        enigma.setRotor2(enigma.enigma.rotor1)
-                        break
-                    case "rotor3":
-                        enigma.setRotor3(enigma.enigma.rotor1)
-                        break
+                if (enigma.enigma.rotor2.rotor.name === otherInUseRotorObj.rotor.name) {
+                    enigma.setRotor2(enigma.enigma.rotor1)
+                } else {
+                    enigma.setRotor3(enigma.enigma.rotor1)
                 }
                 enigma.setRotor1(otherInUseRotorObj);
                 break
             case "rotor2":
-                locationOfOtherInUseRotor = enigma.enigma.rotor1.rotor.name === otherInUseRotorObj.rotor.name
-                    ? "rotor1"
-                    : "rotor3"
-                switch (locationOfOtherInUseRotor) {
-                    case "rotor1":
-                        enigma.setRotor1(enigma.enigma.rotor2)
-                        break
-                    case "rotor3":
-                        enigma.setRotor3(enigma.enigma.rotor2)
-                        break
+                if (enigma.enigma.rotor1.rotor.name === otherInUseRotorObj.rotor.name ) {
+                    enigma.setRotor1(enigma.enigma.rotor2)
+                } else {
+                    enigma.setRotor3(enigma.enigma.rotor2)
                 }
                 enigma.setRotor2(otherInUseRotorObj);
                 break
             case "rotor3":
-                locationOfOtherInUseRotor = enigma.enigma.rotor1.rotor.name === otherInUseRotorObj.rotor.name
-                    ? "rotor1"
-                    : "rotor2"
-                switch (locationOfOtherInUseRotor) {
-                    case "rotor1":
-                        enigma.setRotor1(enigma.enigma.rotor3)
-                        break
-                    case "rotor2":
-                        enigma.setRotor2(enigma.enigma.rotor3)
-                        break
+                if (enigma.enigma.rotor1.rotor.name === otherInUseRotorObj.rotor.name) {
+                    enigma.setRotor1(enigma.enigma.rotor3)
+                } else {
+                    enigma.setRotor2(enigma.enigma.rotor3)
                 }
                 enigma.setRotor3(otherInUseRotorObj);
         }
     }
 
-    //for logic of when the use clicking on an already in-use rotor
-    const inUseRotors = document.querySelectorAll(".other-in-use-rotor");
-    [...inUseRotors].forEach((pEle) => {
-        pEle.addEventListener("click", (e) => {
+    const addListenerForDropDownEle = (pEle, type) => {
+        pEle.addEventListener("click", () => {
             const currentRotorEle = pEle.parentElement.parentElement
             const selectedRotorObj = globalRotorArr.find((obj) => obj.rotorName === pEle.textContent).rotorObj
-
-            switchTwoInUseRotors(currentRotorEle, selectedRotorObj);
-
+            
+            if (type === "inUse") {
+                switchTwoInUseRotors(currentRotorEle, selectedRotorObj);
+            } else if (type === "toAvailable") {
+                switchToAvailableRotor(currentRotorEle, selectedRotorObj);
+            }
+    
             //update the current number display to the starting number of the new rotor 
             updateCurrentNumberDisplay();
             //closes the drop down menu
             availableRotorsEle.style.display = "none"
             isDropDownShowing = false;
         })
+    }
+
+    //for logic of when the use clicking on an already in-use rotor
+    const inUseRotors = document.querySelectorAll(".other-in-use-rotor");
+    [...inUseRotors].forEach((pEle) => {
+        addListenerForDropDownEle(pEle, "inUse");
     })
 
     //for logic of when the use clicking on a available rotor
     const availableRotors = document.querySelectorAll(".available-rotor");
     [...availableRotors].forEach((pEle) => {
-        //add event listener for each p elements that was created by createRotorDropDownMenu() function
-        pEle.addEventListener("click", (e) => {
-            const currentRotorEle = pEle.parentElement.parentElement;
-            const selectedRotorObj = globalRotorArr.find((obj) => obj.rotorName === pEle.textContent).rotorObj
-            
-            switchToAvailableRotor(currentRotorEle, selectedRotorObj);
-            updateCurrentNumberDisplay();
-            availableRotorsEle.style.display = "none"
-            isDropDownShowing = false;
-        })
+        addListenerForDropDownEle(pEle, "toAvailable")
     })
 }
 
@@ -301,7 +282,7 @@ const handleKeyUp = () => {
 keys.forEach((key) => {
     key.addEventListener("mousedown", handleKeyDown);
     key.addEventListener("touchstart", (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         handleKeyDown(e);
     });
     key.addEventListener("mouseup", handleKeyUp);
@@ -347,7 +328,7 @@ previousNumberDivs.forEach((previousNumberDiv) => {
         const currentRotor = previousNumberDiv.parentElement;
         const currentNumberDiv = currentRotor.querySelector(".current-number");
 
-        if (currentNumberDiv.textContent === "0") {
+        if (currentNumberDiv.textContent === "1") {
             currentNumberDiv.textContent = "26";
         } else {
             currentNumberDiv.textContent = parseInt(currentNumberDiv.textContent) - 1;
@@ -359,12 +340,34 @@ previousNumberDivs.forEach((previousNumberDiv) => {
 
 document.addEventListener("keydown", (e) => {
     if (!isKeyDown) {
+        //to execute function for when the 26 characters is pressed
         keys.forEach((key) => {
             if (e.key === key.textContent.toLowerCase() && !e.ctrlKey && !e.altKey && !e.shiftKey) {
                 handleKeyDown(e);
                 key.classList.add("key-pressed");
             }
         })
+        if (e.key === "Backspace") {
+            if (decryptionContainer.textContent === "") return
+            //if the decryption output is empty, return immediately
+            
+            decryptionContainer.textContent = decryptionContainer.textContent.slice(0, -1);
+
+            if (enigma.enigma.rotor1.rotor.currentNumber === enigma.enigma.rotor2.rotor.ringNotch) {
+                if (enigma.enigma.rotor2.rotor.currentNumber === 0){
+                    enigma.enigma.rotor2.rotor.currentNumber = 25;
+                } else {
+                    enigma.enigma.rotor2.rotor.currentNumber -= 1
+                }
+            }
+
+            if (enigma.enigma.rotor1.rotor.currentNumber === 0) {
+                enigma.enigma.rotor1.rotor.currentNumber = 25;
+            } else {
+                enigma.enigma.rotor1.rotor.currentNumber -= 1
+            }
+            updateCurrentNumberDisplay();
+        }
     }
 })
 document.addEventListener("keyup", () => {
@@ -398,14 +401,7 @@ const handleDrop = (e) => {
     };
 }
 
-document.addEventListener("touchstart", handleTouchStart)
-
-//both for listening for user dropping a plug
-document.addEventListener("drop", handleDrop)
-document.addEventListener("touchend", handleDrop)
-
-document.addEventListener("mousedown", (e) => {
-    //for removing plugs
+const handleMouseDown = (e) => {
     if (typeof e.target.className !== "string") return
 
     if (e.target.className.includes("plugged")) {
@@ -415,6 +411,15 @@ document.addEventListener("mousedown", (e) => {
             enigma.removePlug(targetPlugObj);
         }
     }
-})
+}
+
+document.addEventListener("touchstart", handleTouchStart)
+
+//both for listening for user dropping a plug
+document.addEventListener("drop", handleDrop)
+document.addEventListener("touchend", handleDrop)
+
+//for removing plugs
+document.addEventListener("mousedown", handleMouseDown)
 
 updateCurrentNumberDisplay();

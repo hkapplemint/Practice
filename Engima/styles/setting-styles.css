@@ -13,6 +13,10 @@ th.rotor-spec {
     width: fit-content;
 }
 
+th.plugs {
+    width: 70px;
+}
+
 td {
     height: 24px;
 }
