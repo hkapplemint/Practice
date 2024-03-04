@@ -342,32 +342,40 @@ document.addEventListener("keydown", (e) => {
     if (!isKeyDown) {
         //to execute function for when the 26 characters is pressed
         keys.forEach((key) => {
-            if (e.key === key.textContent.toLowerCase() && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+            if ((e.key === key.textContent.toLowerCase() || e.key.toUpperCase() === key.textContent) && !e.ctrlKey && !e.altKey && !e.shiftKey) {
                 handleKeyDown(e);
                 key.classList.add("key-pressed");
             }
         })
-        if (e.key === "Backspace") {
-            if (decryptionContainer.textContent === "") return
-            //if the decryption output is empty, return immediately
-            
-            decryptionContainer.textContent = decryptionContainer.textContent.slice(0, -1);
-
-            if (enigma.enigma.rotor1.rotor.currentNumber === enigma.enigma.rotor2.rotor.ringNotch) {
-                if (enigma.enigma.rotor2.rotor.currentNumber === 0){
-                    enigma.enigma.rotor2.rotor.currentNumber = 25;
-                } else {
-                    enigma.enigma.rotor2.rotor.currentNumber -= 1
-                }
-            }
-
-            if (enigma.enigma.rotor1.rotor.currentNumber === 0) {
-                enigma.enigma.rotor1.rotor.currentNumber = 25;
+    }
+    
+    if (e.key === "Backspace") {
+        if (decryptionContainer.textContent === "") return
+        //if the decryption output is empty, return immediately
+        
+        decryptionContainer.textContent = decryptionContainer.textContent.slice(0, -1);
+        
+        if (enigma.enigma.rotor2.rotor.currentNumber === enigma.enigma.rotor3.rotor.ringNotch && enigma.enigma.rotor1.rotor.currentNumber === enigma.enigma.rotor2.rotor.ringNotch) {
+            if (enigma.enigma.rotor3.rotor.currentNumber === 0){
+                enigma.enigma.rotor3.rotor.currentNumber = 25;
             } else {
-                enigma.enigma.rotor1.rotor.currentNumber -= 1
+                enigma.enigma.rotor3.rotor.currentNumber -= 1
             }
-            updateCurrentNumberDisplay();
         }
+        
+        if (enigma.enigma.rotor1.rotor.currentNumber === enigma.enigma.rotor2.rotor.ringNotch) {
+            if (enigma.enigma.rotor2.rotor.currentNumber === 0){
+                enigma.enigma.rotor2.rotor.currentNumber = 25;
+            } else {
+                enigma.enigma.rotor2.rotor.currentNumber -= 1
+            }   
+        }
+        if (enigma.enigma.rotor1.rotor.currentNumber === 0) {
+            enigma.enigma.rotor1.rotor.currentNumber = 25;
+        } else {
+            enigma.enigma.rotor1.rotor.currentNumber -= 1
+        }
+        updateCurrentNumberDisplay();
     }
 })
 document.addEventListener("keyup", () => {

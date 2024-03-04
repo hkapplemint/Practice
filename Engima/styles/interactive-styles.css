@@ -1,3 +1,42 @@
+.interactive-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content 1fr 1fr;
+    max-width: 100%;
+}
+
+.incoming-code-container, .decryption-container {
+    padding: 20px;
+    max-width: 100vw;
+    white-space: normal;
+}
+
+.incoming-code-container {
+    background-color: rgb(112, 108, 128);
+    font-size: 1rem;
+    color: black;
+    white-space: normal;
+}
+
 .decryption-container {
-    min-height: 3rem;
+    background-color: rgb(8, 0, 35);
+    font-size: 1rem;
+    color: white;
+}
+
+@media screen and (max-width: 768px) {
+    .incoming-code-container {
+        font-size: 1rem;
+        background-color: rgb(8, 0, 35);
+        color: white;
+        white-space: normal;
+    }
+    
+    .decryption-container {
+        background-color: rgb(112, 108, 128);
+        font-size: 1rem;
+        color: white;
+        white-space: normal;
+    }
+    
 }

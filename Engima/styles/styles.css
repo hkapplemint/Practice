@@ -6,11 +6,12 @@
 
 html, body {
     height: 100%;
-    overflow: scroll;
-    overflow-y: hidden;
+    overflow: hidden;
 }
 
 body {
     display: grid;
+    overflow: scroll;
+    overflow-y: hidden;
     grid-template-columns: 1fr max-content;
 }

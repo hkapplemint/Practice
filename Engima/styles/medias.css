@@ -1,8 +1,11 @@
 @media screen and (max-width: 768px) and (min-width: 426px) {
+    html {
+        overflow-x: hidden;
+    }
     body {
         grid-template-columns: 1fr;
-        overflow-y: auto;
-        gap: 30px
+        overflow-y: scroll;
+        overflow-x: hidden;
     }
     
     .lightbulb-container, .keyboard-container, .plugboard-container {
