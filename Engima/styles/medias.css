@@ -5,7 +5,7 @@
     body {
         grid-template-columns: 1fr;
         overflow-y: scroll;
-        overflow-x: hidden;
+        overflow-x: scroll;
     }
     
     .lightbulb-container, .keyboard-container, .plugboard-container {
@@ -33,7 +33,6 @@
     body {
         overflow: scroll;
         grid-template-columns: 1fr;
-        gap: 30px
     }
     th, td {
         font-size: 1.2rem;
@@ -71,7 +70,7 @@
         transform: translateX(0);
     }
     .key-row-1, .key-row-2, .key-row-3, .light-row-1, .light-row-2, .light-row-3, .plug-row-1, .plug-row-2, .plug-row-3 {
-        display: flex;
+        /* display: flex; */
         gap: 4px;
     }
     .key, .light {
