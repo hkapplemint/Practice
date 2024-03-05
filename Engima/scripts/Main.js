@@ -354,6 +354,11 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Backspace") {
         if (decryptionContainer.textContent === "") return
         //if the decryption output is empty, return immediately
+
+        if (decryptionContainer.textContent.at(-1) === " ") {
+            decryptionContainer.textContent = decryptionContainer.textContent.slice(0, -1);
+            return
+        };
         
         decryptionContainer.textContent = decryptionContainer.textContent.slice(0, -1);
         
@@ -444,7 +449,7 @@ const autoEncrypt = (string) => {
         const DELAY = 75;
         const char = string[i];
         
-        if (char === " ") {
+        if (char === " " || char === " ") {
             setTimeout(() => {
                 decryptionContainer.textContent += " ";
             }, i * DELAY)
