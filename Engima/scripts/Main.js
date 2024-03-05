@@ -441,7 +441,16 @@ updateCurrentNumberDisplay();
 
 const autoEncrypt = (string) => {
     for (let i = 0; i < string.length; i++) {
+        const DELAY = 75;
         const char = string[i];
+        
+        if (char === " ") {
+            setTimeout(() => {
+                decryptionContainer.textContent += " ";
+            }, i * DELAY)
+            continue
+        }
+
         const mouseDownEvent = new MouseEvent("mousedown", {
             bubbles: true,
             cancelable: true,
@@ -452,7 +461,6 @@ const autoEncrypt = (string) => {
             cancelable: true,
             view: window
         })
-        const delay = 200;
     
         setTimeout(() => {
             [...keys].forEach((key) => {
@@ -460,20 +468,20 @@ const autoEncrypt = (string) => {
                     key.dispatchEvent(mouseDownEvent);
                 }
             })
-        }, i * delay)
+        }, i * DELAY)
         setTimeout(() => {
             [...keys].forEach((key) => {
                 if (key.textContent === char) {
                     key.dispatchEvent(mouseUpEvent);
                 }
             })
-        }, i * delay + 50)
+        }, i * DELAY + 50)
     }
 }
 let filteredInput;
 autoEncryptTextArea.addEventListener("input", (e) => {
     autoEncryptTextArea.value = autoEncryptTextArea.value.toUpperCase();
-    const matches = autoEncryptTextArea.value.match(/[A-Z]/g);
+    const matches = autoEncryptTextArea.value.match(/[A-Z\s]/g);
     if (matches) {
         filteredInput = matches.join("")
     }

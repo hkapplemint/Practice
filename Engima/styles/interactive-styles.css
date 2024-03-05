@@ -2,7 +2,8 @@
     align-self: flex-start;
     display: grid;
     height: 100%;
-    grid-template-rows: min-content 1fr 1fr;
+    /* grid-template-rows: min-content 1fr 1fr; */
+    grid-template-rows: min-content 1fr;
 }
 
 .incoming-code-container, .decryption-container, .setting-container {
@@ -35,6 +36,7 @@
     flex-direction: column;
 }
 .auto-encrypt-textarea {
+    width: 100%;
     font-size: 2rem;
     padding: 5px;
 }
