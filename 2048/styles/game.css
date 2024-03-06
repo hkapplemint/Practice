@@ -1,0 +1,27 @@
+.background-container {
+    aspect-ratio: 1;
+    height: 70%;
+    display: grid;
+    position: relative;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 2vh;
+    padding: 2vh;
+    background-color: gray;
+}
+
+.background-cell {
+    aspect-ratio: 1;
+    border-radius: 5px;
+    background-color: rgb(241, 236, 255);
+}
+
+.game-overlay {
+    display: none;
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(138, 138, 255, 0.5);
+}
