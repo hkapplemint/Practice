@@ -11,6 +11,12 @@
     .lightbulb-container, .keyboard-container, .plugboard-container {
         padding: 10px 5px;
     }
+    .incoming-code-container, .decryption-container {
+        min-height: 5rem;
+    }
+    .decryption-container {
+        font-size: 1.5rem;
+    }
     .enigma {
         padding-top: 30px;
     }
@@ -38,7 +44,7 @@
         font-size: 1.2rem;
     }
     .decryption-container {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
     .interactive-container {
         grid-area: 1 / 1 / 2 / 2;
