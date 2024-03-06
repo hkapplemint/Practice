@@ -30,7 +30,7 @@ const generateRandomCell = () => {
 
     setTimeout(() => {
         newElement.style.scale = "1"
-    }, 300)
+    }, 350)
 
     return true;
 }
@@ -43,8 +43,10 @@ const findNumberCell = (col, row) => {
 }
 
 const moveLeft = () => {
-    const allCellArr = document.querySelectorAll(".cell");
-    const allPossibleLeftMoveCellArr = [...allCellArr].filter(cell => cell.dataset.col !== "0")
+    const allCellsArr = document.querySelectorAll(".cell");
+    const allPossibleLeftMoveCellArr = [...allCellsArr].filter(cell => cell.dataset.col !== "0")
+
+    let movementCounter = 0;
 
     allPossibleLeftMoveCellArr.forEach(cell => {
         let col = cell.dataset.col;
@@ -52,66 +54,96 @@ const moveLeft = () => {
 
         let respectiveBgCell = findBgDiv(col, row)
         let leftBgCell = findBgDiv(parseInt(col)-1, row)
-        // console.log(respectiveBgCell);
 
-        while (isDirectionEmptyOrEqual(col, row, "left")) {
+        while (directionIsEmptyOrEqual(col, row, "left")) {
+            movementCounter++
+
             respectiveBgCell = findBgDiv(col, row)
-            if(respectiveBgCell) {
-                respectiveBgCell.dataset.isEmpty = "true"
-            }
+            respectiveBgCell.dataset.isEmpty = "true"
 
             cell.dataset.col = parseInt(cell.dataset.col) - 1;
-            col = cell.dataset.col;
+            col = cell.dataset.col
             
             leftBgCell = findBgDiv(col, row)
             if(leftBgCell) {
                 leftBgCell.dataset.isEmpty = "false"
             }
-                
-
+            
             console.log("cell:", cell, "is moving left")
         }
-
         updateCellPosition(cell, cell.dataset.col, cell.dataset.row)
     })
-}
-function merging(targetNumberCell, ogNumberCell) {
-    targetNumberCell.textContent = parseInt(targetNumberCell.textContent)*2;
-    ogNumberCell.remove();
-}
-
-function updateCellPosition(cell, col, row) {
-    cell.style.translate = `calc((100% + var(--gap-width))*${col}) calc((100% + var(--gap-width))*${row})`
+    //if movementCounter = 0, this mean the while loop has never been ran
+    //meaning no cells were moved
+    //return "false" if movementCounter === 0
+    return movementCounter !== 0
 }
 
-function isDirectionEmptyOrEqual(col, row, direction) {
-    let targetBgCell, targetNumberCell, targetNextNumberCell;
+const moveDown = () => {
+    const allCellsArr = document.querySelectorAll(".cell");
+    const allPossibleDownMoveCellArr = [...allCellsArr].filter(cell => cell.dataset.row !== "3")
+
+    let movementCounter = 0;
+
+    allPossibleDownMoveCellArr.forEach(cell => {
+        let col = cell.dataset.col;
+        let row = cell.dataset.row;
+
+        let respectiveBgCell = findBgDiv(col, row)
+        let downBgCell = findBgDiv(col, parseInt(row)+1)
+
+        while (directionIsEmptyOrEqual(col, row, "down")) {
+            movementCounter++
+
+            respectiveBgCell = findBgDiv(col, row)
+            respectiveBgCell.dataset.isEmpty = "true"
+
+            cell.dataset.row = parseInt(cell.dataset.row) + 1;
+            row = cell.dataset.row
+            
+            downBgCell = findBgDiv(col, row)
+            if(downBgCell) {
+                downBgCell.dataset.isEmpty = "false"
+            }
+        }
+        updateCellPosition(cell, cell.dataset.col, cell.dataset.row)
+    })
+    return movementCounter !== 0
+}
+
+
+function directionIsEmptyOrEqual(col, row, direction) {
+    let targetBgCell, targetNumberCell;
     const ogNumberCell = findNumberCell(col, row);
     switch (direction) {
         case "left":
             targetBgCell = findBgDiv(parseInt(col)-1, row)
             targetNumberCell = findNumberCell(parseInt(col)-1, row)
-            targetNextNumberCell = findNumberCell(parseInt(col)-2, row)
             if(targetBgCell) {
                 if(targetBgCell.dataset.isEmpty === "true") {
                     return true
                 } else if(targetNumberCell.textContent == ogNumberCell.textContent) {
-                    if (targetNextNumberCell && targetNextNumberCell?.textContent == ogNumberCell.textContent) {
-                        return false
-                    }
-                    //***need more work on this
-                    //found bug: 4 4 4 --> all three will merge together and become 16
-
-
-                    console.log("Found matching number, merging")
-                    setTimeout(() => {
-                        merging(targetNumberCell, ogNumberCell)
-                    }, 500)
+                    merge(targetNumberCell, ogNumberCell)
                     return true
                 } else {
                     return false
                 }
             }
+            break
+        case "down":
+            targetBgCell = findBgDiv(col, parseInt(row) + 1)
+            targetNumberCell = findNumberCell(col, parseInt(row) + 1)
+            if(targetBgCell) {
+                if(targetBgCell.dataset.isEmpty === "true") {
+                    return true
+                } else if(targetNumberCell.textContent == ogNumberCell.textContent) {
+                    merge(targetNumberCell, ogNumberCell)
+                    return true
+                } else {
+                    return false
+                }
+            }
+            break
     }
 }
 
@@ -119,12 +151,25 @@ const endGame = () => {
     console.log("End Game")
 }
 
+function merge(targetNumberCell, ogNumberCell) {
+    targetNumberCell.style.zIndex = "2";
+    targetNumberCell.textContent = parseInt(targetNumberCell.textContent)*2;
+    setTimeout(() => {
+        ogNumberCell.remove();
+    }, 500)
+}
+
+function updateCellPosition(cell, col, row) {
+    cell.style.translate = `calc((100% + var(--gap-width))*${col}) calc((100% + var(--gap-width))*${row})`
+}
+
 document.addEventListener("keydown", e => {
     switch (e.key) {
         case "ArrowLeft":
-            moveLeft();
-            if (!generateRandomCell()) {
-                endGame();
+            if (moveLeft()) {
+                if (!generateRandomCell()) {
+                    endGame();
+                }
             }
             break
         case "ArrowRight":
@@ -132,6 +177,11 @@ document.addEventListener("keydown", e => {
         case "ArrowUp":
             break
         case "ArrowDown":
+            if (moveDown()) {
+                if (!generateRandomCell()) {
+                    endGame();
+                }
+            }
             break
     }
 })
