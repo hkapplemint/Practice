@@ -41,35 +41,67 @@ const moveLeft = () => {
         movableCellArr.push(movableCell);
     })
 
-    movableCellArr.forEach(movableCell => {
-        checkLeft(movableCell, movableCell.dataset.col, movableCell.dataset.rol);
-    })
+    if(movableCellArr.length !== 0) {
+        movableCellArr.forEach(movableCell => {
+            let count = 0;
+            const isLeftClear = (ogCell, ogCol, ogRow) => {
+                const backgroundCellToLeft = [...ALL_BACKGROUND_CELL_DIVS].find(backgroundCell => backgroundCell.dataset.col == `${parseInt(ogCol) - 1}` && backgroundCell.dataset.row == `${parseInt(ogRow)}`)
+                
+                if(backgroundCellToLeft === undefined) return
+            
+                if (backgroundCellToLeft.dataset.isEmpty === "false") {
+                    //if the background cell to left is not empty
+                    const cellToLeft = backgroundCellToLeft.querySelector(".cell")
+                    if (ogCell.textContent == cellToLeft.textContent) {
+                        //check the text of the cell to the left
+                        //if it is equal, combine it
+                        count++
+                        combineLeft(cellToLeft, ogCell);
+                        return
+                    } else { //left side is not empty and its number is different from ogCell
+                        return
+                    }
+            
+                } else { //the background cell to left is empty
+                    backgroundCell = [...ALL_BACKGROUND_CELL_DIVS].find(backgroundCell => backgroundCell.dataset.col === ogCell.dataset.col && backgroundCell.dataset.row === ogRow);
+                    backgroundCell.dataset.isEmpty = "true";
+            
+                    console.log(backgroundCell);
+            
+                    ogCell.dataset.col = `${ogCol - 1}`;
+                    backgroundCellToLeft.dataset.isEmpty = "false";
+            
+                    setTimeout(() => {
+                        backgroundCellToLeft.append(ogCell);
+                    }, 500)
+            
+                    count++;
+                    isLeftClear(ogCell, ogCell.dataset.col, ogRow);
+                }
+            }
 
-    console.log(movableCellArr);
-}
+            isLeftClear(movableCell, movableCell.dataset.col, movableCell.dataset.row)
 
-const checkLeft = (ogCell, ogCol, ogRow) => {
-    const backgroundCellToLeft = [...ALL_BACKGROUND_CELL_DIVS].filter(backgroundCell => backgroundCell.dataset.col == `${parseInt(ogCol) - 1}` && backgroundCell.dataset.row == `${parseInt(ogRow)}`)
-
-    console.log(backgroundCellToLeft);
-    if (backgroundCellToLeft.dataset.isEmpty === "false") {
-        //if the background cell to left is not empty
-        const cellToLeft = backgroundCellToLeft.querySelector(".cell")
-        if (ogCell.textContent == cellToLeft.textContent) {
-            //check the text of the cell to the left
-            //if it is equal, combine it
-            combineLeft(ogCell, cellToLeft);
-            return true
-        } else {
-            //if it is not equal, do not combine it
-            return false
-        }
-    } else {
-        //the background cell to left is empty
-        console.log("moving to left")
-        return true
+            movableCell.style.transform = `translateX(calc(-100% - var(--gap-width))*count)`
+            console.log(movableCell)
+            console.log(count);
+        })
+    
     }
 
+}
+
+
+function combineLeft(cellToLeft, ogCell) {
+    cellToLeft.textContent = parseInt(cellToLeft.textContent) + parseInt(ogCell.textContent);
+
+    ogBackgroundCell = [...ALL_BACKGROUND_CELL_DIVS].find(backgroundCell => backgroundCell.dataset.col === ogCell.dataset.col && backgroundCell.dataset.row === ogCell.dataset.row)
+    ogBackgroundCell.dataset.isEmpty = "true";
+
+    ogCell.style.zIndex = "0";
+    setTimeout(() => {
+        ogCell.remove();
+    }, 200)
 }
 
 document.addEventListener("keydown", e => {
