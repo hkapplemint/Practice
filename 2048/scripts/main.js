@@ -48,9 +48,7 @@ const moveLeft = () => {
     const allCellsArr = document.querySelectorAll(".cell");
     const allPossibleLeftMoveCellArr = [...allCellsArr]
         .filter(cell => cell.dataset.col !== "0")
-        .sort((a, b) => parseInt(a.dataset.col) - parseInt(b.dataset.col))
-    //.sort((a, b) => a.dataset.col - b.dataset.col) is to sort all the filtered cell into ascending order in terms of its column value
-    //in the following .forEach method, we want to iterate the left most (i.e. smallest column value) cell first.
+        .sort((a, b) => a.dataset.col - b.dataset.col)
 
     let movementCounter = 0;
 
@@ -63,8 +61,6 @@ const moveLeft = () => {
         let leftBgCell = findBgDiv(parseInt(col)-1, row)
 
         while (directionIsEmptyOrEqual(col, row, "left")) {
-            
-            
             movementCounter++
             
             respectiveBgCell = findBgDiv(col, row)
@@ -75,6 +71,8 @@ const moveLeft = () => {
             
             leftBgCell = findBgDiv(col, row)
             if(leftBgCell) {
+                //because thi cell moved to the background cell which originally to the left of the cell
+                //we set the leftBgCell to be NOT empty
                 leftBgCell.dataset.isEmpty = "false"
             }
             
@@ -92,7 +90,7 @@ const moveDown = () => {
     const allCellsArr = document.querySelectorAll(".cell");
     const allPossibleDownMoveCellArr = [...allCellsArr]
         .filter(cell => cell.dataset.row !== "3")
-        .sort((a, b) => parseInt(b.dataset.row) - parseInt(a.dataset.row))
+        .sort((a, b) => b.dataset.row - a.dataset.row)
 
     let movementCounter = 0;
 
@@ -126,13 +124,87 @@ const moveDown = () => {
     return movementCounter !== 0
 }
 
+const moveUp = () => {
+    const allCellsArr = document.querySelectorAll(".cell");
+    const allPossibleUpMoveCellArr = [...allCellsArr]
+        .filter(cell => cell.dataset.row !== "0")
+        .sort((a, b) => a.dataset.row - b.dataset.row)
+
+    let movementCounter = 0;
+
+    allPossibleUpMoveCellArr.forEach(cell => {
+
+        let col = cell.dataset.col;
+        let row = cell.dataset.row;
+
+        let respectiveBgCell = findBgDiv(col, row)
+        let upBgCell = findBgDiv(col, parseInt(row) - 1)
+
+        while (directionIsEmptyOrEqual(col, row, "up")) {
+            
+            movementCounter++
+            
+            respectiveBgCell = findBgDiv(col, row)
+            respectiveBgCell.dataset.isEmpty = "true"
+            
+            cell.dataset.row = parseInt(cell.dataset.row) -1;
+            row = cell.dataset.row
+            
+            upBgCell = findBgDiv(col, row)
+            if(upBgCell) {
+                upBgCell.dataset.isEmpty = "false"
+            }
+
+            if(globalMergeCount > 0) break
+        }
+        updateCellPosition(cell, cell.dataset.col, cell.dataset.row)
+    })
+    return movementCounter !== 0
+}
+
+const moveRight = () => {
+    const allCellsArr = document.querySelectorAll(".cell");
+    const allPossibleRightMoveCellArr = [...allCellsArr]
+        .filter(cell => cell.dataset.col !== "3")
+        .sort((a, b) => b.dataset.col - a.dataset.col)
+
+    let movementCounter = 0;
+
+    allPossibleRightMoveCellArr.forEach(cell => {
+
+        let col = cell.dataset.col;
+        let row = cell.dataset.row;
+
+        let respectiveBgCell = findBgDiv(col, row)
+        let rightBgCell = findBgDiv(parseInt(col) + 1, row)
+
+        while (directionIsEmptyOrEqual(col, row, "right")) {
+            
+            movementCounter++
+            
+            respectiveBgCell = findBgDiv(col, row)
+            respectiveBgCell.dataset.isEmpty = "true"
+            
+            cell.dataset.col = parseInt(cell.dataset.col) + 1;
+            col = cell.dataset.col
+            
+            rightBgCell = findBgDiv(col, row)
+            if(rightBgCell) {
+                rightBgCell.dataset.isEmpty = "false"
+            }
+
+            if(globalMergeCount > 0) break
+        }
+        updateCellPosition(cell, cell.dataset.col, cell.dataset.row)
+    })
+    return movementCounter !== 0
+}
+
 function directionIsEmptyOrEqual(col, row, direction) {
     let targetBgCell, targetNumberCell;
     const ogNumberCell = findNumberCell(col, row);
     switch (direction) {
         case "left":
-            console.log(globalMergeCount)
-
             targetBgCell = findBgDiv(parseInt(col)-1, row)
             targetNumberCell = findNumberCell(parseInt(col)-1, row)
 
@@ -140,7 +212,7 @@ function directionIsEmptyOrEqual(col, row, direction) {
                 if(targetBgCell.dataset.isEmpty === "true") {
                     globalMergeCount = 0;
                     return true
-                } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged === "false") {
+                } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
                     globalMergeCount++
                     merge(targetNumberCell, ogNumberCell)
                     return true
@@ -151,15 +223,47 @@ function directionIsEmptyOrEqual(col, row, direction) {
             }
             break
         case "down":
-            console.log(globalMergeCount)
-
             targetBgCell = findBgDiv(col, parseInt(row) + 1)
             targetNumberCell = findNumberCell(col, parseInt(row) + 1)
             if(targetBgCell) {
                 if(targetBgCell.dataset.isEmpty === "true") {
                     globalMergeCount = 0;
                     return true
-                } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged === "false") {
+                } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
+                    globalMergeCount++
+                    merge(targetNumberCell, ogNumberCell)
+                    return true
+                } else {
+                    globalMergeCount = 0;
+                    return false
+                }
+            }
+            break
+        case "right":
+            targetBgCell = findBgDiv(parseInt(col) + 1, row)
+            targetNumberCell = findNumberCell(parseInt(col) + 1, row)
+            if(targetBgCell) {
+                if(targetBgCell.dataset.isEmpty === "true") {
+                    globalMergeCount = 0;
+                    return true
+                } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
+                    globalMergeCount++
+                    merge(targetNumberCell, ogNumberCell)
+                    return true
+                } else {
+                    globalMergeCount = 0;
+                    return false
+                }
+            }
+            break
+        case "up":
+            targetBgCell = findBgDiv(col, parseInt(row) - 1)
+            targetNumberCell = findNumberCell(col, parseInt(row) - 1)
+            if(targetBgCell) {
+                if(targetBgCell.dataset.isEmpty === "true") {
+                    globalMergeCount = 0;
+                    return true
+                } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
                     globalMergeCount++
                     merge(targetNumberCell, ogNumberCell)
                     return true
@@ -178,20 +282,25 @@ const endGame = () => {
 
 function merge(targetNumberCell, ogNumberCell) {
     targetNumberCell.style.zIndex = "3";
+    ogNumberCell.style.zIndex = "0";
     targetNumberCell.textContent = parseInt(ogNumberCell.textContent)*2;
     targetNumberCell.dataset.merged = "true";
+    ogNumberCell.dataset.merged = "true";
     setTimeout(() => {
         ogNumberCell.remove();
     }, 500)
 }
 
 function updateCellPosition(cell, col, row) {
-    cell.style.translate = `calc((100% + var(--gap-width))*${col}) calc((100% + var(--gap-width))*${row})`
+    cell.style.translate = `calc((100% + var(--gap-width))*${col}) calc((100% + var(--gap-width))*${row})`;
+    cell.style.zIndex = "0";
 }
 
-function resetAllCellMergedStatus() {
+function resetAllCellStatusAfterMove() {
     const cellsArr = document.querySelectorAll(".cell");
-    [...cellsArr].forEach(cell => cell.dataset.merged = "false")
+    [...cellsArr].forEach(cell => {
+        cell.dataset.merged = "false"
+    })
 }
 
 document.addEventListener("keydown", e => {
@@ -199,20 +308,34 @@ document.addEventListener("keydown", e => {
         case "ArrowLeft":
             if (moveLeft()) {
                 globalMergeCount = 0;
-                resetAllCellMergedStatus();
+                resetAllCellStatusAfterMove();
                 if (!generateRandomCell()) {
                     endGame();
                 }
             }
             break
         case "ArrowRight":
+            if (moveRight()) {
+                globalMergeCount = 0;
+                resetAllCellStatusAfterMove();
+                if (!generateRandomCell()) {
+                    endGame();
+                }
+            }
             break
         case "ArrowUp":
+            if (moveUp()) {
+                globalMergeCount = 0;
+                resetAllCellStatusAfterMove();
+                if (!generateRandomCell()) {
+                    endGame();
+                }
+            }
             break
         case "ArrowDown":
             if (moveDown()) {
                 globalMergeCount = 0;
-                resetAllCellMergedStatus();
+                resetAllCellStatusAfterMove();
                 if (!generateRandomCell()) {
                     endGame();
                 }
