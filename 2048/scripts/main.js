@@ -48,7 +48,7 @@ const generateRandomCell = () => {
 
     setTimeout(() => {
         newElement.style.scale = "1"
-    }, 350)
+    }, 200)
 
     return true;
 }
@@ -230,7 +230,7 @@ function directionIsEmptyOrEqual(col, row, direction) {
                 if(targetBgCell.dataset.isEmpty === "true") {
                     globalMergeCount = 0;
                     return true
-                } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
+                } else if(targetNumberCell && targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
                     globalMergeCount++
                     merge(targetNumberCell, ogNumberCell)
                     return true
@@ -322,44 +322,54 @@ function resetAllCellStatusAfterMove() {
     })
 }
 
+let isThrottled = false;
+
 document.addEventListener("keydown", e => {
-    switch (e.key) {
-        case "ArrowLeft":
-            if (moveLeft()) {
-                globalMergeCount = 0;
-                resetAllCellStatusAfterMove();
-                if (!generateRandomCell()) {
-                    endGame();
+    if (!isThrottled) {
+        switch (e.key) {
+            case "ArrowLeft":
+                if (moveLeft()) {
+                    globalMergeCount = 0;
+                    resetAllCellStatusAfterMove();
+                    if (!generateRandomCell()) {
+                        endGame();
+                    }
                 }
-            }
-            break
-        case "ArrowRight":
-            if (moveRight()) {
-                globalMergeCount = 0;
-                resetAllCellStatusAfterMove();
-                if (!generateRandomCell()) {
-                    endGame();
+                break
+            case "ArrowRight":
+                if (moveRight()) {
+                    globalMergeCount = 0;
+                    resetAllCellStatusAfterMove();
+                    if (!generateRandomCell()) {
+                        endGame();
+                    }
                 }
-            }
-            break
-        case "ArrowUp":
-            if (moveUp()) {
-                globalMergeCount = 0;
-                resetAllCellStatusAfterMove();
-                if (!generateRandomCell()) {
-                    endGame();
+                break
+            case "ArrowUp":
+                if (moveUp()) {
+                    globalMergeCount = 0;
+                    resetAllCellStatusAfterMove();
+                    if (!generateRandomCell()) {
+                        endGame();
+                    }
                 }
-            }
-            break
-        case "ArrowDown":
-            if (moveDown()) {
-                globalMergeCount = 0;
-                resetAllCellStatusAfterMove();
-                if (!generateRandomCell()) {
-                    endGame();
+                break
+            case "ArrowDown":
+                if (moveDown()) {
+                    globalMergeCount = 0;
+                    resetAllCellStatusAfterMove();
+                    if (!generateRandomCell()) {
+                        endGame();
+                    }
                 }
-            }
-            break
+                break
+        }
+
+        isThrottled = true;
+
+        setTimeout(() => {
+            isThrottled = false
+        }, 200)
     }
 })
 
