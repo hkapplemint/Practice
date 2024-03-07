@@ -1,20 +1,28 @@
 const ALL_BACKGROUND_CELL_DIVS = document.querySelectorAll(".background-cell")
 
-const CELL_BG_COLOR = ["#eee4da", "#ede0c8", "#f2b179", "#f59563", "#f67c60", "#f65e3b", "#edcf73", "#edcc62", "#edc850", "#edc53f", "#edc22d"]
-const CELL_FONT_COLOR = ["#776e65", "#776e65", "#f9f6f2"]
+const CELL_BG_COLORS = ["#eee4da", "#ede0c8", "#f2b179", "#f59563", "#f67c60", "#f65e3b", "#edcf73", "#edcc62", "#edc850", "#edc53f", "#edc22d"]
+const CELL_FONT_COLORS = ["#776e65", "#776e65", "#f9f6f2"]
+const CELL_FONT_SIZES = ["min(10vw, 10vh)", "min(8vw, 8vh)"]
 
-const colorCell = (cell) => {
+const styleCell = (cell) => {
     const number = parseInt(cell.textContent);
     let relativeBgColorIndex = Math.log2(number) - 1
-    if (relativeBgColorIndex > CELL_BG_COLOR.length - 1) {
-        relativeBgColorIndex = CELL_BG_COLOR.length - 1
+    if (relativeBgColorIndex > CELL_BG_COLORS.length - 1) {
+        relativeBgColorIndex = CELL_BG_COLORS.length - 1
     }
     let relativeFontColorIndex = Math.log2(number) - 1
-    if (relativeFontColorIndex > CELL_FONT_COLOR.length - 1) {
-        relativeFontColorIndex = CELL_FONT_COLOR.length - 1
+    if (relativeFontColorIndex > CELL_FONT_COLORS.length - 1) {
+        relativeFontColorIndex = CELL_FONT_COLORS.length - 1
     }
-    cell.style.backgroundColor = CELL_BG_COLOR[relativeBgColorIndex]
-    cell.style.color = CELL_FONT_COLOR[relativeFontColorIndex]
+    let relativeFontSize = Math.log2(number)
+    if (relativeFontSize < 10) {
+        cell.style.fontSize = CELL_FONT_SIZES[0]
+    } else {
+        cell.style.fontSize = CELL_FONT_SIZES[1]
+
+    }
+    cell.style.backgroundColor = CELL_BG_COLORS[relativeBgColorIndex]
+    cell.style.color = CELL_FONT_COLORS[relativeFontColorIndex]
 }
 
 const generateRandomCell = () => {
@@ -34,7 +42,7 @@ const generateRandomCell = () => {
     newElement.classList.add("cell");
     //70% to be a 2, 30% to be a 4
     newElement.textContent = Math.random() > 0.3 ? 2 : 4;
-    colorCell(newElement);
+    styleCell(newElement);
     newElement.dataset.col = randomCellDiv.dataset.col;
     newElement.dataset.row = randomCellDiv.dataset.row;
     //move the newly created cell to the specified place by using translate
@@ -48,7 +56,7 @@ const generateRandomCell = () => {
 
     setTimeout(() => {
         newElement.style.scale = "1"
-    }, 200)
+    }, 100)
 
     return true;
 }
@@ -293,21 +301,22 @@ function directionIsEmptyOrEqual(col, row, direction) {
             break
     }
 }
-
+let isEnded = false;
 const endGame = () => {
-    console.log("End Game")
+    console.log("End Game");
+    isEnded = true;
 }
 
 function merge(targetNumberCell, ogNumberCell) {
     targetNumberCell.style.zIndex = "3";
     ogNumberCell.style.zIndex = "0";
     targetNumberCell.textContent = parseInt(ogNumberCell.textContent)*2;
-    colorCell(targetNumberCell);
+    styleCell(targetNumberCell);
     targetNumberCell.dataset.merged = "true";
     ogNumberCell.dataset.merged = "true";
     setTimeout(() => {
         ogNumberCell.remove();
-    }, 500)
+    }, 100)
 }
 
 function updateCellPosition(cell, col, row) {
@@ -325,7 +334,11 @@ function resetAllCellStatusAfterMove() {
 let isThrottled = false;
 
 document.addEventListener("keydown", e => {
+    if (isEnded) return
+
     if (!isThrottled) {
+        isThrottled = true;
+
         switch (e.key) {
             case "ArrowLeft":
                 if (moveLeft()) {
@@ -334,6 +347,8 @@ document.addEventListener("keydown", e => {
                     if (!generateRandomCell()) {
                         endGame();
                     }
+                } else {
+                    isThrottled = false
                 }
                 break
             case "ArrowRight":
@@ -343,6 +358,8 @@ document.addEventListener("keydown", e => {
                     if (!generateRandomCell()) {
                         endGame();
                     }
+                } else {
+                    isThrottled = false
                 }
                 break
             case "ArrowUp":
@@ -352,6 +369,8 @@ document.addEventListener("keydown", e => {
                     if (!generateRandomCell()) {
                         endGame();
                     }
+                } else {
+                    isThrottled = false
                 }
                 break
             case "ArrowDown":
@@ -361,16 +380,56 @@ document.addEventListener("keydown", e => {
                     if (!generateRandomCell()) {
                         endGame();
                     }
+                } else {
+                    isThrottled = false
                 }
                 break
         }
 
-        isThrottled = true;
-
         setTimeout(() => {
             isThrottled = false
-        }, 200)
+        }, 300)
     }
 })
+
+let initialX, initialY;
+document.addEventListener("touchstart", e => {
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    initialX = touch.clientX;
+    initialY = touch.clientY;
+})
+document.addEventListener("touchmove", e => {
+    e.preventDefault();
+
+    const touch = e.changedTouches[0];
+    const currentX = touch.clientX;
+    const currentY = touch.clientY;
+
+    console.log("initialY", initialY, "currentY", currentY)
+
+    const swipeLeft = currentX - initialX < -100 && Math.abs(currentY - initialY) < 20
+    const swipeDown = currentY - initialY > 100 && Math.abs(currentX - initialX) < 20
+    const swipeUp = currentY - initialY < -100 && Math.abs(currentX - initialX) < 20
+    const swipeRight =  currentX - initialX > 100 && Math.abs(currentY - initialY) < 20
+
+    const leftArrowEvent = new KeyboardEvent("keydown", {key: "ArrowLeft"})
+    const downArrowEvent = new KeyboardEvent("keydown", {key: "ArrowDown"})
+    const upArrowEvent = new KeyboardEvent("keydown", {key: "ArrowUp"})
+    const rightArrowEvent = new KeyboardEvent("keydown", {key: "ArrowRight"})
+
+    if(swipeLeft) {
+        document.dispatchEvent(leftArrowEvent)
+    } else if (swipeDown) {
+        document.dispatchEvent(downArrowEvent)
+    } else if (swipeUp) {
+        console.log("detected swiping up")
+        document.dispatchEvent(upArrowEvent)
+    } else if (swipeRight) {
+        console.log("detected swiping right")
+        document.dispatchEvent(rightArrowEvent)
+    }
+}, {passive: false})
 
 generateRandomCell()
