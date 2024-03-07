@@ -1,5 +1,22 @@
 const ALL_BACKGROUND_CELL_DIVS = document.querySelectorAll(".background-cell")
 
+const CELL_BG_COLOR = ["#eee4da", "#ede0c8", "#f2b179", "#f59563", "#f67c60", "#f65e3b", "#edcf73", "#edcc62", "#edc850", "#edc53f", "#edc22d"]
+const CELL_FONT_COLOR = ["#776e65", "#776e65", "#f9f6f2"]
+
+const colorCell = (cell) => {
+    const number = parseInt(cell.textContent);
+    let relativeBgColorIndex = Math.log2(number) - 1
+    if (relativeBgColorIndex > CELL_BG_COLOR.length - 1) {
+        relativeBgColorIndex = CELL_BG_COLOR.length - 1
+    }
+    let relativeFontColorIndex = Math.log2(number) - 1
+    if (relativeFontColorIndex > CELL_FONT_COLOR.length - 1) {
+        relativeFontColorIndex = CELL_FONT_COLOR.length - 1
+    }
+    cell.style.backgroundColor = CELL_BG_COLOR[relativeBgColorIndex]
+    cell.style.color = CELL_FONT_COLOR[relativeFontColorIndex]
+}
+
 const generateRandomCell = () => {
     //get all empty cells
     //randomly choose one of the empty cell
@@ -17,6 +34,7 @@ const generateRandomCell = () => {
     newElement.classList.add("cell");
     //70% to be a 2, 30% to be a 4
     newElement.textContent = Math.random() > 0.3 ? 2 : 4;
+    colorCell(newElement);
     newElement.dataset.col = randomCellDiv.dataset.col;
     newElement.dataset.row = randomCellDiv.dataset.row;
     //move the newly created cell to the specified place by using translate
@@ -284,6 +302,7 @@ function merge(targetNumberCell, ogNumberCell) {
     targetNumberCell.style.zIndex = "3";
     ogNumberCell.style.zIndex = "0";
     targetNumberCell.textContent = parseInt(ogNumberCell.textContent)*2;
+    colorCell(targetNumberCell);
     targetNumberCell.dataset.merged = "true";
     ogNumberCell.dataset.merged = "true";
     setTimeout(() => {
