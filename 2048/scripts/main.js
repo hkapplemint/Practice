@@ -2,7 +2,7 @@ const ALL_BACKGROUND_CELL_DIVS = document.querySelectorAll(".background-cell")
 
 const CELL_BG_COLORS = ["#eee4da", "#ede0c8", "#f2b179", "#f59563", "#f67c60", "#f65e3b", "#edcf73", "#edcc62", "#edc850", "#edc53f", "#edc22d"]
 const CELL_FONT_COLORS = ["#776e65", "#776e65", "#f9f6f2"]
-const CELL_FONT_SIZES = ["min(10vw, 10vh)", "min(8vw, 8vh)"]
+const CELL_FONT_SIZES = ["min(10vw, 10vh)", "min(9vw, 9vh)", "min(8vw, 8vh)"]
 
 const styleCell = (cell) => {
     const number = parseInt(cell.textContent);
@@ -15,11 +15,13 @@ const styleCell = (cell) => {
         relativeFontColorIndex = CELL_FONT_COLORS.length - 1
     }
     let relativeFontSize = Math.log2(number)
-    if (relativeFontSize < 10) {
+    if (relativeFontSize < 7) {
         cell.style.fontSize = CELL_FONT_SIZES[0]
-    } else {
+    } else if (relativeFontSize >= 7 && relativeFontSize <= 9) {
         cell.style.fontSize = CELL_FONT_SIZES[1]
-
+    }
+    else {
+         cell.style.fontSize = CELL_FONT_SIZES[2]
     }
     cell.style.backgroundColor = CELL_BG_COLORS[relativeBgColorIndex]
     cell.style.color = CELL_FONT_COLORS[relativeFontColorIndex]
@@ -331,6 +333,20 @@ function resetAllCellStatusAfterMove() {
     })
 }
 
+const gameStateArr = [];
+
+const backgroundContainer = document.querySelector(".background-container")
+
+const saveGameState = () => {
+    setTimeout(() => {
+        gameStateArr.push(backgroundContainer.innerHTML)
+        console.log(gameStateArr)
+    }, 200)
+}
+const loadPreviousGameState = () => {
+    backgroundContainer.innerHTML = gameStateArr[gameStateArr.length - 2];
+}
+
 let isThrottled = false;
 
 document.addEventListener("keydown", e => {
@@ -347,6 +363,7 @@ document.addEventListener("keydown", e => {
                     if (!generateRandomCell()) {
                         endGame();
                     }
+                    saveGameState();
                 } else {
                     isThrottled = false
                 }
@@ -358,6 +375,7 @@ document.addEventListener("keydown", e => {
                     if (!generateRandomCell()) {
                         endGame();
                     }
+                    saveGameState();
                 } else {
                     isThrottled = false
                 }
@@ -369,6 +387,7 @@ document.addEventListener("keydown", e => {
                     if (!generateRandomCell()) {
                         endGame();
                     }
+                    saveGameState();
                 } else {
                     isThrottled = false
                 }
@@ -380,6 +399,7 @@ document.addEventListener("keydown", e => {
                     if (!generateRandomCell()) {
                         endGame();
                     }
+                    saveGameState();
                 } else {
                     isThrottled = false
                 }
@@ -388,7 +408,7 @@ document.addEventListener("keydown", e => {
 
         setTimeout(() => {
             isThrottled = false
-        }, 300)
+        }, 200)
     }
 })
 
