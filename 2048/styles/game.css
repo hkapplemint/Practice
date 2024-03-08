@@ -1,14 +1,16 @@
 *, *::after, *::before {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    display: flex;
+    display: grid;
     overflow: hidden;
     height: 100vh;
     width: 100vw;
-    justify-content: center;
-    align-items: center;
+    grid-template-rows: 1fr min-content;
+    place-items: center center;
     background-color: #f1ece7;
 }
 
@@ -67,4 +69,10 @@ body {
     transition: scale 0.2s, translate 0.2s;
 
     z-index: 1;
+}
+
+.options {
+    width: 100%;
+    height: 10vh;
+    background-color: #c5b29e;
 }
