@@ -1,0 +1,31 @@
+.options {
+    width: 100%;
+    height: 10vh;
+    background-color: #c5b29e;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.restart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    fill: white;
+    height: 80%;
+    aspect-ratio: 1;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #d7c8b7;
+}
+.restart-container:hover {
+    background-color: #e0d3c5;
+}
+.restart-container:active {
+    background-color: #b0a393;
+}
+
+svg {
+    width: 90%;
+    height: 90%;
+}

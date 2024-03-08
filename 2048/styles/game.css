@@ -2,6 +2,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    user-select: none;
 }
 
 body {
@@ -69,10 +70,4 @@ body {
     transition: scale 0.2s, translate 0.2s;
 
     z-index: 1;
-}
-
-.options {
-    width: 100%;
-    height: 10vh;
-    background-color: #c5b29e;
 }

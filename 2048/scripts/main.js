@@ -221,16 +221,59 @@ const gameStateArr = [];
 
 const backgroundContainer = document.querySelector(".background-container")
 
+function createCustomCell(col, row, number) {
+    const newCell = document.createElement("div");
+    newCell.dataset.col = col;
+    newCell.dataset.row = row;
+    newCell.dataset.merged = "false";
+    newCell.textContent = number;
+    newCell.classList.add("cell")
+
+    const gameOverlayDiv = document.querySelector(".game-overlay");
+    gameOverlayDiv.append(newCell);
+
+    setTimeout(() => {
+        newCell.style.scale = "1"
+    }, 100)
+
+    styleCell(newCell);
+    updateCellPosition(newCell, col, row);
+}
+
 function saveGameState () {
     setTimeout(() => {
-        gameStateArr.push(backgroundContainer.innerHTML)
-        // console.log(gameStateArr)
+        gameStateArr.push(backgroundContainer.cloneNode(true))
+        console.log(gameStateArr)
     }, 200)
 }
 function loadPreviousGameState () {
-    document.removeEventListener("keydown", handleKeydown);
-    backgroundContainer.innerHTML = gameStateArr[gameStateArr.length - 2];
-    document.addEventListener("keydown", handleKeydown);
+    const previousBackgroundContainer = gameStateArr[gameStateArr.length - 2];
+
+    const previousBackgroundCells = [...previousBackgroundContainer.children]
+        .map(ele => {
+            if (ele.className === "background-cell" && !undefined) {
+                return ele
+            } else {
+                return null
+            }
+        })
+        .filter(ele => ele !== null);
+    console.log(previousBackgroundCells)
+
+    const previousGameOverlay = [...previousBackgroundContainer.children].find(ele => ele.className === "game-overlay")
+    console.log(previousGameOverlay);
+    const previousGameCells = [...previousGameOverlay.children].map(ele => ele);
+    console.log(previousGameCells);
+
+    const backgroundContainer = document.querySelector(".background-container")
+    backgroundContainer.innerHTML = ""
+    previousBackgroundCells.forEach(bgCell => backgroundContainer.append(bgCell));
+    const newGameOverlayDiv = document.createElement("div");
+    newGameOverlayDiv.classList.add("game-overlay");
+    previousGameCells.forEach(gameCell => newGameOverlayDiv.append(gameCell));
+    backgroundContainer.append(newGameOverlayDiv)
+
+
 }
 //______________________________________________________________________//
 //_______________________ End of undo functionality ____________________//
@@ -336,6 +379,13 @@ document.addEventListener("touchmove", e => {
     }
 }, {passive: false})
 
+
+const restartContainer = document.querySelector(".restart-container");
+restartContainer.addEventListener("click", e => {
+    e.stopPropagation();
+    e.preventDefault();
+    location.reload();
+})
 generateRandomCell()
 
 
