@@ -3,14 +3,16 @@
     margin: 0;
     padding: 0;
     user-select: none;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; 
 }
 
 body {
     display: grid;
     overflow: hidden;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     grid-template-rows: 1fr min-content;
+    gap: 5px;
     place-items: center center;
     background-color: #f1ece7;
 }
@@ -18,9 +20,10 @@ body {
 .background-container {
     --gap-width: min(2vw, 2vh);
 
-    aspect-ratio: 1;
-    /* height: 70%; */
+    margin-top: 5vh;
+
     width: 80%;
+    aspect-ratio: 1;
     max-width: 80vh;
     display: grid;
     position: relative;
@@ -62,7 +65,7 @@ body {
     align-items: center;
     color: white;
     font-size: min(10vw, 10vh);
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    
     font-weight: bold;
     background-color: red;
     scale: 0;

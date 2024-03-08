@@ -4,6 +4,8 @@ const CELL_BG_COLORS = ["#eee4da", "#ede0c8", "#f2b179", "#f59563", "#f67c60", "
 const CELL_FONT_COLORS = ["#776e65", "#776e65", "#f9f6f2"]
 const CELL_FONT_SIZES = ["min(10vw, 10vh)", "min(9vw, 9vh)", "min(8vw, 8vh)"]
 
+let score = 0;
+
 const styleCell = (cell) => {
     const number = parseInt(cell.textContent);
     let relativeBgColorIndex = Math.log2(number) - 1
@@ -192,6 +194,10 @@ function merge(targetNumberCell, ogNumberCell) {
     styleCell(targetNumberCell);
     targetNumberCell.dataset.merged = "true";
     ogNumberCell.dataset.merged = "true";
+
+    const scoreDiv = document.querySelector(".score");
+    scoreDiv.textContent = parseInt(scoreDiv.textContent) + parseInt(targetNumberCell.textContent);
+
     setTimeout(() => {
         ogNumberCell.remove();
     }, 100)
@@ -291,6 +297,8 @@ function afterMoveLogic() {
 let isThrottled = false;
 
 function handleKeydown(e) {
+    e.preventDefault();
+
     if (isEnded) return
 
     if (!isThrottled) {
@@ -342,43 +350,54 @@ document.addEventListener("keydown", handleKeydown)
 //---------------------- For touch functionality -----------------------//
 //----------------------------------------------------------------------//
 let initialX, initialY;
+let stoppedSwiping = true
 document.addEventListener("touchstart", e => {
-    e.preventDefault();
-
     const touch = e.touches[0];
     initialX = touch.clientX;
     initialY = touch.clientY;
 })
 document.addEventListener("touchmove", e => {
     e.preventDefault();
-
+    
     const touch = e.changedTouches[0];
     const currentX = touch.clientX;
     const currentY = touch.clientY;
 
-    console.log("initialY", initialY, "currentY", currentY)
+    const sensitivity = 50;
 
-    const swipeLeft = currentX - initialX < -100 && Math.abs(currentY - initialY) < 20
-    const swipeDown = currentY - initialY > 100 && Math.abs(currentX - initialX) < 20
-    const swipeUp = currentY - initialY < -100 && Math.abs(currentX - initialX) < 20
-    const swipeRight =  currentX - initialX > 100 && Math.abs(currentY - initialY) < 20
+    const swipeLeft = currentX - initialX < -sensitivity && Math.abs(currentY - initialY) < 20
+    const swipeDown = currentY - initialY > sensitivity && Math.abs(currentX - initialX) < 20
+    const swipeUp = currentY - initialY < -sensitivity && Math.abs(currentX - initialX) < 20
+    const swipeRight =  currentX - initialX > sensitivity && Math.abs(currentY - initialY) < 20
 
     const leftArrowEvent = new KeyboardEvent("keydown", {key: "ArrowLeft"})
     const downArrowEvent = new KeyboardEvent("keydown", {key: "ArrowDown"})
     const upArrowEvent = new KeyboardEvent("keydown", {key: "ArrowUp"})
     const rightArrowEvent = new KeyboardEvent("keydown", {key: "ArrowRight"})
-
-    if(swipeLeft) {
-        document.dispatchEvent(leftArrowEvent)
-    } else if (swipeDown) {
-        document.dispatchEvent(downArrowEvent)
-    } else if (swipeUp) {
-        document.dispatchEvent(upArrowEvent)
-    } else if (swipeRight) {
-        document.dispatchEvent(rightArrowEvent)
+    console.log(stoppedSwiping)
+    if (stoppedSwiping) {
+        if(swipeLeft) {
+            document.dispatchEvent(leftArrowEvent)
+            stoppedSwiping = false;
+        } else if (swipeDown) {
+            document.dispatchEvent(downArrowEvent)
+            stoppedSwiping = false;
+        } else if (swipeUp) {
+            document.dispatchEvent(upArrowEvent)
+            stoppedSwiping = false;
+        } else if (swipeRight) {
+            document.dispatchEvent(rightArrowEvent)
+            stoppedSwiping = false;
+        }
     }
 }, {passive: false})
 
+document.addEventListener("touchend", () => {
+    stoppedSwiping = true;
+})
+document.addEventListener("touchcancel", () => {
+    stoppedSwiping = true;
+})
 
 const restartContainer = document.querySelector(".restart-container");
 restartContainer.addEventListener("click", e => {
