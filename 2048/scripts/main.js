@@ -33,14 +33,14 @@ const generateRandomCell = () => {
     //get all empty cells
     //randomly choose one of the empty cell
     //create a new element and append to that empty cell
-    const emptyCellsDivArr = [...ALL_BACKGROUND_CELL_DIVS].filter(backgroundCell => backgroundCell.dataset.isEmpty === "true")
+    const backgroundCells = document.querySelectorAll(".background-cell")
+
+    const emptyCellsDivArr = [...backgroundCells].filter(backgroundCell => backgroundCell.dataset.isEmpty === "true")
 
     //guard clause: if there is no empty cell in the game, return
     if (emptyCellsDivArr.length === 0) return false;
 
     const randomCellDiv = emptyCellsDivArr[Math.floor(Math.random()*emptyCellsDivArr.length)]
-
-    //translate: calc((100% + var(--gap-width))*3) calc((100% + var(--gap-width))*3)
     
     const newElement = document.createElement("div")
     newElement.classList.add("cell");
@@ -53,7 +53,7 @@ const generateRandomCell = () => {
     //move the newly created cell to the specified place by using translate
     newElement.style.translate = `calc((100% + var(--gap-width))*${newElement.dataset.col}) calc((100% + var(--gap-width))*${newElement.dataset.row})`
 
-    const gameOverlayDiv = document.querySelector(".game-overlay");
+    const gameOverlayDiv = document.getElementById("game-overlay");
     gameOverlayDiv.append(newElement);
 
     //mark this chosen cell to be NOT empty
@@ -70,7 +70,6 @@ let globalMergeCount = 0;
 
 function move(direction) {
     const allCellsArr = document.querySelectorAll(".cell");
-    console.log(allCellsArr);
     let movementCounter = 0;
     let allPossibleMoveCellArr;
     switch (direction) {
@@ -95,8 +94,6 @@ function move(direction) {
                 .sort((a, b) => b.dataset.col - a.dataset.col)
             break
     }
-
-    console.log(allPossibleMoveCellArr);
 
     allPossibleMoveCellArr.forEach(cell => {
         let col = cell.dataset.col;
@@ -171,7 +168,6 @@ function directionIsEmptyOrEqual(col, row, direction) {
             merge(targetNumberCell, ogNumberCell)
             return true
         } else {
-            console.log("Obstacle reached, targetBgCell:",targetBgCell)
             globalMergeCount = 0;
             return false
         }
@@ -223,11 +219,11 @@ function findNumberCell(col, row) {
 //----------------------------------------------------------------------//
 //----------------------- For undo functionality -----------------------//
 //----------------------------------------------------------------------//
-const gameStateArr = [];
+const gameCellStateArr = [];
 
 const backgroundContainer = document.querySelector(".background-container")
-
 function createCustomCell(col, row, number) {
+
     const newCell = document.createElement("div");
     newCell.dataset.col = col;
     newCell.dataset.row = row;
@@ -235,57 +231,71 @@ function createCustomCell(col, row, number) {
     newCell.textContent = number;
     newCell.classList.add("cell")
 
+    const relativeBgCell = findBgDiv(col, row);
+    relativeBgCell.dataset.isEmpty = "false";
+
     const gameOverlayDiv = document.querySelector(".game-overlay");
     gameOverlayDiv.append(newCell);
-
+    
     setTimeout(() => {
         newCell.style.scale = "1"
     }, 100)
-
+    
     styleCell(newCell);
     updateCellPosition(newCell, col, row);
 }
 
 function saveGameState () {
-    setTimeout(() => {
-        gameStateArr.push(backgroundContainer.cloneNode(true))
-        console.log(gameStateArr)
-    }, 200)
+    const gameCells = document.querySelectorAll(".cell")
+    const currentGameCellStateArr = [];
+
+    [...gameCells].forEach(gameCell => {
+        currentGameCellStateArr.push({
+            col: gameCell.dataset.col,
+            row: gameCell.dataset.row,
+            num: gameCell.textContent
+        })
+    })
+    gameCellStateArr.push(currentGameCellStateArr)
+
+    console.log(gameCellStateArr)
 }
 function loadPreviousGameState () {
-    const previousBackgroundContainer = gameStateArr[gameStateArr.length - 2];
+    if (gameCellStateArr.length < 2) return
 
-    const previousBackgroundCells = [...previousBackgroundContainer.children]
-        .map(ele => {
-            if (ele.className === "background-cell" && !undefined) {
-                return ele
-            } else {
-                return null
-            }
-        })
-        .filter(ele => ele !== null);
-    console.log(previousBackgroundCells)
-
-    const previousGameOverlay = [...previousBackgroundContainer.children].find(ele => ele.className === "game-overlay")
-    console.log(previousGameOverlay);
-    const previousGameCells = [...previousGameOverlay.children].map(ele => ele);
-    console.log(previousGameCells);
-
-    const backgroundContainer = document.querySelector(".background-container")
-    backgroundContainer.innerHTML = ""
-    previousBackgroundCells.forEach(bgCell => backgroundContainer.append(bgCell));
-    const newGameOverlayDiv = document.createElement("div");
-    newGameOverlayDiv.classList.add("game-overlay");
-    previousGameCells.forEach(gameCell => newGameOverlayDiv.append(gameCell));
-    backgroundContainer.append(newGameOverlayDiv)
-
-
+    const previousGameCellStateArr = gameCellStateArr[gameCellStateArr.length - 2];
+    console.log(previousGameCellStateArr);
+    const currentGameCellStateArr = gameCellStateArr.pop();
+    currentGameCellStateArr.forEach(obj => {
+        const gameCell = findNumberCell(parseInt(obj.col), parseInt(obj.row))
+        if(gameCell.textContent == obj.num) {
+            gameCell.remove();
+        }
+    })
+    // const gameOverlay = document.getElementById("game-overlay");
+    // const childElementCount = parseInt(gameOverlay.childElementCount)
+    // console.log(childElementCount)
+    // for (let i = 0; i < childElementCount; i++) {
+        //     gameOverlay.removeChild(gameOverlay.firstChild)
+        // }
+        // console.log("gameOverlay:",gameOverlay)
+        
+    console.log(previousGameCellStateArr);
+    const backgroundCells = document.querySelectorAll(".background-cell");
+    [...backgroundCells].forEach(backgroundCell => backgroundCell.dataset.isEmpty = "true")
+    
+    previousGameCellStateArr.forEach(gameCell => {
+        createCustomCell(gameCell.col, gameCell.row, gameCell.num)
+        const bgCell = findBgDiv(gameCell.col, gameCell.row)
+        bgCell.isEmpty = "false";
+    })
 }
 //______________________________________________________________________//
 //_______________________ End of undo functionality ____________________//
 //______________________________________________________________________//
 
 function afterMoveLogic() {
+    isKeydown = true;
     globalMergeCount = 0;
     resetAllCellStatusAfterMove();
     if (!generateRandomCell()) {
@@ -295,55 +305,45 @@ function afterMoveLogic() {
 }
 
 let isThrottled = false;
+let isKeydown = false;
 
 function handleKeydown(e) {
     e.preventDefault();
 
     if (isEnded) return
 
-    if (!isThrottled) {
-        isThrottled = true;
+    if (isKeydown) return
 
-        switch (e.key) {
-            case "ArrowLeft":
-                if (move("left")) {
-                    afterMoveLogic();
-                } else {
-                    isThrottled = false;
-                }
-                break
-            case "ArrowRight":
-                if (move("right")) {
-                    afterMoveLogic()
-                } else {
-                    isThrottled = false
-                }
-                break
-            case "ArrowUp":
-                if (move("up")) {
-                    afterMoveLogic()
-                } else {
-                    isThrottled = false
-                }
-                break
-            case "ArrowDown":
-                if (move("down")) {
-                    afterMoveLogic()
-                } else {
-                    isThrottled = false
-                }
-                break
-        }
-
-        setTimeout(() => {
-            isThrottled = false
-        }, 200)
+    switch (e.key) {
+        case "ArrowLeft":
+            if (move("left")) {
+                afterMoveLogic();
+            }
+            break
+        case "ArrowRight":
+            if (move("right")) {
+                afterMoveLogic()
+            }
+            break
+        case "ArrowUp":
+            if (move("up")) {
+                afterMoveLogic()
+            }
+            break
+        case "ArrowDown":
+            if (move("down")) {
+                afterMoveLogic()
+            }
+            break
     }
 }
 
 
 document.addEventListener("keydown", handleKeydown)
 
+document.addEventListener("keyup", () => {
+    isKeydown = false;
+})
 
 
 //----------------------------------------------------------------------//
@@ -374,29 +374,28 @@ document.addEventListener("touchmove", e => {
     const downArrowEvent = new KeyboardEvent("keydown", {key: "ArrowDown"})
     const upArrowEvent = new KeyboardEvent("keydown", {key: "ArrowUp"})
     const rightArrowEvent = new KeyboardEvent("keydown", {key: "ArrowRight"})
-    console.log(stoppedSwiping)
-    if (stoppedSwiping) {
-        if(swipeLeft) {
-            document.dispatchEvent(leftArrowEvent)
-            stoppedSwiping = false;
-        } else if (swipeDown) {
-            document.dispatchEvent(downArrowEvent)
-            stoppedSwiping = false;
-        } else if (swipeUp) {
-            document.dispatchEvent(upArrowEvent)
-            stoppedSwiping = false;
-        } else if (swipeRight) {
-            document.dispatchEvent(rightArrowEvent)
-            stoppedSwiping = false;
-        }
+
+    if (isKeydown) return
+
+    if(swipeLeft) {
+        document.dispatchEvent(leftArrowEvent)
+    } else if (swipeDown) {
+        document.dispatchEvent(downArrowEvent)
+        isKeydown = true;
+    } else if (swipeUp) {
+        document.dispatchEvent(upArrowEvent)
+        isKeydown = true;
+    } else if (swipeRight) {
+        document.dispatchEvent(rightArrowEvent)
+        isKeydown = true;
     }
 }, {passive: false})
 
 document.addEventListener("touchend", () => {
-    stoppedSwiping = true;
+    isKeydown = false;
 })
 document.addEventListener("touchcancel", () => {
-    stoppedSwiping = true;
+    isKeydown = false;
 })
 
 const restartContainer = document.querySelector(".restart-container");
@@ -405,241 +404,5 @@ restartContainer.addEventListener("click", e => {
     e.preventDefault();
     location.reload();
 })
+
 generateRandomCell()
-
-
-
-
-
-
-// const moveLeft = () => {
-//     const allCellsArr = document.querySelectorAll(".cell");
-//     const allPossibleLeftMoveCellArr = [...allCellsArr]
-//         .filter(cell => cell.dataset.col !== "0")
-//         .sort((a, b) => a.dataset.col - b.dataset.col)
-
-//     let movementCounter = 0;
-
-//     allPossibleLeftMoveCellArr.forEach(cell => {
-
-//         let col = cell.dataset.col;
-//         let row = cell.dataset.row;
-
-//         let respectiveBgCell = findBgDiv(col, row)
-//         let leftBgCell = findBgDiv(parseInt(col)-1, row)
-
-//         while (directionIsEmptyOrEqual(col, row, "left")) {
-//             movementCounter++
-            
-//             respectiveBgCell = findBgDiv(col, row)
-//             respectiveBgCell.dataset.isEmpty = "true"
-            
-//             cell.dataset.col = parseInt(cell.dataset.col) - 1;
-//             col = cell.dataset.col
-            
-//             leftBgCell = findBgDiv(col, row)
-//             if(leftBgCell) {
-//                 //because thi cell moved to the background cell which originally to the left of the cell
-//                 //we set the leftBgCell to be NOT empty
-//                 leftBgCell.dataset.isEmpty = "false"
-//             }
-            
-//             if(globalMergeCount > 0) break
-//         }
-//         updateCellPosition(cell, cell.dataset.col, cell.dataset.row)
-//     })
-//     //if movementCounter = 0, this mean the while loop has never been ran
-//     //meaning no cells were moved
-//     //return "false" if movementCounter === 0
-//     return movementCounter !== 0
-// }
-
-// const moveDown = () => {
-//     const allCellsArr = document.querySelectorAll(".cell");
-//     const allPossibleDownMoveCellArr = [...allCellsArr]
-//         .filter(cell => cell.dataset.row !== "3")
-//         .sort((a, b) => b.dataset.row - a.dataset.row)
-
-//     let movementCounter = 0;
-
-//     allPossibleDownMoveCellArr.forEach(cell => {
-
-//         let col = cell.dataset.col;
-//         let row = cell.dataset.row;
-
-//         let respectiveBgCell = findBgDiv(col, row)
-//         let downBgCell = findBgDiv(col, parseInt(row)+1)
-
-//         while (directionIsEmptyOrEqual(col, row, "down")) {
-            
-//             movementCounter++
-            
-//             respectiveBgCell = findBgDiv(col, row)
-//             respectiveBgCell.dataset.isEmpty = "true"
-            
-//             cell.dataset.row = parseInt(cell.dataset.row) + 1;
-//             row = cell.dataset.row
-            
-//             downBgCell = findBgDiv(col, row)
-//             if(downBgCell) {
-//                 downBgCell.dataset.isEmpty = "false"
-//             }
-
-//             if(globalMergeCount > 0) break
-//         }
-//         updateCellPosition(cell, cell.dataset.col, cell.dataset.row)
-//     })
-//     return movementCounter !== 0
-// }
-
-// const moveUp = () => {
-//     const allCellsArr = document.querySelectorAll(".cell");
-//     const allPossibleUpMoveCellArr = [...allCellsArr]
-//         .filter(cell => cell.dataset.row !== "0")
-//         .sort((a, b) => a.dataset.row - b.dataset.row)
-
-//     let movementCounter = 0;
-
-//     allPossibleUpMoveCellArr.forEach(cell => {
-
-//         let col = cell.dataset.col;
-//         let row = cell.dataset.row;
-
-//         let respectiveBgCell = findBgDiv(col, row)
-//         let upBgCell = findBgDiv(col, parseInt(row) - 1)
-
-//         while (directionIsEmptyOrEqual(col, row, "up")) {
-            
-//             movementCounter++
-            
-//             respectiveBgCell = findBgDiv(col, row)
-//             respectiveBgCell.dataset.isEmpty = "true"
-            
-//             cell.dataset.row = parseInt(cell.dataset.row) -1;
-//             row = cell.dataset.row
-            
-//             upBgCell = findBgDiv(col, row)
-//             if(upBgCell) {
-//                 upBgCell.dataset.isEmpty = "false"
-//             }
-
-//             if(globalMergeCount > 0) break
-//         }
-//         updateCellPosition(cell, cell.dataset.col, cell.dataset.row)
-//     })
-//     return movementCounter !== 0
-// }
-
-// const moveRight = () => {
-//     const allCellsArr = document.querySelectorAll(".cell");
-//     const allPossibleRightMoveCellArr = [...allCellsArr]
-//         .filter(cell => cell.dataset.col !== "3")
-//         .sort((a, b) => b.dataset.col - a.dataset.col)
-
-//     let movementCounter = 0;
-
-//     allPossibleRightMoveCellArr.forEach(cell => {
-
-//         let col = cell.dataset.col;
-//         let row = cell.dataset.row;
-
-//         let respectiveBgCell = findBgDiv(col, row)
-//         let rightBgCell = findBgDiv(parseInt(col) + 1, row)
-
-//         while (directionIsEmptyOrEqual(col, row, "right")) {
-            
-//             movementCounter++
-            
-//             respectiveBgCell = findBgDiv(col, row)
-//             respectiveBgCell.dataset.isEmpty = "true"
-            
-//             cell.dataset.col = parseInt(cell.dataset.col) + 1;
-//             col = cell.dataset.col
-            
-//             rightBgCell = findBgDiv(col, row)
-//             if(rightBgCell) {
-//                 rightBgCell.dataset.isEmpty = "false"
-//             }
-
-//             if(globalMergeCount > 0) break
-//         }
-//         updateCellPosition(cell, cell.dataset.col, cell.dataset.row)
-//     })
-//     return movementCounter !== 0
-// }
-
-// function directionIsEmptyOrEqual(col, row, direction) {
-//     let targetBgCell, targetNumberCell;
-//     const ogNumberCell = findNumberCell(col, row);
-//     switch (direction) {
-//         case "left":
-//             targetBgCell = findBgDiv(parseInt(col)-1, row)
-//             targetNumberCell = findNumberCell(parseInt(col)-1, row)
-
-//             if(targetBgCell) {
-//                 if(targetBgCell.dataset.isEmpty === "true") {
-//                     globalMergeCount = 0;
-//                     return true
-//                 } else if(targetNumberCell && targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
-//                     globalMergeCount++
-//                     merge(targetNumberCell, ogNumberCell)
-//                     return true
-//                 } else {
-//                     globalMergeCount = 0;
-//                     return false
-//                 }
-//             }
-//             break
-//         case "down":
-//             targetBgCell = findBgDiv(col, parseInt(row) + 1)
-//             targetNumberCell = findNumberCell(col, parseInt(row) + 1)
-//             if(targetBgCell) {
-//                 if(targetBgCell.dataset.isEmpty === "true") {
-//                     globalMergeCount = 0;
-//                     return true
-//                 } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
-//                     globalMergeCount++
-//                     merge(targetNumberCell, ogNumberCell)
-//                     return true
-//                 } else {
-//                     globalMergeCount = 0;
-//                     return false
-//                 }
-//             }
-//             break
-//         case "right":
-//             targetBgCell = findBgDiv(parseInt(col) + 1, row)
-//             targetNumberCell = findNumberCell(parseInt(col) + 1, row)
-//             if(targetBgCell) {
-//                 if(targetBgCell.dataset.isEmpty === "true") {
-//                     globalMergeCount = 0;
-//                     return true
-//                 } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
-//                     globalMergeCount++
-//                     merge(targetNumberCell, ogNumberCell)
-//                     return true
-//                 } else {
-//                     globalMergeCount = 0;
-//                     return false
-//                 }
-//             }
-//             break
-//         case "up":
-//             targetBgCell = findBgDiv(col, parseInt(row) - 1)
-//             targetNumberCell = findNumberCell(col, parseInt(row) - 1)
-//             if(targetBgCell) {
-//                 if(targetBgCell.dataset.isEmpty === "true") {
-//                     globalMergeCount = 0;
-//                     return true
-//                 } else if(targetNumberCell.textContent == ogNumberCell.textContent && targetNumberCell.dataset.merged !== "true") {
-//                     globalMergeCount++
-//                     merge(targetNumberCell, ogNumberCell)
-//                     return true
-//                 } else {
-//                     globalMergeCount = 0;
-//                     return false
-//                 }
-//             }
-//             break
-//     }
-// }

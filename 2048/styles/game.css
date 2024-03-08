@@ -6,6 +6,11 @@
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; 
 }
 
+html {
+    height: 100vh;
+    width: 100vw;
+}
+
 body {
     display: grid;
     overflow: hidden;
@@ -20,7 +25,6 @@ body {
 .background-container {
     --gap-width: min(2vw, 2vh);
 
-    margin-top: 5vh;
 
     width: 80%;
     aspect-ratio: 1;
