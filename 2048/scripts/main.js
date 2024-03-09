@@ -193,6 +193,7 @@ function merge(targetNumberCell, ogNumberCell) {
 
     const scoreDiv = document.querySelector(".score");
     scoreDiv.textContent = parseInt(scoreDiv.textContent) + parseInt(targetNumberCell.textContent);
+    score = parseInt(scoreDiv.textContent)
 
     setTimeout(() => {
         ogNumberCell.remove();
@@ -244,52 +245,57 @@ function createCustomCell(col, row, number) {
     styleCell(newCell);
     updateCellPosition(newCell, col, row);
 }
-
-function saveGameState () {
-    const gameCells = document.querySelectorAll(".cell")
-    const currentGameCellStateArr = [];
-
-    [...gameCells].forEach(gameCell => {
-        currentGameCellStateArr.push({
-            col: gameCell.dataset.col,
-            row: gameCell.dataset.row,
-            num: gameCell.textContent
-        })
-    })
-    gameCellStateArr.push(currentGameCellStateArr)
-
-    console.log(gameCellStateArr)
-}
-function loadPreviousGameState () {
-    if (gameCellStateArr.length < 2) return
-
-    const previousGameCellStateArr = gameCellStateArr[gameCellStateArr.length - 2];
-    console.log(previousGameCellStateArr);
-    const currentGameCellStateArr = gameCellStateArr.pop();
-    currentGameCellStateArr.forEach(obj => {
-        const gameCell = findNumberCell(parseInt(obj.col), parseInt(obj.row))
-        if(gameCell.textContent == obj.num) {
-            gameCell.remove();
-        }
-    })
-    // const gameOverlay = document.getElementById("game-overlay");
-    // const childElementCount = parseInt(gameOverlay.childElementCount)
-    // console.log(childElementCount)
-    // for (let i = 0; i < childElementCount; i++) {
-        //     gameOverlay.removeChild(gameOverlay.firstChild)
-        // }
-        // console.log("gameOverlay:",gameOverlay)
-        
-    console.log(previousGameCellStateArr);
+function setAllBGCellEmpty() {
     const backgroundCells = document.querySelectorAll(".background-cell");
     [...backgroundCells].forEach(backgroundCell => backgroundCell.dataset.isEmpty = "true")
+}
+function removeAllGameCell() {
+    const gameOverlay = document.getElementById("game-overlay");
+    while (gameOverlay.children.length > 0) {
+        console.log(gameOverlay.firstElementChild)
+        gameOverlay.firstElementChild.remove()
+    }
+}
+
+function saveGameState () {
+    setTimeout(() => {
+        const gameCells = document.querySelectorAll(".cell");
+        
+        const currentGameCellStateArr = [];
+        [...gameCells].forEach(gameCell => {
+            currentGameCellStateArr.push({
+                col: gameCell.dataset.col,
+                row: gameCell.dataset.row,
+                num: gameCell.textContent,
+                score: score,
+            })
+        })
+        gameCellStateArr.push(currentGameCellStateArr)
     
+        console.log(gameCellStateArr)
+    }, 110)
+}
+function loadPreviousGameState() {
+    //guard clause for user pressing restart at the start of the game
+    if(gameCellStateArr.length < 2) return
+
+    setAllBGCellEmpty();
+    removeAllGameCell();
+
+    const previousGameCellStateArr = gameCellStateArr[gameCellStateArr.length - 2]
+    const removedGameCellStateArr = gameCellStateArr.pop()
+    console.log("loading previous arr:", previousGameCellStateArr)
     previousGameCellStateArr.forEach(gameCell => {
         createCustomCell(gameCell.col, gameCell.row, gameCell.num)
-        const bgCell = findBgDiv(gameCell.col, gameCell.row)
-        bgCell.isEmpty = "false";
     })
+
+    const scoreDiv = document.querySelector(".score");
+    scoreDiv.textContent = previousGameCellStateArr[0].score;
 }
+
+const undoContainer = document.querySelector(".undo-container");
+undoContainer.addEventListener("click", loadPreviousGameState);
+
 //______________________________________________________________________//
 //_______________________ End of undo functionality ____________________//
 //______________________________________________________________________//
@@ -399,10 +405,27 @@ document.addEventListener("touchcancel", () => {
 })
 
 const restartContainer = document.querySelector(".restart-container");
-restartContainer.addEventListener("click", e => {
+const restartDialog = document.querySelector(".restart-dialog")
+restartContainer.addEventListener("click", () => {
+    restartDialog.style.display = "grid";
+    restartDialog.showModal();
+
+    document.removeEventListener("keydown", handleKeydown);
+})
+const restartYesBtn = document.getElementById("restart-yes");
+restartYesBtn.addEventListener("click", e => {
     e.stopPropagation();
     e.preventDefault();
+    restartDialog.close();
+    restartDialog.style.display = "none";
     location.reload();
+})
+const restartNoBtn = document.getElementById("restart-no");
+restartNoBtn.addEventListener("click", () => {
+    restartDialog.style.display = "none";
+    restartDialog.close();
+
+    document.addEventListener("keydown", handleKeydown);
 })
 
 generateRandomCell()
