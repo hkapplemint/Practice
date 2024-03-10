@@ -1,4 +1,5 @@
 const ALL_BACKGROUND_CELL_DIVS = document.querySelectorAll(".background-cell");
+const scoreDiv = document.querySelector(".score");
 
 const CELL_BG_COLORS = [
   "#eee4da",
@@ -50,8 +51,11 @@ const generateRandomCell = () => {
     (backgroundCell) => backgroundCell.dataset.isEmpty === "true"
   );
 
-  //guard clause: if there is no empty cell in the game, return
-  if (emptyCellsDivArr.length === 0) return false;
+  //guard clause: if there is no empty cell in the game, game over
+  if (emptyCellsDivArr.length === 0) {
+    gameOver();
+    return;
+  }
 
   const randomCellDiv =
     emptyCellsDivArr[Math.floor(Math.random() * emptyCellsDivArr.length)];
@@ -194,20 +198,21 @@ function directionIsEmptyOrEqual(col, row, direction) {
 //----------------------------------------------------------------------//
 //---------------------------- Minor functions -------------------------//
 //----------------------------------------------------------------------//
-let isEnded = false;
-const endGame = () => {
-  console.log("End Game");
-  isEnded = true;
-};
+let gameWon = false;
+
 function merge(targetNumberCell, ogNumberCell) {
   targetNumberCell.style.zIndex = "3";
   ogNumberCell.style.zIndex = "0";
   targetNumberCell.textContent = parseInt(ogNumberCell.textContent) * 2;
   styleCell(targetNumberCell);
+
+  if (targetNumberCell.textContent === "2048" && !gameWon) {
+    gameWin();
+  }
+
   targetNumberCell.dataset.merged = "true";
   ogNumberCell.dataset.merged = "true";
 
-  const scoreDiv = document.querySelector(".score");
   scoreDiv.textContent =
     parseInt(scoreDiv.textContent) + parseInt(targetNumberCell.textContent);
   score = parseInt(scoreDiv.textContent);
@@ -233,6 +238,66 @@ function findNumberCell(col, row) {
   return [...document.querySelectorAll(".cell")].find(
     (cell) => cell.dataset.col == col && cell.dataset.row == row
   );
+}
+function gameWin() {
+  gameWon = true;
+
+  const gameWinDialog = document.getElementById("game-win-dialog");
+
+  document.removeEventListener("keydown", handleKeydown);
+
+  setTimeout(() => {
+    gameWinDialog.style.display = "grid";
+    gameWinDialog.showModal();
+  }, 200);
+
+  const gameWinContinue = document.getElementById("game-win-continue");
+  gameWinContinue.addEventListener("click", () => {
+    gameWinDialog.style.display = "none";
+    gameWinDialog.close();
+
+    document.addEventListener("keydown", handleKeydown);
+  });
+
+  const gameWinRestart = document.getElementById("game-win-restart");
+  gameWinRestart.addEventListener("click", () => {
+    gameWinDialog.style.display = "none";
+    gameWinDialog.close();
+
+    restart();
+
+    document.addEventListener("keydown", handleKeydown);
+  });
+}
+
+function gameOver() {
+  document.removeEventListener("keydown", handleKeydown);
+
+  const gameOverDialog = document.getElementById("game-over-dialog");
+
+  setTimeout(() => {
+    gameOverDialog.style.display = "grid";
+    gameOverDialog.showModal();
+  }, 200);
+
+  const gameOverRestart = document.getElementById("game-over-restart");
+  gameOverRestart.addEventListener("click", () => {
+    document.addEventListener("keydown", handleKeydown);
+
+    gameOverDialog.style.display = "none";
+    gameOverDialog.close();
+
+    restart();
+  });
+
+  const gameOverUndo = document.getElementById("game-over-undo");
+  gameOverUndo.addEventListener("click", () => {
+    document.addEventListener("keydown", handleKeydown);
+    gameOverDialog.style.display = "none";
+    gameOverDialog.close();
+
+    loadPreviousGameState();
+  });
 }
 //______________________________________________________________________//
 //_______________________ End of minor functions _______________________//
@@ -274,7 +339,6 @@ function setAllBGCellEmpty() {
 function removeAllGameCell() {
   const gameOverlay = document.getElementById("game-overlay");
   while (gameOverlay.children.length > 0) {
-    console.log(gameOverlay.firstElementChild);
     gameOverlay.firstElementChild.remove();
   }
 }
@@ -293,8 +357,6 @@ function saveGameState() {
       });
     });
     gameCellStateArr.push(currentGameCellStateArr);
-
-    console.log(gameCellStateArr);
   }, 110);
 }
 function loadPreviousGameState() {
@@ -307,7 +369,6 @@ function loadPreviousGameState() {
   const previousGameCellStateArr =
     gameCellStateArr[gameCellStateArr.length - 2];
   const removedGameCellStateArr = gameCellStateArr.pop();
-  console.log("loading previous arr:", previousGameCellStateArr);
   previousGameCellStateArr.forEach((gameCell) => {
     createCustomCell(gameCell.col, gameCell.row, gameCell.num);
   });
@@ -327,9 +388,7 @@ function afterMoveLogic() {
   isKeydown = true;
   globalMergeCount = 0;
   resetAllCellStatusAfterMove();
-  if (!generateRandomCell()) {
-    endGame();
-  }
+  generateRandomCell();
   saveGameState();
 }
 
@@ -338,8 +397,6 @@ let isKeydown = false;
 
 function handleKeydown(e) {
   e.preventDefault();
-
-  if (isEnded) return;
 
   if (isKeydown) return;
 
@@ -377,7 +434,6 @@ document.addEventListener("keyup", () => {
 //---------------------- For touch functionality -----------------------//
 //----------------------------------------------------------------------//
 let initialX, initialY;
-let stoppedSwiping = true;
 document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
   initialX = touch.clientX;
@@ -417,6 +473,7 @@ document.addEventListener(
 
     if (swipeLeft) {
       document.dispatchEvent(leftArrowEvent);
+      isKeydown = true;
     } else if (swipeDown) {
       document.dispatchEvent(downArrowEvent);
       isKeydown = true;
@@ -444,18 +501,32 @@ restartContainer.addEventListener("click", () => {
   restartDialog.style.display = "grid";
   restartDialog.showModal();
 
+  //remove keydown listener to prevent user keep playing even if the restart modal appeared
   document.removeEventListener("keydown", handleKeydown);
 });
+
 const restartYesBtn = document.getElementById("restart-yes");
 restartYesBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  e.preventDefault();
+  //hide the restart modal
   restartDialog.close();
   restartDialog.style.display = "none";
-  location.reload();
+  //perform restart setup
+  restart();
+
+  document.addEventListener("keydown", handleKeydown);
 });
+
+function restart() {
+  removeAllGameCell();
+  setAllBGCellEmpty();
+  generateRandomCell();
+  scoreDiv.textContent = "0";
+  gameWon = false;
+}
+
 const restartNoBtn = document.getElementById("restart-no");
 restartNoBtn.addEventListener("click", () => {
+  //hide the restart modal
   restartDialog.style.display = "none";
   restartDialog.close();
 
