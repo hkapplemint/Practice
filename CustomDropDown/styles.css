@@ -1,0 +1,18 @@
+.custom-drop-down {
+  box-sizing: border-box;
+}
+
+.custom-drop-down > label,
+#gender-select > option,
+#gender-select {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 3rem;
+}
+
+.custom-select {
+  background-color: red;
+}
+
+.custom-option {
+  background-color: aqua;
+}
