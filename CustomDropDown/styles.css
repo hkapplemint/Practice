@@ -1,18 +1,63 @@
-.custom-drop-down {
+.custom-select-container,
+.custom-select-options,
+.custom-select-option,
+.custom-select-value {
   box-sizing: border-box;
 }
 
-.custom-drop-down > label,
-#gender-select > option,
-#gender-select {
-  font-family: "Courier New", Courier, monospace;
-  font-size: 3rem;
+.custom-select-container {
+  display: inline-block;
+  position: relative;
 }
 
-.custom-select {
-  background-color: red;
+.custom-select-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 200px;
+  border: 1px solid black;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+.custom-select-value::after {
+  content: "";
+  display: inline-block;
+  margin-left: 10px;
+  margin-top: 4px;
+  border: 4px solid transparent;
+  border-top: 4px solid black;
+}
+.custom-select-container:focus > .custom-select-value {
+  border-width: 2px;
+  outline: none;
 }
 
-.custom-option {
-  background-color: aqua;
+.custom-select-options {
+  display: none;
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: 2px solid black;
+  border-top: 0;
+  list-style-type: none;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+.custom-select-options.show {
+  display: block;
+}
+
+.custom-select-option {
+  padding: 0.25rem 0.5rem;
+  user-select: none;
+  cursor: pointer;
+}
+.custom-select-option:hover {
+  background-color: hsl(200, 100%, 70%);
+}
+.custom-select-option.selected {
+  background-color: hsl(200, 100%, 50%);
 }
