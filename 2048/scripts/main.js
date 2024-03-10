@@ -19,7 +19,7 @@ const CELL_FONT_SIZES = ["min(10vw, 10vh)", "min(9vw, 9vh)", "min(8vw, 8vh)"];
 
 let score = 0;
 
-const styleCell = (cell) => {
+function styleCell(cell) {
   const number = parseInt(cell.textContent);
   let relativeBgColorIndex = Math.log2(number) - 1;
   if (relativeBgColorIndex > CELL_BG_COLORS.length - 1) {
@@ -39,9 +39,9 @@ const styleCell = (cell) => {
   }
   cell.style.backgroundColor = CELL_BG_COLORS[relativeBgColorIndex];
   cell.style.color = CELL_FONT_COLORS[relativeFontColorIndex];
-};
+}
 
-const generateRandomCell = () => {
+function generateRandomCell() {
   //get all empty cells
   //randomly choose one of the empty cell
   //create a new element and append to that empty cell
@@ -51,25 +51,19 @@ const generateRandomCell = () => {
     (backgroundCell) => backgroundCell.dataset.isEmpty === "true"
   );
 
-  //guard clause: if there is no empty cell in the game, game over
-  if (emptyCellsDivArr.length === 0) {
-    gameOver();
-    return;
-  }
-
   const randomCellDiv =
     emptyCellsDivArr[Math.floor(Math.random() * emptyCellsDivArr.length)];
 
   const newElement = document.createElement("div");
   newElement.classList.add("cell");
-  //70% to be a 2, 30% to be a 4
   newElement.textContent = Math.random() > 0.3 ? 2 : 4;
+  //70% to be a 2, 30% to be a 4
   styleCell(newElement);
   newElement.dataset.col = randomCellDiv.dataset.col;
   newElement.dataset.row = randomCellDiv.dataset.row;
   newElement.dataset.merged = "false";
-  //move the newly created cell to the specified place by using translate
   newElement.style.translate = `calc((100% + var(--gap-width))*${newElement.dataset.col}) calc((100% + var(--gap-width))*${newElement.dataset.row})`;
+  //move the newly created cell to the specified place by using translate
 
   const gameOverlayDiv = document.getElementById("game-overlay");
   gameOverlayDiv.append(newElement);
@@ -82,7 +76,7 @@ const generateRandomCell = () => {
   }, 100);
 
   return true;
-};
+}
 
 let globalMergeCount = 0;
 
@@ -94,6 +88,7 @@ function move(direction) {
     case "left":
       allPossibleMoveCellArr = [...allCellsArr]
         .filter((cell) => cell.dataset.col !== "0")
+        //skip the cells which are already touching the left border
         .sort((a, b) => a.dataset.col - b.dataset.col);
       break;
     case "down":
@@ -111,19 +106,26 @@ function move(direction) {
         .filter((cell) => cell.dataset.col !== "3")
         .sort((a, b) => b.dataset.col - a.dataset.col);
       break;
+    //sort through the array so that the cell closest to the movement direction have a priority to move first
+    //e.g. when moving left, we want to move the leftmost cell first
+    // 2 2 2, moving left, if we do not sort the array, it may become 2 4 (the 2nd and 3rd two merged), instead of 4 2 (the 1st and 2nd two merged)
   }
 
   allPossibleMoveCellArr.forEach((cell) => {
+    //.forEach to iterate every movable cell
     let col = cell.dataset.col;
     let row = cell.dataset.row;
 
     let respectiveBgCell = findBgDiv(col, row);
 
     while (directionIsEmptyOrEqual(col, row, direction)) {
+      //a while loop to keep moving the cell to the specified direction
+
       movementCounter++;
 
       respectiveBgCell = findBgDiv(col, row);
       respectiveBgCell.dataset.isEmpty = "true";
+      //mark the original background cell as EMPTY
 
       switch (direction) {
         case "left":
@@ -139,24 +141,33 @@ function move(direction) {
           cell.dataset.col = parseInt(cell.dataset.col) + 1;
           break;
       }
+      //update the cell's col and row data
+
       col = cell.dataset.col;
       row = cell.dataset.row;
-
       respectiveBgCell = findBgDiv(col, row);
+      //using a newly updated col and row, find the new background cell
       if (respectiveBgCell) {
         respectiveBgCell.dataset.isEmpty = "false";
       }
+      //mark the new background cell as NOT EMPTY
 
       if (globalMergeCount > 0) break;
+      //if this cell already merges once, stop moving the cell and work on the next cell
+      //if this globalMergeCount > 0 check does not exist, the while loop will continue to move the cell and merge with other cell in its path. e.g. this cell originally is 2. 2 + 2 -> 4, the cell continue to move, and if it encounter another 4, this cell will merge a SECOND time to become 8
     }
     updateCellPosition(cell, cell.dataset.col, cell.dataset.row);
   });
+
   return movementCounter !== 0;
+  //after trying to move all movable cells, if movementCounter still equal to 0, this mean none of the movable cells moved. This could be due to the user made a useless move input, or the game board is full
+  //we have a checkGameOver() function to see which case this is
 }
 
 function directionIsEmptyOrEqual(col, row, direction) {
-  let targetBgCell, targetNumberCell;
   const ogNumberCell = findNumberCell(col, row);
+
+  let targetBgCell, targetNumberCell;
   switch (direction) {
     case "left":
       targetBgCell = findBgDiv(parseInt(col) - 1, row);
@@ -178,19 +189,25 @@ function directionIsEmptyOrEqual(col, row, direction) {
 
   if (targetBgCell) {
     if (targetBgCell.dataset.isEmpty === "true") {
+      //first case, the cell is moving toward an empty space
       globalMergeCount = 0;
       return true;
+      //return true to continue the while loop, keep moving the cell
     } else if (
       targetNumberCell &&
       targetNumberCell.textContent == ogNumberCell.textContent &&
       targetNumberCell.dataset.merged !== "true"
     ) {
+      //second case, the cell is moving toward a space occupied by another cell that has the same "number" as our cell
       globalMergeCount++;
       merge(targetNumberCell, ogNumberCell);
       return true;
+      //return true to make the cell move INTO the target cell
     } else {
+      //third case, the cell is moving toward a space occupied by another cell that has a different "number" to our cell
       globalMergeCount = 0;
       return false;
+      //return false to stop the while loop
     }
   }
 }
@@ -207,6 +224,8 @@ function merge(targetNumberCell, ogNumberCell) {
   styleCell(targetNumberCell);
 
   if (targetNumberCell.textContent === "2048" && !gameWon) {
+    //!gameWon is to check if this is the first time the user merged two 1024 cell.
+    //if !gameWon evaluated to be false, this mean the user had already made a 2048 cell, no need to run gameWin() a second time.
     gameWin();
   }
 
@@ -222,6 +241,7 @@ function merge(targetNumberCell, ogNumberCell) {
   }, 100);
 }
 function updateCellPosition(cell, col, row) {
+  //for display purpose only
   cell.style.translate = `calc((100% + var(--gap-width))*${col}) calc((100% + var(--gap-width))*${row})`;
   cell.style.zIndex = "0";
 }
@@ -251,16 +271,16 @@ function gameWin() {
     gameWinDialog.showModal();
   }, 200);
 
-  const gameWinContinue = document.getElementById("game-win-continue");
-  gameWinContinue.addEventListener("click", () => {
+  const gameWinContinueBtn = document.getElementById("game-win-continue");
+  gameWinContinueBtn.addEventListener("click", () => {
     gameWinDialog.style.display = "none";
     gameWinDialog.close();
 
     document.addEventListener("keydown", handleKeydown);
   });
 
-  const gameWinRestart = document.getElementById("game-win-restart");
-  gameWinRestart.addEventListener("click", () => {
+  const gameWinRestartBtn = document.getElementById("game-win-restart");
+  gameWinRestartBtn.addEventListener("click", () => {
     gameWinDialog.style.display = "none";
     gameWinDialog.close();
 
@@ -270,7 +290,30 @@ function gameWin() {
   });
 }
 
-function gameOver() {
+function checkGameOver() {
+  const stillHaveEmptyBgCell = [...ALL_BACKGROUND_CELL_DIVS].some(
+    (backgroundCell) => backgroundCell.dataset.isEmpty === "true"
+  );
+
+  if (stillHaveEmptyBgCell) return;
+
+  //second guard clause, if there is no empty background cell
+  //and user inputted a direction that no cells were moved
+  //check if moving all the direction still results no empty background cell
+  const directions = ["left", "up", "down", "right"];
+  for (let i = 0; i < directions.length; i++) {
+    const direction = directions[i];
+    move(direction);
+    //if after moving the cells around, there are some empty background cell, do not proceed to game over logic
+    if (
+      [...ALL_BACKGROUND_CELL_DIVS].some(
+        (backgroundCell) => backgroundCell.dataset.isEmpty === "true"
+      )
+    ) {
+      return;
+    }
+  }
+  //game over logic
   document.removeEventListener("keydown", handleKeydown);
 
   const gameOverDialog = document.getElementById("game-over-dialog");
@@ -280,23 +323,24 @@ function gameOver() {
     gameOverDialog.showModal();
   }, 200);
 
-  const gameOverRestart = document.getElementById("game-over-restart");
-  gameOverRestart.addEventListener("click", () => {
-    document.addEventListener("keydown", handleKeydown);
-
-    gameOverDialog.style.display = "none";
-    gameOverDialog.close();
-
-    restart();
-  });
-
-  const gameOverUndo = document.getElementById("game-over-undo");
-  gameOverUndo.addEventListener("click", () => {
-    document.addEventListener("keydown", handleKeydown);
+  const gameOverUndoBtn = document.getElementById("game-over-undo");
+  gameOverUndoBtn.addEventListener("click", () => {
     gameOverDialog.style.display = "none";
     gameOverDialog.close();
 
     loadPreviousGameState();
+
+    document.addEventListener("keydown", handleKeydown);
+  });
+
+  const gameOverRestartBtn = document.getElementById("game-over-restart");
+  gameOverRestartBtn.addEventListener("click", () => {
+    gameOverDialog.style.display = "none";
+    gameOverDialog.close();
+
+    restart();
+
+    document.addEventListener("keydown", handleKeydown);
   });
 }
 //______________________________________________________________________//
@@ -310,6 +354,8 @@ const gameCellStateArr = [];
 
 const backgroundContainer = document.querySelector(".background-container");
 function createCustomCell(col, row, number) {
+  //used for debugging and for restoring previous game board
+
   const newCell = document.createElement("div");
   newCell.dataset.col = col;
   newCell.dataset.row = row;
@@ -322,25 +368,25 @@ function createCustomCell(col, row, number) {
 
   const gameOverlayDiv = document.querySelector(".game-overlay");
   gameOverlayDiv.append(newCell);
+  styleCell(newCell);
+  updateCellPosition(newCell, col, row);
 
   setTimeout(() => {
     newCell.style.scale = "1";
-  }, 100);
-
-  styleCell(newCell);
-  updateCellPosition(newCell, col, row);
+  }, 10);
 }
-function setAllBGCellEmpty() {
+function setAllBgCellEmpty() {
   const backgroundCells = document.querySelectorAll(".background-cell");
   [...backgroundCells].forEach(
     (backgroundCell) => (backgroundCell.dataset.isEmpty = "true")
   );
 }
-function removeAllGameCell() {
+function removeAllGameCells() {
   const gameOverlay = document.getElementById("game-overlay");
   while (gameOverlay.children.length > 0) {
     gameOverlay.firstElementChild.remove();
   }
+  //gameOverlay.innerHTML = "" does not work. We need a proper .remove() to truly remove all the game cells.
 }
 
 function saveGameState() {
@@ -363,8 +409,8 @@ function loadPreviousGameState() {
   //guard clause for user pressing restart at the start of the game
   if (gameCellStateArr.length < 2) return;
 
-  setAllBGCellEmpty();
-  removeAllGameCell();
+  setAllBgCellEmpty();
+  removeAllGameCells();
 
   const previousGameCellStateArr =
     gameCellStateArr[gameCellStateArr.length - 2];
@@ -392,33 +438,44 @@ function afterMoveLogic() {
   saveGameState();
 }
 
-let isThrottled = false;
 let isKeydown = false;
 
 function handleKeydown(e) {
-  e.preventDefault();
-
   if (isKeydown) return;
 
   switch (e.key) {
     case "ArrowLeft":
+      e.preventDefault();
       if (move("left")) {
+        //move("left") evaluated to be true, meaning it successfully moved some of the cell to the left
         afterMoveLogic();
+      } else {
+        //meaning no cells were moved, check if it is due to full board or just user's error
+        checkGameOver();
       }
       break;
     case "ArrowRight":
+      e.preventDefault();
       if (move("right")) {
         afterMoveLogic();
+      } else {
+        checkGameOver();
       }
       break;
     case "ArrowUp":
+      e.preventDefault();
       if (move("up")) {
         afterMoveLogic();
+      } else {
+        checkGameOver();
       }
       break;
     case "ArrowDown":
+      e.preventDefault();
       if (move("down")) {
         afterMoveLogic();
+      } else {
+        checkGameOver();
       }
       break;
   }
@@ -505,6 +562,14 @@ restartContainer.addEventListener("click", () => {
   document.removeEventListener("keydown", handleKeydown);
 });
 
+function restart() {
+  removeAllGameCells();
+  setAllBgCellEmpty();
+  generateRandomCell();
+  scoreDiv.textContent = "0";
+  gameWon = false;
+}
+
 const restartYesBtn = document.getElementById("restart-yes");
 restartYesBtn.addEventListener("click", (e) => {
   //hide the restart modal
@@ -515,14 +580,6 @@ restartYesBtn.addEventListener("click", (e) => {
 
   document.addEventListener("keydown", handleKeydown);
 });
-
-function restart() {
-  removeAllGameCell();
-  setAllBGCellEmpty();
-  generateRandomCell();
-  scoreDiv.textContent = "0";
-  gameWon = false;
-}
 
 const restartNoBtn = document.getElementById("restart-no");
 restartNoBtn.addEventListener("click", () => {
