@@ -1,0 +1,33 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-container {
+  height: min(70vw, 70vh);
+  aspect-ratio: 1;
+  background-color: red;
+  position: relative;
+}
+
+.snake-head {
+  position: absolute;
+  height: 5%;
+  aspect-ratio: 1;
+  translate: 100% 100%;
+  border: 10px solid transparent;
+  border-bottom: 10px solid aqua;
+}
