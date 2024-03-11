@@ -37,7 +37,7 @@ function setUpCustomElement(CustomDropDown) {
 
     optionElement.addEventListener("click", e => {
       CustomDropDown.labelElement.innerText = optionElement.innerText;
-      updateOptions(CustomDropDown.options, optionElement.innerText);
+      updateOptions(CustomDropDown.customElement, CustomDropDown.options, optionElement.innerText);
     });
 
     CustomDropDown.optionsCustomElement.append(optionElement);
@@ -61,8 +61,10 @@ function setUpCustomElement(CustomDropDown) {
         const prevOption = CustomDropDown.options[selectedOptionIndex - 1];
         if (prevOption) {
           CustomDropDown.labelElement.innerText = prevOption.value;
-          updateOptions(CustomDropDown.options, prevOption.value);
-          selectedElement = document.querySelector(`[data-value="${prevOption.value}"]`);
+          updateOptions(CustomDropDown.customElement, CustomDropDown.options, prevOption.value);
+          selectedElement = CustomDropDown.customElement.querySelector(
+            `[data-value="${prevOption.value}"]`
+          );
           selectedElement.scrollIntoView();
         }
         break;
@@ -70,13 +72,12 @@ function setUpCustomElement(CustomDropDown) {
         const nextOption = CustomDropDown.options[selectedOptionIndex + 1];
         if (nextOption) {
           CustomDropDown.labelElement.innerText = nextOption.text;
-          updateOptions(CustomDropDown.options, nextOption.value);
-          selectedElement = document.querySelector(`[data-value="${nextOption.value}"]`);
+          updateOptions(CustomDropDown.customElement, CustomDropDown.options, nextOption.value);
+          selectedElement = CustomDropDown.customElement.querySelector(
+            `[data-value="${nextOption.value}"]`
+          );
           selectedElement.scrollIntoView();
         }
-        break;
-      case " ":
-        CustomDropDown.optionsCustomElement.classList.toggle("show");
         break;
       case "Escape":
       case "Enter":
@@ -85,14 +86,15 @@ function setUpCustomElement(CustomDropDown) {
       default:
         clearTimeout(debounceTimer);
         searchTerm += e.key;
-        console.log(searchTerm);
         const selectedOption = CustomDropDown.options.find(option =>
           option.text.toLowerCase().startsWith(searchTerm)
         );
         if (selectedOption) {
           CustomDropDown.labelElement.innerText = selectedOption.text;
-          updateOptions(CustomDropDown.options, selectedOption.value);
-          selectedElement = document.querySelector(`[data-value="${selectedOption.value}"]`);
+          updateOptions(CustomDropDown.customElement, CustomDropDown.options, selectedOption.value);
+          selectedElement = CustomDropDown.customElement.querySelector(
+            `[data-value="${selectedOption.value}"]`
+          );
           selectedElement.scrollIntoView();
         }
         debounceTimer = setTimeout(() => {
@@ -103,14 +105,16 @@ function setUpCustomElement(CustomDropDown) {
   });
 }
 
-function updateOptions(optionList, newOptionValue) {
+function updateOptions(customElement, optionList, newOptionValue) {
   const previouslySelectedOption = optionList.find(option => option.selected);
   const newlySelectedOption = optionList.find(option => option.value === newOptionValue);
   previouslySelectedOption.selected = false;
   newlySelectedOption.selected = true;
 
-  const previouslySelectedOptionElement = document.querySelector(".selected");
-  const newlySelectedOptionElement = document.querySelector(`[data-value="${newOptionValue}"]`);
+  const previouslySelectedOptionElement = customElement.querySelector(".selected");
+  const newlySelectedOptionElement = customElement.querySelector(
+    `[data-value="${newOptionValue}"]`
+  );
   previouslySelectedOptionElement.classList.remove("selected");
   newlySelectedOptionElement.classList.add("selected");
 }
