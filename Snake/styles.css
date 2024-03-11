@@ -18,16 +18,25 @@ body {
 
 .game-container {
   height: min(70vw, 70vh);
-  aspect-ratio: 1;
-  background-color: red;
+  aspect-ratio: 1.4 / 1;
+  background-color: burlywood;
   position: relative;
 }
-
-.snake-head {
+.snake-head,
+.snake-body,
+.snake-tail {
   position: absolute;
   height: 5%;
   aspect-ratio: 1;
-  translate: 100% 100%;
-  border: 10px solid transparent;
-  border-bottom: 10px solid aqua;
+  transition: all 0.2s linear;
+}
+
+.snake-head {
+  background-color: aqua;
+}
+.snake-body {
+  background-color: blueviolet;
+}
+.snake-tail {
+  background-color: black;
 }

@@ -9,16 +9,11 @@
   </head>
   <body>
     <div class="game-container">
-      <div data-col="10" data-row="2" class="snake-head"></div>
-      <div
-        data-col-entry="1"
-        data-row-entry="1"
-        data-col-exit="1"
-        data-row-exit="2"
-        class="snake-body"
-      ></div>
-      <div data-col-exit="1" data-row-exit="2" class="snake-tail"></div>
-      <div data-col="4" data-row="5" class="food"></div>
+      <div id="0" class="snake-head" style="translate: 1200% 1000%"></div>
+      <div id="1" class="snake-body" data-next="up" style="translate: 1200% 1100%"></div>
+      <div id="2" class="snake-body" data-next="left" style="translate: 1300% 1100%"></div>
+      <div id="3" class="snake-body" data-next="left" style="translate: 1400% 1100%"></div>
+      <div class="food"></div>
     </div>
   </body>
 </html>
