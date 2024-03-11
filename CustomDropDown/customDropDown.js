@@ -7,14 +7,18 @@ export default class CustomDropDown {
     this.optionsCustomElement = document.createElement("ul");
 
     setUpCustomElement(this);
+
     selectElement.style.display = "none";
     selectElement.after(this.customElement);
   }
 
   get selectedOption() {
-    return this.options.find((option) => option.selected);
+    return this.options.find(option => option.selected);
   }
 }
+
+let debounceTimer;
+let searchTerm = "";
 
 function setUpCustomElement(CustomDropDown) {
   CustomDropDown.customElement.classList.add("custom-select-container");
@@ -24,14 +28,14 @@ function setUpCustomElement(CustomDropDown) {
   CustomDropDown.customElement.append(CustomDropDown.labelElement);
 
   CustomDropDown.optionsCustomElement.classList.add("custom-select-options");
-  CustomDropDown.options.forEach((option) => {
+  CustomDropDown.options.forEach(option => {
     const optionElement = document.createElement("li");
     optionElement.classList.add("custom-select-option");
     optionElement.classList.toggle("selected", option.selected);
     optionElement.innerText = option.text;
     optionElement.dataset.value = option.value;
 
-    optionElement.addEventListener("click", (e) => {
+    optionElement.addEventListener("click", e => {
       CustomDropDown.labelElement.innerText = optionElement.innerText;
       updateOptions(CustomDropDown.options, optionElement.innerText);
     });
@@ -44,64 +48,75 @@ function setUpCustomElement(CustomDropDown) {
   CustomDropDown.customElement.addEventListener("click", () => {
     CustomDropDown.optionsCustomElement.classList.toggle("show");
   });
-  CustomDropDown.customElement.addEventListener("keydown", (e) => {
+  CustomDropDown.customElement.addEventListener("blur", () => {
+    CustomDropDown.optionsCustomElement.classList.remove("show");
+  });
+  CustomDropDown.customElement.addEventListener("keydown", e => {
     e.preventDefault();
 
-    const selectedOptionIndex = CustomDropDown.options.indexOf(
-      CustomDropDown.selectedOption
-    );
+    const selectedOptionIndex = CustomDropDown.options.indexOf(CustomDropDown.selectedOption);
     let selectedElement;
     switch (e.key) {
       case "ArrowUp":
-        if (CustomDropDown.options[selectedOptionIndex - 1]) {
-          CustomDropDown.labelElement.innerText =
-            CustomDropDown.options[selectedOptionIndex - 1].value;
-          updateOptions(
-            CustomDropDown.options,
-            CustomDropDown.labelElement.innerText
-          );
-          selectedElement = document.querySelector(
-            `[data-value="${CustomDropDown.labelElement.innerText}"]`
-          );
+        const prevOption = CustomDropDown.options[selectedOptionIndex - 1];
+        if (prevOption) {
+          CustomDropDown.labelElement.innerText = prevOption.value;
+          updateOptions(CustomDropDown.options, prevOption.value);
+          selectedElement = document.querySelector(`[data-value="${prevOption.value}"]`);
           selectedElement.scrollIntoView();
         }
         break;
       case "ArrowDown":
-        if (CustomDropDown.options[selectedOptionIndex + 1]) {
-          CustomDropDown.labelElement.innerText =
-            CustomDropDown.options[selectedOptionIndex + 1].value;
-          updateOptions(
-            CustomDropDown.options,
-            CustomDropDown.labelElement.innerText
-          );
-          selectedElement = document.querySelector(
-            `[data-value="${CustomDropDown.labelElement.innerText}"]`
-          );
+        const nextOption = CustomDropDown.options[selectedOptionIndex + 1];
+        if (nextOption) {
+          CustomDropDown.labelElement.innerText = nextOption.text;
+          updateOptions(CustomDropDown.options, nextOption.value);
+          selectedElement = document.querySelector(`[data-value="${nextOption.value}"]`);
           selectedElement.scrollIntoView();
         }
+        break;
+      case " ":
+        CustomDropDown.optionsCustomElement.classList.toggle("show");
+        break;
+      case "Escape":
+      case "Enter":
+        CustomDropDown.optionsCustomElement.classList.remove("show");
+        break;
+      default:
+        clearTimeout(debounceTimer);
+        searchTerm += e.key;
+        console.log(searchTerm);
+        const selectedOption = CustomDropDown.options.find(option =>
+          option.text.toLowerCase().startsWith(searchTerm)
+        );
+        if (selectedOption) {
+          CustomDropDown.labelElement.innerText = selectedOption.text;
+          updateOptions(CustomDropDown.options, selectedOption.value);
+          selectedElement = document.querySelector(`[data-value="${selectedOption.value}"]`);
+          selectedElement.scrollIntoView();
+        }
+        debounceTimer = setTimeout(() => {
+          searchTerm = "";
+        }, 1000);
         break;
     }
   });
 }
 
-function updateOptions(optionList, newOptionText) {
-  const previouslySelectedOption = optionList.find((option) => option.selected);
-  const newlySelectedOption = optionList.find(
-    (option) => option.text === newOptionText
-  );
+function updateOptions(optionList, newOptionValue) {
+  const previouslySelectedOption = optionList.find(option => option.selected);
+  const newlySelectedOption = optionList.find(option => option.value === newOptionValue);
   previouslySelectedOption.selected = false;
   newlySelectedOption.selected = true;
 
   const previouslySelectedOptionElement = document.querySelector(".selected");
-  const newlySelectedOptionElement = document.querySelector(
-    `[data-value="${newOptionText}"]`
-  );
+  const newlySelectedOptionElement = document.querySelector(`[data-value="${newOptionValue}"]`);
   previouslySelectedOptionElement.classList.remove("selected");
   newlySelectedOptionElement.classList.add("selected");
 }
 
 function formatOption(options) {
-  return [...options].map((option) => {
+  return [...options].map(option => {
     return {
       text: option.innerText,
       value: option.value,
