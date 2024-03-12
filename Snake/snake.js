@@ -7,50 +7,93 @@ const widthRatio = parseInt(gameBoardBox.width / blockBox.width);
 const heightRatio = parseInt(gameBoardBox.height / blockBox.height);
 
 document.addEventListener("keydown", e => {
+    switch (e.key) {
+        case "ArrowUp":
+            if (gameStarted === false) {
+                startGame();
+                gameStarted = true;
+            }
+            if (currentDirection === "down") return;
+            currentDirection = "up";
+            break;
+        case "ArrowDown":
+            if (gameStarted === false) {
+                startGame();
+                gameStarted = true;
+            }
+            if (currentDirection === "up") return;
+            currentDirection = "down";
+            break;
+        case "ArrowRight":
+            if (gameStarted === false) {
+                startGame();
+                gameStarted = true;
+            }
+            if (currentDirection === "left") return;
+            currentDirection = "right";
+            break;
+        case "ArrowLeft":
+            if (gameStarted === false) {
+                startGame();
+                gameStarted = true;
+            }
+            if (currentDirection === "right") return;
+            currentDirection = "left";
+            break;
+    }
+});
+
+generateFood();
+
+var gameStarted = false;
+var isGameOver = false;
+var currentDirection = "";
+
+function startGame() {
+    const intervalId = setInterval(() => {
+        moveLogic(currentDirection);
+
+        if (isGameOver) {
+            clearInterval(intervalId);
+            console.log("Game Over!");
+
+            const gameContainer = document.querySelector(".game-container");
+            const snake = [...gameContainer.children].filter(
+                element => element.className !== "food"
+            );
+            snake.forEach(snakePart => {
+                snakePart.style.filter = "grayscale(1)";
+            });
+        }
+    }, 250);
+}
+
+function moveLogic(direction) {
     const snakeHead = document.querySelector(".snake-head");
     const snakeBodies = document.querySelectorAll(".snake-body");
 
     let targetCol;
     let targetRow;
-    switch (e.key) {
-        case "ArrowUp":
-            targetCol = snakeHead.dataset.col;
-            targetRow = parseInt(snakeHead.dataset.row) - 1;
-            if (targetIsSnakeBody(targetCol, targetRow) || snakeHead.dataset.row == 0) {
-                console.log("Snake head cannot move up");
+
+    switch (direction) {
+        case "left":
+            targetCol = parseInt(snakeHead.dataset.col) - 1;
+            targetRow = snakeHead.dataset.row;
+            if (targetIsSnakeBody(targetCol, targetRow) || snakeHead.dataset.col == 0) {
+                console.log("Snake head cannot move left");
+                isGameOver = true;
                 return;
             } else if (targetIsFood(targetCol, targetRow)) {
                 eatFood(targetCol, targetRow);
                 snakeGrow();
+                generateFood();
             }
 
             moveBodyPart(snakeBodies);
-            snakeHead.dataset.next = "up";
-            move("up", snakeHead);
-
-            if (foodEaten) generateFood();
+            snakeHead.dataset.next = "left";
+            move("left", snakeHead);
             break;
-        case "ArrowDown":
-            targetCol = snakeHead.dataset.col;
-            targetRow = parseInt(snakeHead.dataset.row) + 1;
-            if (
-                targetIsSnakeBody(targetCol, targetRow) ||
-                snakeHead.dataset.row == heightRatio - 1
-            ) {
-                console.log("Snake head cannot move down");
-                return;
-            } else if (targetIsFood(targetCol, targetRow)) {
-                eatFood(targetCol, targetRow);
-                snakeGrow();
-            }
-
-            moveBodyPart(snakeBodies);
-            snakeHead.dataset.next = "down";
-            move("down", snakeHead);
-
-            if (foodEaten) generateFood();
-            break;
-        case "ArrowRight":
+        case "right":
             targetCol = parseInt(snakeHead.dataset.col) + 1;
             targetRow = snakeHead.dataset.row;
             if (
@@ -58,37 +101,57 @@ document.addEventListener("keydown", e => {
                 snakeHead.dataset.col == widthRatio - 1
             ) {
                 console.log("Snake head cannot move right");
+                isGameOver = true;
                 return;
             } else if (targetIsFood(targetCol, targetRow)) {
                 eatFood(targetCol, targetRow);
                 snakeGrow();
+                generateFood();
             }
 
             moveBodyPart(snakeBodies);
             snakeHead.dataset.next = "right";
             move("right", snakeHead);
-
-            if (foodEaten) generateFood();
             break;
-        case "ArrowLeft":
-            targetCol = parseInt(snakeHead.dataset.col) - 1;
-            targetRow = snakeHead.dataset.row;
-            if (targetIsSnakeBody(targetCol, targetRow) || snakeHead.dataset.col == 0) {
-                console.log("Snake head cannot move left");
+        case "up":
+            targetCol = snakeHead.dataset.col;
+            targetRow = parseInt(snakeHead.dataset.row) - 1;
+            if (targetIsSnakeBody(targetCol, targetRow) || snakeHead.dataset.row == 0) {
+                console.log("Snake head cannot move up");
+                isGameOver = true;
                 return;
             } else if (targetIsFood(targetCol, targetRow)) {
                 eatFood(targetCol, targetRow);
                 snakeGrow();
+                generateFood();
             }
 
             moveBodyPart(snakeBodies);
-            snakeHead.dataset.next = "left";
-            move("left", snakeHead);
+            snakeHead.dataset.next = "up";
+            move("up", snakeHead);
+            break;
+        case "down":
+            targetCol = snakeHead.dataset.col;
+            targetRow = parseInt(snakeHead.dataset.row) + 1;
+            if (
+                targetIsSnakeBody(targetCol, targetRow) ||
+                snakeHead.dataset.row == heightRatio - 1
+            ) {
+                console.log("Snake head cannot move down");
+                isGameOver = true;
+                return;
+            } else if (targetIsFood(targetCol, targetRow)) {
+                eatFood(targetCol, targetRow);
+                snakeGrow();
+                generateFood();
+            }
 
-            if (foodEaten) generateFood();
+            moveBodyPart(snakeBodies);
+            snakeHead.dataset.next = "down";
+            move("down", snakeHead);
             break;
     }
-});
+}
 
 function move(direction, element) {
     switch (direction) {
@@ -163,10 +226,14 @@ function moveBodyPart(nodeList) {
     });
 }
 
-var foodEaten = false;
 function generateFood() {
-    const randCol = Math.floor(Math.random() * widthRatio);
-    const randRow = Math.floor(Math.random() * heightRatio);
+    let randCol = Math.floor(Math.random() * widthRatio);
+    let randRow = Math.floor(Math.random() * heightRatio);
+
+    if (targetIsSnakeBody(randCol, randRow)) {
+        generateFood();
+        return;
+    }
 
     const newFood = document.createElement("div");
     newFood.classList.add("food");
@@ -177,8 +244,4 @@ function generateFood() {
 
     const gameContainer = document.querySelector(".game-container");
     gameContainer.append(newFood);
-
-    foodEaten = false;
 }
-
-generateFood();
