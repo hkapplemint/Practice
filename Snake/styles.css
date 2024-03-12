@@ -1,42 +1,48 @@
 *,
 *::after,
 *::before {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 html,
 body {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .game-container {
-  height: min(70vw, 70vh);
-  aspect-ratio: 1.4 / 1;
-  background-color: burlywood;
-  position: relative;
+    height: min(70vw, 70vh);
+    aspect-ratio: 1.4 / 1;
+    background-color: burlywood;
+    position: relative;
 }
 .snake-head,
 .snake-body,
-.snake-tail {
-  position: absolute;
-  height: 5%;
-  aspect-ratio: 1;
-  transition: all 0.2s linear;
+.snake-tail,
+.food {
+    position: absolute;
+    height: 5%;
+    aspect-ratio: 1;
+    transition: all 0.2s linear;
 }
 
 .snake-head {
-  background-color: aqua;
+    background-color: aqua;
 }
 .snake-body {
-  background-color: blueviolet;
+    background-color: blueviolet;
 }
 .snake-tail {
-  background-color: black;
+    background-color: black;
+}
+
+.food {
+    border-radius: 50%;
+    background-color: red;
 }

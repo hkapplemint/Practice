@@ -1,19 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snake</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="snake.js" defer></script>
-  </head>
-  <body>
-    <div class="game-container">
-      <div id="0" class="snake-head" style="translate: 1200% 1000%"></div>
-      <div id="1" class="snake-body" data-next="up" style="translate: 1200% 1100%"></div>
-      <div id="2" class="snake-body" data-next="left" style="translate: 1300% 1100%"></div>
-      <div id="3" class="snake-body" data-next="left" style="translate: 1400% 1100%"></div>
-      <div class="food"></div>
-    </div>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Snake</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="snake.js" defer></script>
+    </head>
+    <body>
+        <div class="game-container">
+            <div
+                id="0"
+                class="snake-head"
+                data-next="up"
+                data-col="12"
+                data-row="10"
+                style="translate: 1200% 1000%"
+            ></div>
+            <div
+                id="1"
+                class="snake-body"
+                data-next="left"
+                data-col="12"
+                data-row="11"
+                style="translate: 1200% 1100%"
+            ></div>
+            <div
+                id="2"
+                class="snake-body"
+                data-next="left"
+                data-col="13"
+                data-row="11"
+                style="translate: 1300% 1100%"
+            ></div>
+            <div
+                id="3"
+                class="snake-body"
+                data-next="left"
+                data-col="14"
+                data-row="11"
+                style="translate: 1400% 1100%"
+            ></div>
+            <div
+                id="4"
+                class="snake-body"
+                data-next="left"
+                data-col="15"
+                data-row="11"
+                style="translate: 1500% 1100%"
+            ></div>
+        </div>
+    </body>
 </html>
