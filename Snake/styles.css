@@ -2,6 +2,9 @@
 *::after,
 *::before {
     box-sizing: border-box;
+    user-select: none;
+    margin: 0;
+    padding: 0;
 }
 
 html,
@@ -18,8 +21,8 @@ body {
 }
 
 .game-container {
-    height: min(70vw, 70vh);
-    aspect-ratio: 1.4 / 1;
+    width: min(90vw, 90vh);
+    aspect-ratio: 1.6 / 1;
     border-radius: 10px;
     position: relative;
     border: 2px solid rgb(241, 241, 241);
@@ -47,4 +50,47 @@ body {
 .food {
     border-radius: 50%;
     background-color: white;
+}
+
+#game-over-dialog {
+    display: none;
+    min-width: 100%;
+    min-height: 100%;
+    background-color: transparent;
+    opacity: 0;
+    backdrop-filter: blur(5px);
+    border: none;
+    cursor: pointer;
+    font-size: 3rem;
+    color: white;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 1s;
+}
+#game-over-dialog.show-dialog {
+    opacity: 1;
+}
+
+#game-over-dialog > svg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3rem;
+    width: 3rem;
+    fill: white;
+}
+
+#setting {
+    position: fixed;
+    fill: gray;
+    top: 5px;
+    left: 5px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+#setting:hover {
+    fill: white;
 }

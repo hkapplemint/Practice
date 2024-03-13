@@ -6,7 +6,9 @@ const blockBox = document.querySelector(".snake-head").getBoundingClientRect();
 const widthRatio = parseInt(gameBoardBox.width / blockBox.width);
 const heightRatio = parseInt(gameBoardBox.height / blockBox.height);
 
-document.addEventListener("keydown", e => {
+const gameOverDialog = document.getElementById("game-over-dialog");
+
+function handleKeyDown(e) {
     switch (e.key) {
         case "ArrowUp":
             if (gameStarted === false) {
@@ -45,7 +47,8 @@ document.addEventListener("keydown", e => {
             currentDirection = "left";
             break;
     }
-});
+}
+document.addEventListener("keydown", handleKeyDown);
 
 generateFood();
 
@@ -58,9 +61,15 @@ function startGame() {
     const intervalId = setInterval(() => {
         moveLogic(currentDirection);
 
-        console.log(tickDelay);
-
         if (isGameOver) {
+            gameOverDialog.style.display = "flex";
+            setTimeout(() => {
+                gameOverDialog.showModal();
+                gameOverDialog.classList.add("show-dialog");
+            }, 1000);
+
+            document.removeEventListener("keydown", handleKeyDown);
+
             clearInterval(intervalId);
             console.log("Game Over!");
 
@@ -74,6 +83,11 @@ function startGame() {
         }
     }, tickDelay);
 }
+
+gameOverDialog.close();
+gameOverDialog.addEventListener("click", e => {
+    location.reload();
+});
 
 function moveLogic(direction) {
     const snakeHead = document.querySelector(".snake-head");
@@ -206,6 +220,9 @@ function eatFood(col, row) {
     const targetFood = document.querySelector(`[data-col="${col}"][data-row="${row}"]`);
     targetFood.remove();
     foodEaten = true;
+
+    const scoreSpan = document.getElementById("score-span");
+    scoreSpan.textContent = parseInt(scoreSpan.textContent) + 1;
 }
 function snakeGrow() {
     const snakeBodies = document.querySelectorAll(".snake-body");
