@@ -9,6 +9,7 @@ body {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    background-color: black;
 }
 body {
     display: flex;
@@ -19,8 +20,10 @@ body {
 .game-container {
     height: min(70vw, 70vh);
     aspect-ratio: 1.4 / 1;
-    background-color: burlywood;
+    border-radius: 10px;
     position: relative;
+    border: 2px solid rgb(241, 241, 241);
+    background-color: #333;
 }
 .snake-head,
 .snake-body,
@@ -29,20 +32,19 @@ body {
     position: absolute;
     height: 5%;
     aspect-ratio: 1;
+    border-radius: 2px;
+    box-shadow: 0 0 4px white;
     transition: all 0.2s linear;
 }
 
 .snake-head {
-    background-color: aqua;
+    background-color: white;
 }
 .snake-body {
-    background-color: blueviolet;
-}
-.snake-tail {
-    background-color: black;
+    background-color: gray;
 }
 
 .food {
     border-radius: 50%;
-    background-color: red;
+    background-color: white;
 }

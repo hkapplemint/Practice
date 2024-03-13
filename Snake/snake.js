@@ -10,6 +10,7 @@ document.addEventListener("keydown", e => {
     switch (e.key) {
         case "ArrowUp":
             if (gameStarted === false) {
+                if (currentDirection === "down") return;
                 startGame();
                 gameStarted = true;
             }
@@ -18,6 +19,7 @@ document.addEventListener("keydown", e => {
             break;
         case "ArrowDown":
             if (gameStarted === false) {
+                if (currentDirection === "down") return;
                 startGame();
                 gameStarted = true;
             }
@@ -26,6 +28,7 @@ document.addEventListener("keydown", e => {
             break;
         case "ArrowRight":
             if (gameStarted === false) {
+                if (currentDirection === "down") return;
                 startGame();
                 gameStarted = true;
             }
@@ -34,6 +37,7 @@ document.addEventListener("keydown", e => {
             break;
         case "ArrowLeft":
             if (gameStarted === false) {
+                if (currentDirection === "down") return;
                 startGame();
                 gameStarted = true;
             }
@@ -47,11 +51,14 @@ generateFood();
 
 var gameStarted = false;
 var isGameOver = false;
-var currentDirection = "";
+var currentDirection = "up";
+var tickDelay = 200;
 
 function startGame() {
     const intervalId = setInterval(() => {
         moveLogic(currentDirection);
+
+        console.log(tickDelay);
 
         if (isGameOver) {
             clearInterval(intervalId);
@@ -62,10 +69,10 @@ function startGame() {
                 element => element.className !== "food"
             );
             snake.forEach(snakePart => {
-                snakePart.style.filter = "grayscale(1)";
+                snakePart.style.backgroundColor = "#830037";
             });
         }
-    }, 250);
+    }, tickDelay);
 }
 
 function moveLogic(direction) {
