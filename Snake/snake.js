@@ -3,10 +3,15 @@ const REGEX_TRANSLATE_SECOND_VALUE = /\s([\d]+)%/;
 
 const gameBoardBox = document.querySelector(".game-container").getBoundingClientRect();
 const blockBox = document.querySelector(".snake-head").getBoundingClientRect();
-const widthRatio = parseInt(gameBoardBox.width / blockBox.width);
-const heightRatio = parseInt(gameBoardBox.height / blockBox.height);
+let widthRatio = parseInt(gameBoardBox.width / blockBox.width);
+let heightRatio = parseInt(gameBoardBox.height / blockBox.height);
 
 const gameOverDialog = document.getElementById("game-over-dialog");
+const settingBtn = document.getElementById("setting");
+const settingContainer = document.querySelector(".setting-container");
+const rowInput = document.getElementById("row-input");
+const colInput = document.getElementById("col-input");
+const speedInput = document.getElementById("speed-input");
 
 function handleKeyDown(e) {
     switch (e.key) {
@@ -58,6 +63,7 @@ var currentDirection = "up";
 var tickDelay = 200;
 
 function startGame() {
+    speedInput.disabled = "true";
     const intervalId = setInterval(() => {
         moveLogic(currentDirection);
 
@@ -269,3 +275,19 @@ function generateFood() {
     const gameContainer = document.querySelector(".game-container");
     gameContainer.append(newFood);
 }
+
+settingBtn.addEventListener("click", e => {
+    settingContainer.classList.toggle("open");
+    settingBtn.classList.toggle("rotating");
+});
+
+speedInput.value = tickDelay;
+speedInput.addEventListener("input", e => {
+    tickDelay = speedInput.value;
+});
+
+document.addEventListener("keydown", e => {
+    if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+    }
+});
