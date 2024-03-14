@@ -316,8 +316,30 @@ function handleColRowChanges() {
 
     removeFood();
     generateFood();
+    randomizeSnakePosition();
 
     changeSnakeFoodSize();
+}
+function randomizeSnakePosition() {
+    const { widthRatio, heightRatio } = getLatestBoxSize();
+    const snakeHeadDiv = document.querySelector(".snake-head");
+    const snakeBodyDivs = document.querySelectorAll(".snake-body");
+
+    console.log("snakeBodyDivs.length", snakeBodyDivs.length);
+    snakeHeadDiv.dataset.col = Math.floor(Math.random() * widthRatio);
+    snakeHeadDiv.dataset.row = Math.floor(Math.random() * heightRatio);
+    snakeHeadDiv.style.translate = `${parseInt(snakeHeadDiv.dataset.col) * 100}% ${
+        parseInt(snakeHeadDiv.dataset.row) * 100
+    }%`;
+
+    [...snakeBodyDivs].forEach((snakeBody, index) => {
+        snakeBody.dataset.col = snakeHeadDiv.dataset.col;
+        snakeBody.dataset.row = parseInt(snakeHeadDiv.dataset.row) + 1 + parseInt(index);
+        console.log(snakeBody.dataset.row);
+        snakeBody.style.translate = `${snakeBody.dataset.col * 100}% ${
+            snakeBody.dataset.row * 100
+        }%`;
+    });
 }
 
 function changeSnakeFoodSize() {
