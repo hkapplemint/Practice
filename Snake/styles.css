@@ -31,7 +31,6 @@ body {
 }
 .snake-head,
 .snake-body,
-.snake-tail,
 .food {
     position: absolute;
     height: 5%;

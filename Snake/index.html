@@ -10,7 +10,7 @@
         <script src="../customLibrary/swipe.js" defer></script>
     </head>
     <body>
-        <div class="game-container">
+        <div class="game-container" data-size="5%">
             <div
                 id="0"
                 class="snake-head"
@@ -30,6 +30,7 @@
         </div>
         <svg
             id="setting"
+            class="setting-btn"
             xmlns="http://www.w3.org/2000/svg"
             height="24"
             viewBox="0 -960 960 960"
@@ -40,12 +41,12 @@
             />
         </svg>
         <div class="setting-container">
-            <label for="row-input">Rows: </label>
-            <input id="row-input" type="number" />
             <label for="column-input">Columns: </label>
-            <input id="column-input" type="number" />
+            <input id="column-input" type="number" value="32" min="2" />
+            <label for="row-input">Rows: </label>
+            <input id="row-input" type="number" value="20" min="2" />
             <label for="speed-input">Tick delay: </label>
-            <input id="speed-input" type="number" />
+            <input id="speed-input" type="number" min="100" max="10000" step="50" />
         </div>
         <dialog id="game-over-dialog">
             <p>Score: <span id="score-span">0</span></p>

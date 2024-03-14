@@ -1,21 +1,34 @@
 const REGEX_TRANSLATE_FIRST_VALUE = /([\d]+)%/;
 const REGEX_TRANSLATE_SECOND_VALUE = /\s([\d]+)%/;
 
-const gameBoardBox = document.querySelector(".game-container").getBoundingClientRect();
-const blockBox = document.querySelector(".snake-head").getBoundingClientRect();
-let widthRatio = parseInt(gameBoardBox.width / blockBox.width);
-let heightRatio = parseInt(gameBoardBox.height / blockBox.height);
+let gameBoardBox, blockBox, widthRatio, heightRatio;
+let blockSize = "5%";
+
+function getLatestBoxSize() {
+    gameBoardBox = document.querySelector(".game-container").getBoundingClientRect();
+    blockBox = document.querySelector(".snake-head").getBoundingClientRect();
+    widthRatio = parseInt(gameBoardBox.width / blockBox.width);
+    heightRatio = parseInt(gameBoardBox.height / blockBox.height);
+
+    return {
+        gameBoardBox: gameBoardBox,
+        blockBox: blockBox,
+        widthRatio: widthRatio,
+        heightRatio: heightRatio,
+    };
+}
 
 const gameOverDialog = document.getElementById("game-over-dialog");
 const settingBtn = document.getElementById("setting");
 const settingContainer = document.querySelector(".setting-container");
 const rowInput = document.getElementById("row-input");
-const colInput = document.getElementById("col-input");
+const colInput = document.getElementById("column-input");
 const speedInput = document.getElementById("speed-input");
 
 function handleKeyDown(e) {
     switch (e.key) {
         case "ArrowUp":
+            e.preventDefault();
             if (gameStarted === false) {
                 if (currentDirection === "down") return;
                 startGame();
@@ -25,6 +38,7 @@ function handleKeyDown(e) {
             currentDirection = "up";
             break;
         case "ArrowDown":
+            e.preventDefault();
             if (gameStarted === false) {
                 if (currentDirection === "down") return;
                 startGame();
@@ -34,6 +48,7 @@ function handleKeyDown(e) {
             currentDirection = "down";
             break;
         case "ArrowRight":
+            e.preventDefault();
             if (gameStarted === false) {
                 if (currentDirection === "down") return;
                 startGame();
@@ -43,6 +58,7 @@ function handleKeyDown(e) {
             currentDirection = "right";
             break;
         case "ArrowLeft":
+            e.preventDefault();
             if (gameStarted === false) {
                 if (currentDirection === "down") return;
                 startGame();
@@ -62,32 +78,11 @@ var isGameOver = false;
 var currentDirection = "up";
 var tickDelay = 200;
 
+let intervalId;
+
 function startGame() {
-    speedInput.disabled = "true";
-    const intervalId = setInterval(() => {
-        moveLogic(currentDirection);
-
-        if (isGameOver) {
-            gameOverDialog.style.display = "flex";
-            setTimeout(() => {
-                gameOverDialog.showModal();
-                gameOverDialog.classList.add("show-dialog");
-            }, 1000);
-
-            document.removeEventListener("keydown", handleKeyDown);
-
-            clearInterval(intervalId);
-            console.log("Game Over!");
-
-            const gameContainer = document.querySelector(".game-container");
-            const snake = [...gameContainer.children].filter(
-                element => element.className !== "food"
-            );
-            snake.forEach(snakePart => {
-                snakePart.style.backgroundColor = "#830037";
-            });
-        }
-    }, tickDelay);
+    // speedInput.disabled = "true";
+    intervalId = setInterval(handleInterval, tickDelay);
 }
 
 gameOverDialog.close();
@@ -98,6 +93,8 @@ gameOverDialog.addEventListener("click", e => {
 function moveLogic(direction) {
     const snakeHead = document.querySelector(".snake-head");
     const snakeBodies = document.querySelectorAll(".snake-body");
+
+    const { widthRatio, heightRatio } = getLatestBoxSize();
 
     let targetCol;
     let targetRow;
@@ -181,6 +178,8 @@ function moveLogic(direction) {
 }
 
 function move(direction, element) {
+    const { widthRatio, heightRatio } = getLatestBoxSize();
+
     switch (direction) {
         case "up":
             if (element.dataset.row == 0) return;
@@ -240,6 +239,7 @@ function snakeGrow() {
     newBodyPart.dataset.col = lastBodyPart.dataset.col;
     newBodyPart.dataset.row = lastBodyPart.dataset.row;
     newBodyPart.id = parseInt(lastBodyPart.id) + 1;
+    newBodyPart.style.height = blockSize;
     newBodyPart.style.translate = `${parseInt(newBodyPart.dataset.col) * 100}% ${
         parseInt(newBodyPart.dataset.row) * 100
     }%`;
@@ -257,10 +257,18 @@ function moveBodyPart(nodeList) {
 }
 
 function generateFood() {
-    let randCol = Math.floor(Math.random() * widthRatio);
-    let randRow = Math.floor(Math.random() * heightRatio);
+    const { widthRatio, heightRatio } = getLatestBoxSize();
+    const snakeHead = document.querySelector(".snake-head");
 
-    if (targetIsSnakeBody(randCol, randRow)) {
+    let randCol = Math.floor(Math.random() * (widthRatio - 1));
+    let randRow = Math.floor(Math.random() * (heightRatio - 1));
+
+    if (
+        targetIsSnakeBody(randCol, randRow) ||
+        randCol > widthRatio ||
+        randRow > heightRatio ||
+        (randCol == snakeHead.dataset.col && randRow == snakeHead.dataset.row)
+    ) {
         generateFood();
         return;
     }
@@ -270,6 +278,7 @@ function generateFood() {
 
     newFood.dataset.col = randCol;
     newFood.dataset.row = randRow;
+    newFood.style.height = blockSize;
     newFood.style.translate = `${randCol * 100}% ${randRow * 100}%`;
 
     const gameContainer = document.querySelector(".game-container");
@@ -282,12 +291,74 @@ settingBtn.addEventListener("click", e => {
 });
 
 speedInput.value = tickDelay;
-speedInput.addEventListener("input", e => {
+speedInput.addEventListener("change", () => {
     tickDelay = speedInput.value;
+
+    if (!gameStarted) return;
+    clearInterval(intervalId);
+    intervalId = setInterval(handleInterval, tickDelay);
 });
 
+colInput.addEventListener("input", handleColRowChanges);
+rowInput.addEventListener("input", handleColRowChanges);
+
 document.addEventListener("keydown", e => {
-    if (e.ctrlKey && e.key === "s") {
+    if (e.key === "Escape" || (e.ctrlKey && e.key === "s")) {
         e.preventDefault();
+        settingContainer.classList.remove("open");
+        settingBtn.classList.remove("rotating");
     }
 });
+
+function handleColRowChanges() {
+    const gameContainer = document.querySelector(".game-container");
+    gameContainer.style.aspectRatio = `${colInput.value} / ${rowInput.value}`;
+
+    removeFood();
+    generateFood();
+
+    changeSnakeFoodSize();
+}
+
+function changeSnakeFoodSize() {
+    const snakeHeadDiv = document.querySelector(".snake-head");
+    const snakeBodyDivs = document.querySelectorAll(".snake-body");
+    const foodDiv = document.querySelector(".food");
+    const newSize = `${100 / Math.min(colInput.value, rowInput.value)}%`;
+    snakeHeadDiv.style.height = newSize;
+    [...snakeBodyDivs].forEach(snakeBody => {
+        snakeBody.style.height = newSize;
+    });
+
+    foodDiv.style.height = newSize;
+
+    blockSize = newSize;
+}
+
+function removeFood() {
+    const food = document.querySelector(".food");
+    food.remove();
+}
+
+function handleInterval() {
+    moveLogic(currentDirection);
+
+    if (isGameOver) {
+        gameOverDialog.style.display = "flex";
+        setTimeout(() => {
+            gameOverDialog.showModal();
+            gameOverDialog.classList.add("show-dialog");
+        }, 1000);
+
+        document.removeEventListener("keydown", handleKeyDown);
+
+        clearInterval(intervalId);
+        console.log("Game Over!");
+
+        const gameContainer = document.querySelector(".game-container");
+        const snake = [...gameContainer.children].filter(element => element.className !== "food");
+        snake.forEach(snakePart => {
+            snakePart.style.backgroundColor = "#830037";
+        });
+    }
+}
