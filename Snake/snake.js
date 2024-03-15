@@ -3,6 +3,7 @@ const REGEX_TRANSLATE_SECOND_VALUE = /\s([\d]+)%/;
 
 let gameBoardBox, blockBox, widthRatio, heightRatio;
 let blockSize = "5%";
+let generateFoodTryCount = 0;
 
 function getLatestBoxSize() {
     gameBoardBox = document.querySelector(".game-container").getBoundingClientRect();
@@ -25,9 +26,13 @@ const rowInput = document.getElementById("row-input");
 const colInput = document.getElementById("column-input");
 const speedInput = document.getElementById("speed-input");
 
+let acceptNewInput = true;
+
 function handleKeyDown(e) {
+    if (!acceptNewInput) return;
     switch (e.key) {
         case "ArrowUp":
+            acceptNewInput = false;
             e.preventDefault();
             if (gameStarted === false) {
                 if (currentDirection === "down") return;
@@ -38,6 +43,7 @@ function handleKeyDown(e) {
             currentDirection = "up";
             break;
         case "ArrowDown":
+            acceptNewInput = false;
             e.preventDefault();
             if (gameStarted === false) {
                 if (currentDirection === "down") return;
@@ -48,6 +54,7 @@ function handleKeyDown(e) {
             currentDirection = "down";
             break;
         case "ArrowRight":
+            acceptNewInput = false;
             e.preventDefault();
             if (gameStarted === false) {
                 if (currentDirection === "down") return;
@@ -58,6 +65,7 @@ function handleKeyDown(e) {
             currentDirection = "right";
             break;
         case "ArrowLeft":
+            acceptNewInput = false;
             e.preventDefault();
             if (gameStarted === false) {
                 if (currentDirection === "down") return;
@@ -116,6 +124,8 @@ function moveLogic(direction) {
             moveBodyPart(snakeBodies);
             snakeHead.dataset.next = "left";
             move("left", snakeHead);
+
+            acceptNewInput = true;
             break;
         case "right":
             targetCol = parseInt(snakeHead.dataset.col) + 1;
@@ -136,6 +146,8 @@ function moveLogic(direction) {
             moveBodyPart(snakeBodies);
             snakeHead.dataset.next = "right";
             move("right", snakeHead);
+
+            acceptNewInput = true;
             break;
         case "up":
             targetCol = snakeHead.dataset.col;
@@ -153,6 +165,8 @@ function moveLogic(direction) {
             moveBodyPart(snakeBodies);
             snakeHead.dataset.next = "up";
             move("up", snakeHead);
+
+            acceptNewInput = true;
             break;
         case "down":
             targetCol = snakeHead.dataset.col;
@@ -173,6 +187,8 @@ function moveLogic(direction) {
             moveBodyPart(snakeBodies);
             snakeHead.dataset.next = "down";
             move("down", snakeHead);
+
+            acceptNewInput = true;
             break;
     }
 }
@@ -258,6 +274,11 @@ function moveBodyPart(nodeList) {
 
 function generateFood() {
     const { widthRatio, heightRatio } = getLatestBoxSize();
+    if (generateFoodTryCount > widthRatio * heightRatio) {
+        console.error("No place to generate food");
+        return;
+    }
+
     const snakeHead = document.querySelector(".snake-head");
 
     let randCol = Math.floor(Math.random() * (widthRatio - 1));
@@ -269,6 +290,7 @@ function generateFood() {
         randRow > heightRatio ||
         (randCol == snakeHead.dataset.col && randRow == snakeHead.dataset.row)
     ) {
+        generateFoodTryCount++;
         generateFood();
         return;
     }

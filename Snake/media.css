@@ -1,0 +1,30 @@
+@media screen and (max-width: 768px) {
+    #setting {
+        display: none;
+    }
+    .setting-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        flex-direction: row;
+        width: 100%;
+        height: min-content;
+        margin-top: 10px;
+        justify-content: center;
+        align-items: center;
+    }
+    .setting-container > *:first-child {
+        margin-top: 0;
+    }
+    .setting-container > input {
+        width: 50px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+        margin-right: 10px;
+        color: white;
+        border: 1px solid white;
+        padding: 5px;
+        background-color: black;
+    }
+}

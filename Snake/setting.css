@@ -40,7 +40,7 @@
 }
 .setting-container.open {
     width: 200px;
-    border-right: 2px solid white;
+    border-right: 1px solid rgb(132, 132, 132);
     padding-left: 5px;
     padding-right: 5px;
 }
