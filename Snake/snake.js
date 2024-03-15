@@ -6,17 +6,21 @@ let blockSize = "5%";
 let generateFoodTryCount = 0;
 
 function getLatestBoxSize() {
-    gameBoardBox = document.querySelector(".game-container").getBoundingClientRect();
-    blockBox = document.querySelector(".snake-head").getBoundingClientRect();
-    widthRatio = parseInt(gameBoardBox.width / blockBox.width);
-    heightRatio = parseInt(gameBoardBox.height / blockBox.height);
+    return new Promise(resolve => {
+        setTimeout(() => {
+            const gameBoardBox = document.querySelector(".game-container").getBoundingClientRect();
+            const blockBox = document.querySelector(".snake-head").getBoundingClientRect();
+            const widthRatio = parseInt(gameBoardBox.width / blockBox.width);
+            const heightRatio = parseInt(gameBoardBox.height / blockBox.height);
 
-    return {
-        gameBoardBox: gameBoardBox,
-        blockBox: blockBox,
-        widthRatio: widthRatio,
-        heightRatio: heightRatio,
-    };
+            resolve({
+                gameBoardBox: gameBoardBox,
+                blockBox: blockBox,
+                widthRatio: widthRatio - 1,
+                heightRatio: heightRatio - 1,
+            });
+        }, 20);
+    });
 }
 
 const gameOverDialog = document.getElementById("game-over-dialog");
@@ -89,7 +93,8 @@ var tickDelay = 200;
 let intervalId;
 
 function startGame() {
-    // speedInput.disabled = "true";
+    colInput.disabled = "true";
+    rowInput.disabled = "true";
     intervalId = setInterval(handleInterval, tickDelay);
 }
 
@@ -272,8 +277,8 @@ function moveBodyPart(nodeList) {
     });
 }
 
-function generateFood() {
-    const { widthRatio, heightRatio } = getLatestBoxSize();
+async function generateFood() {
+    const { widthRatio, heightRatio } = await getLatestBoxSize();
     if (generateFoodTryCount > widthRatio * heightRatio) {
         console.error("No place to generate food");
         return;
@@ -281,8 +286,8 @@ function generateFood() {
 
     const snakeHead = document.querySelector(".snake-head");
 
-    let randCol = Math.floor(Math.random() * (widthRatio - 1));
-    let randRow = Math.floor(Math.random() * (heightRatio - 1));
+    let randCol = Math.floor(Math.random() * widthRatio);
+    let randRow = Math.floor(Math.random() * heightRatio);
 
     if (
         targetIsSnakeBody(randCol, randRow) ||
@@ -321,8 +326,12 @@ speedInput.addEventListener("change", () => {
     intervalId = setInterval(handleInterval, tickDelay);
 });
 
-colInput.addEventListener("input", handleColRowChanges);
-rowInput.addEventListener("input", handleColRowChanges);
+colInput.addEventListener("change", () => {
+    handleColRowChanges(colInput.value, rowInput.value);
+});
+rowInput.addEventListener("change", () => {
+    handleColRowChanges(colInput.value, rowInput.value);
+});
 
 document.addEventListener("keydown", e => {
     if (e.key === "Escape" || (e.ctrlKey && e.key === "s")) {
@@ -332,24 +341,26 @@ document.addEventListener("keydown", e => {
     }
 });
 
-function handleColRowChanges() {
+function handleColRowChanges(col, row) {
     const gameContainer = document.querySelector(".game-container");
     gameContainer.style.aspectRatio = `${colInput.value} / ${rowInput.value}`;
 
     removeFood();
     generateFood();
-    randomizeSnakePosition();
+    randomizeSnakePosition(col, row);
 
     changeSnakeFoodSize();
 }
-function randomizeSnakePosition() {
-    const { widthRatio, heightRatio } = getLatestBoxSize();
+async function randomizeSnakePosition(col, row) {
+    // const { widthRatio, heightRatio } = await getLatestBoxSize();
+    const colLimit = parseInt(col);
+    const rowLimit = parseInt(row);
+
     const snakeHeadDiv = document.querySelector(".snake-head");
     const snakeBodyDivs = document.querySelectorAll(".snake-body");
 
-    console.log("snakeBodyDivs.length", snakeBodyDivs.length);
-    snakeHeadDiv.dataset.col = Math.floor(Math.random() * widthRatio);
-    snakeHeadDiv.dataset.row = Math.floor(Math.random() * heightRatio);
+    snakeHeadDiv.dataset.col = Math.floor(Math.random() * colLimit);
+    snakeHeadDiv.dataset.row = Math.floor(Math.random() * rowLimit);
     snakeHeadDiv.style.translate = `${parseInt(snakeHeadDiv.dataset.col) * 100}% ${
         parseInt(snakeHeadDiv.dataset.row) * 100
     }%`;
@@ -357,7 +368,6 @@ function randomizeSnakePosition() {
     [...snakeBodyDivs].forEach((snakeBody, index) => {
         snakeBody.dataset.col = snakeHeadDiv.dataset.col;
         snakeBody.dataset.row = parseInt(snakeHeadDiv.dataset.row) + 1 + parseInt(index);
-        console.log(snakeBody.dataset.row);
         snakeBody.style.translate = `${snakeBody.dataset.col * 100}% ${
             snakeBody.dataset.row * 100
         }%`;
@@ -367,14 +377,16 @@ function randomizeSnakePosition() {
 function changeSnakeFoodSize() {
     const snakeHeadDiv = document.querySelector(".snake-head");
     const snakeBodyDivs = document.querySelectorAll(".snake-body");
-    const foodDiv = document.querySelector(".food");
     const newSize = `${100 / Math.min(colInput.value, rowInput.value)}%`;
     snakeHeadDiv.style.height = newSize;
     [...snakeBodyDivs].forEach(snakeBody => {
         snakeBody.style.height = newSize;
     });
 
-    foodDiv.style.height = newSize;
+    setTimeout(() => {
+        const foodDiv = document.querySelector(".food");
+        foodDiv.style.height = newSize;
+    }, 21);
 
     blockSize = newSize;
 }
